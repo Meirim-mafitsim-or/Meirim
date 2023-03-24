@@ -15,3 +15,10 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_MEIRIM_B3C4F }}'
           projectId: meirim-b3c4f
+      - name: Comment on PR
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Preview URL: ${{ steps.deploy.outputs.urls }}
+          reactions: rocket
