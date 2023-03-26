@@ -11,6 +11,12 @@ This system aims to simplify the process of organizing and managing events for c
 - Manage attendees and hosting families
 - User-friendly interface
 
+## Live site
+
+live site can be found at this [link](meirim-b3c4f.web.app)
+
+on marge the site will be updated, and on creation of pool request a live preview will be lunched.
+
 ## Getting Started
 
 ### Prerequisites
