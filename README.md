@@ -1,3 +1,4 @@
+[![Deploy to Firebase Hosting on merge](https://github.com/Meirim-mafitsim-or/Meirim/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/Meirim-mafitsim-or/Meirim/actions/workflows/firebase-hosting-merge.yml)
 # Meirim - mefitsim or
 A system to organize hosting events for children with special needs.
 
