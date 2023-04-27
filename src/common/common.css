@@ -1,0 +1,31 @@
+.App {
+    text-align: center;
+}
+.nav-logo {
+    width: 70px;
+    display: block;
+    pointer-events: none;
+    /* float: right; */
+}
+
+.s-pic {
+    width: 100%;
+    height: 70vh;
+    object-fit: cover;
+    object-position: center;
+}
+
+.home-paragraph {
+
+    
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    margin: 0 100px;
+}
+.home-color{
+    background-color: #1C5488; 
+    color: #fff;
+    border-radius: 10px;
+
+}
