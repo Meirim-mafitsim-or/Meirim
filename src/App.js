@@ -8,7 +8,6 @@ import About from "./pages/About";
 import Event from "./pages/Event";
 import { LanguageProvider } from './common/LanguageContext';
 import { UserProvider } from './common/UserContext';
-import '@progress/kendo-theme-default/dist/all.css';
 
 function App() {
   return (

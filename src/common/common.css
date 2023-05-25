@@ -75,3 +75,7 @@ html, body {
     object-position: center;
 
 }
+
+.map-card{
+    width:160px!important;
+}
