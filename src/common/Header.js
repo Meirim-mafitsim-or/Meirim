@@ -6,6 +6,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useContext } from 'react';
 import strings from '../static/Strings.json';
 import { LanguageContext } from './LanguageContext';
+import { Link } from 'react-router-dom';
 
 
 export default function Header() {
@@ -13,6 +14,7 @@ export default function Header() {
   const menuItems = [
     { link: "/", text: strings.home[language] },
     { link: "/Contact", text: strings.contact[language] },
+    { link: "/About", text: strings.about[language] },
   ]
   const langItems = [
     { code: "he", text: "עברית" },
@@ -25,7 +27,7 @@ export default function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {menuItems.map((item, index) => (<Nav.Link key={index} href={item.link}>{item.text}</Nav.Link>))}
+              {menuItems.map((item, index) => (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
               <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
             </Nav>
             <Nav>
@@ -36,7 +38,7 @@ export default function Header() {
                   </NavDropdown.Item>
                 ))}
               </NavDropdown>
-              <Nav.Link href="/Login">{strings.login[language]}</Nav.Link>
+              <Nav.Link as={Link} to="/Login">{strings.login[language]}</Nav.Link>
             </Nav>
           </Navbar.Collapse>
       </Navbar>
