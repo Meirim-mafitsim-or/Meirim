@@ -8,6 +8,8 @@ import About from "./pages/About";
 import Event from "./pages/Event";
 import { LanguageProvider } from './common/LanguageContext';
 import { UserProvider } from './common/UserContext';
+import FamiliesManagment from './pages/FamiliesManagment';
+import Families from './pages/Families';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
               <Route path="Contact" element={<Contact />} />
               <Route path="About" element={<About />} />
               <Route path="Event/:id" element={<Event />} />
+              <Route path="Families" element={<FamiliesManagment />} />
+              <Route path="Families/:id" element={<Families />} />
             </Route>
           </Routes>
         </BrowserRouter>

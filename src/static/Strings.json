@@ -137,5 +137,31 @@
     {
         "en":"Thank you for your registration",
         "he":"תודה על ההרשמה"
+    },
+    "show_details":
+    {
+        "en":"Show Details",
+        "he":"הצג נתונים"
+    },
+    "registered_families":
+    {
+        "en":"Registered Families",
+        "he":"רישומי משפחות"
+    },
+    "family_name":
+    {
+        "en":"Family Name",
+        "he":"שם משפחה"
+    },
+    "address":
+    {
+        "en":"Address",
+        "he":"כתובת"
+    },
+    "confirmed":
+    {
+        "en":"confirmed",
+        "he":"אושר"
     }
+
 }

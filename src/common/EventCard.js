@@ -1,6 +1,5 @@
 import './common.css';
 import { LanguageContext } from './LanguageContext';
-import strings from '../static/Strings.json';
 import { useContext } from 'react';
 import { Card } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
@@ -27,7 +26,7 @@ export default function EventCard(props) {
                 <Card.Text>
                     {new Date(props.event.date.seconds * 1000).toUTCString()}
                 </Card.Text>
-                <Button as={Link} to={`Event/${props.event.id}`} variant="primary" >{strings.reg_host[language]}</Button>
+                <Button as={Link} to={`${props.forward}`} variant="primary" >{`${props.buttonText}`}</Button>
             </Card.ImgOverlay>
         </Card>
     )
