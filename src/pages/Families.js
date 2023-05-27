@@ -86,7 +86,7 @@ export default function Families() {
                     <TableCell align="right">{family.special_comment}</TableCell>
                     <TableCell align="right">{family.confirmed ?<span>&#10004;</span> : ''}</TableCell>
                     <TableCell align="right">
-                        <Button as={Link} to={`${family.id}`} variant="primary" state={{ family }} >{strings.edit[language]}</Button>
+                        <Button as={Link} to={`${family.id}`} variant="primary" state={{ family ,pathSuffix}} >{strings.edit[language]}</Button>
                         </TableCell>
                     </TableRow>
                 ))}

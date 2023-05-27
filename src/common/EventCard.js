@@ -1,6 +1,4 @@
 import './common.css';
-import { LanguageContext } from './LanguageContext';
-import { useContext } from 'react';
 import { Card } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
@@ -9,7 +7,6 @@ import { ref, getDownloadURL } from 'firebase/storage';
 import { Link } from 'react-router-dom';
 
 export default function EventCard(props) {
-    const { language } = useContext(LanguageContext);
     // get image from storage
     const [url, setUrl] = useState("");
     const imageRef = ref(storage, props.event.image);

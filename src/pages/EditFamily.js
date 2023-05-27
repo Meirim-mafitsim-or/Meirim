@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState} from 'react';
 import { Card } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
@@ -9,12 +9,12 @@ import { LanguageContext } from '../common/LanguageContext';
 import { db } from '../common/FirebaseApp';
 import { updateDoc } from 'firebase/firestore';
 import { collection, doc, getDoc} from "firebase/firestore"; 
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom"
 
 
 async function update(event_id, id, form) {
-  
-    console.log(event_id);
+
     const events = collection(db, 'events');
     const cur_event = doc(events, event_id);
     const EventsSnapshot = await getDoc(cur_event);
@@ -22,10 +22,19 @@ async function update(event_id, id, form) {
     const families = eventData.families;
     const desiredFamily = families.find((check_family) => id === check_family.id);
 
-
     // Update the name property of desiredFamily
     if (desiredFamily) {
-      desiredFamily.first_name = form.first_name;
+      desiredFamily.first_name = form.first_name.value;
+      desiredFamily.last_name = form.last_name.value;
+      desiredFamily.city = form.city.value;
+      desiredFamily.street = form.street.value;
+      desiredFamily.house_number = form.house_number.value;
+      desiredFamily.apartment_number = form.apartment_number.value;
+      desiredFamily.phone_number = form.phone_number.value;
+      desiredFamily.email = form.email.value;
+      desiredFamily.special_comment = form.special_comment.value;
+      desiredFamily.confirmed = true;
+
 
       // Update the family object in the Firebase Firestore database
       await updateDoc(cur_event, { families });
@@ -34,25 +43,19 @@ async function update(event_id, id, form) {
     } else {
       console.log("Family not found");
     }
+
+
 }
 
 export default function EditFamily() {
   const [validated, setValidated] = useState(false);
   const [submitted, setSubmitted] = useState(false); // Track form submission status
   const { language } = React.useContext(LanguageContext);
-  const [pathSuffix, setPathSuffix] = useState('');
-
-
-  useEffect(() => {
-      const path = location.pathname;
-      const parts = path.split('/');
-      const suffix = parts[parts.length-1];
-      setPathSuffix(suffix);
-  }, [location]);
-
   const location = useLocation();
-  const { family } = location.state;
-  console.log(family);
+  const navigate = useNavigate();
+
+  const family = location.state.family;
+  const event_id = location.state.pathSuffix;
   const id = family.id;  
 
   const handleSubmit = async (event) => {
@@ -62,12 +65,13 @@ export default function EditFamily() {
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+      
     }
 
     setValidated(true);
     setSubmitted(true); // Set the submission status to true
-    await update(pathSuffix, id, form); // Wait for the update function to finish
-    
+    await update(event_id, id, form); // Wait for the update function to finish
+    navigate(`/Families/${event_id}`)
   };
   
   return (
@@ -99,20 +103,20 @@ export default function EditFamily() {
             </Form.Group>
           </Row>
           <Row className="mb-3">
-            <Form.Group as={Col} md="3" controlId="validationCustom03">
+            <Form.Group as={Col} md="3" controlId="city">
               <Form.Label>{strings.city[language]}</Form.Label>
               <Form.Control type="text" defaultValue ={family.city} required />
               <Form.Control.Feedback type="invalid">
                 {/* Please provide a valid city. */}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group as={Col} md="3" controlId="validationCustom04">
+            <Form.Group as={Col} md="3" controlId="street">
               <Form.Label>{strings.street[language]}</Form.Label>
               <Form.Control type="text" defaultValue ={family.street} required />
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group as={Col} md="3" controlId="validationCustom05">
+            <Form.Group as={Col} md="3" controlId="house_number">
               <Form.Label>{strings.house_number[language]}</Form.Label>
               <Form.Control type="number" defaultValue ={family.house_number} required />
               <Form.Control.Feedback type="invalid">
@@ -128,11 +132,11 @@ export default function EditFamily() {
           </Row>
 
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustom07">
+            <Form.Group as={Col} md="4" controlId="phone_number">
               <Form.Label>{strings.phone_number[language]}</Form.Label>
               <Form.Control type="text" defaultValue ={family.phone_number} required />
             </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustom08">
+            <Form.Group as={Col} md="4" controlId="email">
               <Form.Label>{strings.email[language]}</Form.Label>
               <Form.Control type="text" defaultValue ={family.email} required />
               <Form.Control.Feedback type="invalid">
