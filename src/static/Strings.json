@@ -162,6 +162,27 @@
     {
         "en":"confirmed",
         "he":"אושר"
+    },
+    "edit":
+    {
+        "en":"Edit",
+        "he":"ערוך"
+    },
+    "edited_confirm_message":
+    {
+        "en":"The details have been updated.",
+        "he": "הפרטים עודכנו."
+    },
+    "editing":
+    {
+        "en": "editing",
+        "he": "עריכה"
+    },
+    "send_and_confirm":
+    {
+        "en": "send and confirm",
+        "he": "שלח ואשר"
     }
+
 
 }

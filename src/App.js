@@ -10,6 +10,8 @@ import { LanguageProvider } from './common/LanguageContext';
 import { UserProvider } from './common/UserContext';
 import FamiliesManagment from './pages/FamiliesManagment';
 import Families from './pages/Families';
+import EditFamily from './pages/EditFamily';
+
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
               <Route path="Event/:id" element={<Event />} />
               <Route path="Families" element={<FamiliesManagment />} />
               <Route path="Families/:id" element={<Families />} />
+              <Route path="Families/:id/:family" element={<EditFamily/>} />
+
             </Route>
           </Routes>
         </BrowserRouter>
