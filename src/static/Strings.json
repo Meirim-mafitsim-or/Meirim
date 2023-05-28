@@ -182,7 +182,49 @@
     {
         "en": "send and confirm",
         "he": "שלח ואשר"
+    },
+    "placement":
+    {
+        "en": "placement",
+        "he": "שיבוץ"
+    },
+    "manage_and_placement":
+    {
+        "en":"manage and placement",
+        "he": "ניהול ושיבוץ"
+    },
+    "cancel":
+    {
+        "en":"cancel",
+        "he": "בטל"
+    },
+    "confirm":
+    {
+        "en":"confirm",
+        "he": "אשר"
+    },
+    "choose_camper":
+    {
+        "en": "choose a camper",
+        "he": "בחר חניך"
+    },
+    "gender":
+    {
+        "en": "gender",
+        "he": "מין"
+    },
+    "age":
+    {
+        "en": "age",
+        "he": "גיל"
+    },
+    "disability":
+    {
+        "en": "disability",
+        "he": "מוגבלות"
     }
+
+
 
 
 }

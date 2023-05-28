@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Container, Button,  } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import { db } from '../common/FirebaseApp';
 import { collection, doc, getDoc} from "firebase/firestore"; 
@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import strings from '../static/Strings.json';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
+import Placement from "../common/Placement";
 
 
 export async function getFamilies(id) {
@@ -24,6 +25,8 @@ export default function Families() {
     const [families, setFamilies] = useState([]);
     const location = useLocation();
     const [pathSuffix, setPathSuffix] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [selectedFamily, setSelectedFamily] = useState(null);
 
 
     useEffect(() => {
@@ -40,6 +43,15 @@ export default function Families() {
             .catch((error) => console.log(error));
         }
       }, [pathSuffix]);
+
+      const handlePlacement = () => {
+        setSelectedFamily(selectedFamily);
+        setShowModal(true);
+      };
+    
+      const handleModalClose = () => {
+        setShowModal(false);
+      };
 
   return (
         <Container fluid>
@@ -63,7 +75,8 @@ export default function Families() {
                     <TableCell align="right">{strings.special_comment[language]}</TableCell>
                     <TableCell align="right">{strings.confirmed[language]}</TableCell>
                     <TableCell align="right">{strings.edit[language]}</TableCell>
-                    
+                    <TableCell align="right">{strings.placement[language]}</TableCell>
+
 
                     <TableCell ></TableCell>
 
@@ -88,11 +101,17 @@ export default function Families() {
                     <TableCell align="right">
                         <Button as={Link} to={`${family.id}`} variant="primary" state={{ family ,pathSuffix}} >{strings.edit[language]}</Button>
                         </TableCell>
+                        <TableCell align="right">                        
+                        <Button  variant="primary" onClick={() => handlePlacement()} >{strings.placement[language]}</Button>
+                        </TableCell>
+                        <Placement show={showModal} onHide={handleModalClose} language={language} family={null}/> 
+
                     </TableRow>
                 ))}
                 </TableBody>
             </Table>
             </TableContainer>
-        </Container>
+    </Container>
+
     );
 }

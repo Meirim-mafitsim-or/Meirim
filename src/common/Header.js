@@ -15,6 +15,8 @@ export default function Header() {
     { link: "/", text: strings.home[language] },
     { link: "/Contact", text: strings.contact[language] },
     { link: "/About", text: strings.about[language] },
+    { link: "/Families", text: strings.manage_and_placement[language] },
+
   ]
   const langItems = [
     { code: "he", text: "עברית" },
