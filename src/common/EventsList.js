@@ -19,7 +19,9 @@ export default function EventsList() {
     const [Events, setEvents] = useState([]);
 
     useEffect(() => {
-        getEvents().then(Events => setEvents(Events))
+        let now = new Date();//get the date of today and add the events that are not over yet
+        getEvents().then(Events => Events.filter(event => event.date.seconds > now.getTime() / 1000))
+        .then(events=> setEvents(events));
     }, []);
 
     return (
@@ -31,7 +33,7 @@ export default function EventsList() {
                     .map((row, index) => (
                         <Row key={index} xs={1} md={4} >
                             {row.map((event, index) => (
-                                <Col key={index} className="p-1 m-1">
+                                <Col key={index} className="p-1">
                                     <EventCard event={event} forward={`Event/${event.id}`} buttonText={strings.reg_host[language]}/>
                                 </Col>
                             ))}

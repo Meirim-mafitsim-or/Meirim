@@ -7,10 +7,12 @@ import { useContext } from 'react';
 import strings from '../static/Strings.json';
 import { LanguageContext } from './LanguageContext';
 import { Link } from 'react-router-dom';
+import { UserContext } from './UserContext';
 
 
 export default function Header() {
   const { language, changeLanguage } = useContext(LanguageContext);
+  const { user } = useContext(UserContext);
   const menuItems = [
     { link: "/", text: strings.home[language] },
     { link: "/Contact", text: strings.contact[language] },
@@ -27,7 +29,9 @@ export default function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              {menuItems.map((item, index) => (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
+              {menuItems.map((item, index) => 
+              (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
+              {user && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
               <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
             </Nav>
             <Nav>

@@ -5,6 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { Map, Marker, Overlay } from "pigeon-maps"
 import MapCard from './MapCard';
 
+
 async function getEvents() {
   const EventsRef = collection(db, "events");
   const EventsSnapshot = await getDocs(EventsRef);
@@ -12,7 +13,7 @@ async function getEvents() {
   return Events;
 }
 
-export default function MyMap(props) {
+export default function MyMap() {
   const [center, setCenter] = useState([30.8516, 36.0461])
   const [zoom, setZoom] = useState(7)
   const [markers, setMarkers] = useState([])
@@ -20,15 +21,13 @@ export default function MyMap(props) {
 
   useEffect(() => {
     getEvents().then(Events => {
-      const sett = Events.map(event => event.settlement);
+      const sett = Events.map(event => event.settlement_en);
       const mark = [];
 
+      //every one of the card have english name and hebrow name so i can use only english name
       for (let i = 0; i < sett.length; i++) {
-        let settlements = citys.values.filter(city => city.english_name === sett[i]);
-        console.log(settlements);
-        if (sett[i] === settlements[0].english_name) {
-          mark.push({ name: settlements[0].english_name, latlng: [settlements[0].latt, settlements[0].long], event: Events[i] })
-        }
+        let settlement = citys.values.filter(city => city.english_name === sett[i]);
+          mark.push({ name: settlement[0].english_name, latlng: [settlement[0].latt, settlement[0].long], event: Events[i] })
       }
       setMarkers(mark);
     });
