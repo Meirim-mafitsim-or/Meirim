@@ -137,5 +137,52 @@
     {
         "en":"Thank you for your registration",
         "he":"תודה על ההרשמה"
+    },
+    "show_details":
+    {
+        "en":"Show Details",
+        "he":"הצג נתונים"
+    },
+    "registered_families":
+    {
+        "en":"Registered Families",
+        "he":"רישומי משפחות"
+    },
+    "family_name":
+    {
+        "en":"Family Name",
+        "he":"שם משפחה"
+    },
+    "address":
+    {
+        "en":"Address",
+        "he":"כתובת"
+    },
+    "confirmed":
+    {
+        "en":"confirmed",
+        "he":"אושר"
+    },
+    "edit":
+    {
+        "en":"Edit",
+        "he":"ערוך"
+    },
+    "edited_confirm_message":
+    {
+        "en":"The details have been updated.",
+        "he": "הפרטים עודכנו."
+    },
+    "editing":
+    {
+        "en": "editing",
+        "he": "עריכה"
+    },
+    "send_and_confirm":
+    {
+        "en": "send and confirm",
+        "he": "שלח ואשר"
     }
+
+
 }

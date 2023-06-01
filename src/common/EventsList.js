@@ -32,7 +32,7 @@ export default function EventsList() {
                         <Row key={index} xs={1} md={4} >
                             {row.map((event, index) => (
                                 <Col key={index} className="p-1 m-1">
-                                    <EventCard event={event} />
+                                    <EventCard event={event} forward={`Event/${event.id}`} buttonText={strings.reg_host[language]}/>
                                 </Col>
                             ))}
                         </Row>
