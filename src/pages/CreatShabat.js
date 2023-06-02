@@ -9,7 +9,7 @@ import { LanguageContext } from '../common/LanguageContext';
 import "bootstrap/dist/css/bootstrap.css";
 import Select from 'react-select';
 import citys from '../static/city.json';
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc,addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../common/FirebaseApp';
@@ -87,6 +87,7 @@ export default function FormCreatShabat() {
     await uploadBytes(storageRef, imageFile);// Upload the image file to Firestore storage
     const downloadURL = await getDownloadURL(storageRef);// Get the download URL of the uploaded image
 
+ 
 
     let city_he, city_en;
     if (language === "he") {
@@ -97,8 +98,8 @@ export default function FormCreatShabat() {
       city_he = citys.values.filter(city => city.english_name === place_name).map(city => city.name)[0];
       city_en = place_name;
     }
-
-
+    const id = await createRegistration(city_he, city_en);
+    console.log(id.id);
     const shabatData = {
       settlement_en: city_en,
       settlement_he: city_he,
@@ -106,8 +107,9 @@ export default function FormCreatShabat() {
       image: downloadURL,
       coordinator: choosenCoordinator.value,
       campers: choosenCampers.map((camper, index) => camper.value),
+      registrationId: id.id,
     };
-
+    
     await addShabat(shabatData);
     navigate("/");
   };
@@ -116,6 +118,18 @@ export default function FormCreatShabat() {
     const events = collection(db, 'events');
     await setDoc(doc(events), shabatData);
   }
+  async function createRegistration(city_he, city_en) {
+    let registration = {
+      families: [],
+      settlement_en: city_en,
+      settlement_he: city_he,
+    }
+    const addRegistration = collection(db, 'familiesRegistration');
+    // await setDoc(doc(addRegistration), registration);
+    let id = await addDoc(addRegistration, registration);
+    return id;
+  }
+
   /* ----------------------------------------creat shabat form--------------------------------------------- */
   return (
     <div className="App home-paragraph home-color text-dark pt-5">
