@@ -222,7 +222,48 @@
     {
         "en": "disability",
         "he": "מוגבלות"
-    }
+    },
+    "filter_option":
+    {
+        "en": "filter",
+        "he": "סנן"
+    },
+    "all":
+    {
+        "en": "all",
+        "he": "הכל"
+    } ,
+    "male":
+    {
+        "en": "male",
+        "he": "זכר"
+    },
+    "female":
+    {
+        "en": "female",
+        "he": "נקבה"
+    },
+    "sort_by": {
+        "en": "Sort By",
+        "he": "מיון לפי"
+      },
+      "none": {
+        "en": "None",
+        "he": "ללא"
+      },
+      "ascending": {
+        "en": "Ascending",
+        "he": "עולה"
+      },
+      "descending": {
+        "en": "Descending",
+        "he": "יורד"
+      },
+      "sort_direction": {
+        "en": "Sort Direction",
+        "he": "כיוון מיון"
+      }
+    
 
 
 

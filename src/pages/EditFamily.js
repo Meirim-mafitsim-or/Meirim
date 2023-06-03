@@ -61,13 +61,12 @@ export default function EditFamily() {
   const event_id = location.state.pathSuffix;
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
-
+    event.preventDefault(); // Prevent default form submission behavior
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
-      
+      setValidated(true);
+      return;
     }
 
     setValidated(true);

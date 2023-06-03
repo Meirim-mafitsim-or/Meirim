@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import { doc, updateDoc, arrayUnion, getDoc, collection } from 'firebase/firestore';
 import { db } from '../common/FirebaseApp';
 
@@ -16,6 +16,7 @@ export default function FormExample() {
   const { language } = React.useContext(LanguageContext);
   const [pathSuffix, setPathSuffix] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
 
   
   useEffect(() => {
@@ -27,10 +28,12 @@ export default function FormExample() {
 
 
   const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent default form submission behavior
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
+      setValidated(true);
+      return;
     }
 
     setValidated(true);
@@ -48,7 +51,6 @@ export default function FormExample() {
     const familiesDocName = familiesDocSnapshot.id;
     const familiesCol = collection(db, 'familiesRegistration');
     const cur_families = doc(familiesCol, familiesDocName);
-
     // Create the new map object
     const newFamily = {
       "first_name" : form.first_name.value,
@@ -71,6 +73,7 @@ export default function FormExample() {
     } catch (error) {
       console.error('Error adding new map:', error);
     }
+    navigate(`/`)
   };
 
   return (

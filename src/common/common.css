@@ -79,3 +79,14 @@ html, body {
 .map-card{
     width:160px!important;
 }
+
+.modal-dialog {
+  width: 800px; /* Set your desired width */
+  max-width: 800px; /* Set your desired max-width */
+}
+
+.modal-content {
+  height: 600px; /* Set your desired height */
+  max-height: 500px; /* Set your desired max-height */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+}

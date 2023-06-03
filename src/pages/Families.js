@@ -11,8 +11,6 @@ import { Link } from 'react-router-dom';
 import Assigning from "../common/Assigning";
 
 
-
-
 export default function Families() {
     const { language } = React.useContext(LanguageContext);
     const [families, setFamilies] = useState([]);
@@ -77,11 +75,8 @@ export default function Families() {
                 </TableRow>
                 </TableHead>
                 <TableBody>
-                {families.map((family) => (
-                    <TableRow
-                    key={family.id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
+                {families.map((family, index) => (
+                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell align="right">{family.first_name}</TableCell>
                     <TableCell align="right">{family.last_name}</TableCell>
                     <TableCell align="right">{family.city}</TableCell>
@@ -98,7 +93,7 @@ export default function Families() {
                         <TableCell align="right">                        
                         <Button  variant="primary" onClick={() => handlePlacement()} >{strings.assigning[language]}</Button>
                         </TableCell>
-                        <Assigning show={showModal} onHide={handleModalClose} language={language} family={null}/> 
+                        <Assigning show={showModal} onHide={handleModalClose} language={language}/>
 
                     </TableRow>
                 ))}
