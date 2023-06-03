@@ -111,16 +111,18 @@ export default function Families() {
 }
 
 
-
 export async function getFamilies(id, setFamiliesEvent) {
+    const familiesDoc =  await getFamiliesDoc(id);
+    const familiesData = familiesDoc.data();
+    setFamiliesEvent(familiesDoc.id);
+    return familiesData.families || [];
+  }
+
+  export async function getFamiliesDoc(id) {
     const events = collection(db, 'events');
     const cur_event = doc(events, id);
     const EventsSnapshot = await getDoc(cur_event);
     const eventData = EventsSnapshot.data();
     const familiesDoc =  await getDoc(eventData.families);
-    console.log(familiesDoc);
-    const familiesData = familiesDoc.data();
-    console.log(familiesData);
-    setFamiliesEvent(familiesDoc.id);
-    return familiesData.families || [];
+    return familiesDoc;
   }

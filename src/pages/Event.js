@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Card } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
@@ -6,15 +6,27 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
-
+import { useLocation } from 'react-router-dom';
+import { doc, updateDoc, arrayUnion, getDoc, collection } from 'firebase/firestore';
+import { db } from '../common/FirebaseApp';
 
 export default function FormExample() {
   const [validated, setValidated] = useState(false);
   const [submitted, setSubmitted] = useState(false); // Track form submission status
   const { language } = React.useContext(LanguageContext);
+  const [pathSuffix, setPathSuffix] = useState('');
+  const location = useLocation();
+
+  
+  useEffect(() => {
+    const path = location.pathname;
+    const parts = path.split('/');
+    const suffix = parts[parts.length-1];
+    setPathSuffix(suffix);
+  }, [location]);
 
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
@@ -23,6 +35,42 @@ export default function FormExample() {
 
     setValidated(true);
     setSubmitted(true); // Set the submission status to true
+
+
+    const events = collection(db, 'events');
+    const cur_event = doc(events, pathSuffix);
+    const EventsSnapshot = await getDoc(cur_event);
+    const eventData = EventsSnapshot.data();
+    const familiesDocRef = eventData.families; // Assuming families is a DocumentReference
+    const familiesDocSnapshot = await getDoc(familiesDocRef);
+    
+    // Get the name of the familiesDoc document
+    const familiesDocName = familiesDocSnapshot.id;
+    const familiesCol = collection(db, 'familiesRegistration');
+    const cur_families = doc(familiesCol, familiesDocName);
+
+    // Create the new map object
+    const newFamily = {
+      "first_name" : form.first_name.value,
+      "last_name" : form.last_name.value,
+      "city" : form.city.value,
+      "street": form.street.value,
+      "house_number": form.house_number.value,
+      "apartment_number": form.apartment_number.value,
+      "phone_number": form.phone_number.value,
+      "email": form.email.value,
+      "special_comment": form.special_comment.value,
+      "confirmed": false
+    };
+    try {
+      // Update the array field with the new map using arrayUnion
+      await updateDoc(cur_families, {
+        families: arrayUnion(newFamily),
+      });
+      console.log('New map added successfully!');
+    } catch (error) {
+      console.error('Error adding new map:', error);
+    }
   };
 
   return (
@@ -54,20 +102,20 @@ export default function FormExample() {
             </Form.Group>
           </Row>
           <Row className="mb-3">
-            <Form.Group as={Col} md="3" controlId="validationCustom03">
+            <Form.Group as={Col} md="3"  controlId="city">
               <Form.Label>{strings.city[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.city[language]} required />
               <Form.Control.Feedback type="invalid">
                 {/* Please provide a valid city. */}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group as={Col} md="3" controlId="validationCustom04">
+            <Form.Group as={Col} md="3" controlId="street">
               <Form.Label>{strings.street[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.street[language]} required />
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group as={Col} md="3" controlId="validationCustom05">
+            <Form.Group as={Col} md="3" controlId="house_number">
               <Form.Label>{strings.house_number[language]}</Form.Label>
               <Form.Control type="number" placeholder={strings.house_number[language]} required />
               <Form.Control.Feedback type="invalid">
@@ -83,11 +131,11 @@ export default function FormExample() {
           </Row>
 
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustom07">
+            <Form.Group as={Col} md="4" controlId="phone_number">
               <Form.Label>{strings.phone_number[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.phone_number[language]} required />
             </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustom08">
+            <Form.Group as={Col} md="4" controlId="email">
               <Form.Label>{strings.email[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.email[language]} required />
               <Form.Control.Feedback type="invalid">
