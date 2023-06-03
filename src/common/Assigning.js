@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Table } from 'react-bootstrap';
 import strings from '../static/Strings.json';
-import { db } from '../common/FirebaseApp';
+import { db } from './FirebaseApp';
 import { collection, getDocs} from "firebase/firestore"; 
 import { useState, useEffect } from 'react';
 
@@ -13,7 +13,7 @@ export async function getCampers() {
     return Campers;
 }
 
-const Placement = ({ show, onHide, language, family}) => {
+const Assigning = ({ show, onHide, language, family}) => {
     const [campers, setCampers] = useState([]);
 
     useEffect(() => {
@@ -70,4 +70,4 @@ const Placement = ({ show, onHide, language, family}) => {
   );
 };
 
-export default Placement;
+export default Assigning;
