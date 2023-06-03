@@ -11,13 +11,6 @@ import { Link } from 'react-router-dom';
 import Assigning from "../common/Assigning";
 
 
-export async function getFamilies(id) {
-    const events = collection(db, 'events');
-    const cur_event = doc(events, id);
-    const EventsSnapshot = await getDoc(cur_event);
-    const eventData = EventsSnapshot.data();
-    return eventData.families || [];
-  }
 
 
 export default function Families() {
@@ -27,6 +20,7 @@ export default function Families() {
     const [pathSuffix, setPathSuffix] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [selectedFamily, setSelectedFamily] = useState(null);
+    const [familiesEvent, setFamiliesEvent] = useState(null);
 
 
     useEffect(() => {
@@ -38,7 +32,7 @@ export default function Families() {
     
     useEffect(() => {
         if (pathSuffix) {
-          getFamilies(pathSuffix)
+          getFamilies(pathSuffix, setFamiliesEvent)
             .then((families) => setFamilies(families))
             .catch((error) => console.log(error));
         }
@@ -99,7 +93,7 @@ export default function Families() {
                     <TableCell align="right">{family.special_comment}</TableCell>
                     <TableCell align="right">{family.confirmed ?<span>&#10004;</span> : ''}</TableCell>
                     <TableCell align="right">
-                        <Button as={Link} to={`${family.id}`} variant="primary" state={{ family ,pathSuffix}} >{strings.edit[language]}</Button>
+                        <Button as={Link} to={`${familiesEvent}`} variant="primary" state={{ family,familiesEvent ,pathSuffix}} >{strings.edit[language]}</Button>
                         </TableCell>
                         <TableCell align="right">                        
                         <Button  variant="primary" onClick={() => handlePlacement()} >{strings.assigning[language]}</Button>
@@ -115,3 +109,18 @@ export default function Families() {
 
     );
 }
+
+
+
+export async function getFamilies(id, setFamiliesEvent) {
+    const events = collection(db, 'events');
+    const cur_event = doc(events, id);
+    const EventsSnapshot = await getDoc(cur_event);
+    const eventData = EventsSnapshot.data();
+    const familiesDoc =  await getDoc(eventData.families);
+    console.log(familiesDoc);
+    const familiesData = familiesDoc.data();
+    console.log(familiesData);
+    setFamiliesEvent(familiesDoc.id);
+    return familiesData.families || [];
+  }

@@ -13,15 +13,16 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom"
 
 
-async function update(event_id, id, form) {
+async function update(families_id, id, form) {
 
-    const events = collection(db, 'events');
-    const cur_event = doc(events, event_id);
-    const EventsSnapshot = await getDoc(cur_event);
-    const eventData = EventsSnapshot.data();
-    const families = eventData.families;
+    const familiesCol = collection(db, 'familiesRegistration');
+    const cur_families = doc(familiesCol, families_id);
+
+    const FamiliesSnapshot = await getDoc(cur_families);
+    const familiesData = FamiliesSnapshot.data();
+
+    const families = familiesData.families;
     const desiredFamily = families.find((check_family) => id === check_family.id);
-
     // Update the name property of desiredFamily
     if (desiredFamily) {
       desiredFamily.first_name = form.first_name.value;
@@ -37,7 +38,7 @@ async function update(event_id, id, form) {
 
 
       // Update the family object in the Firebase Firestore database
-      await updateDoc(cur_event, { families });
+      await updateDoc(cur_families, { families });
 
       console.log("Family updated:", desiredFamily);
     } else {
@@ -54,9 +55,10 @@ export default function EditFamily() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const families = location.state.familiesEvent;
   const family = location.state.family;
+  const family_id = location.state.family.id;
   const event_id = location.state.pathSuffix;
-  const id = family.id;  
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission behavior
@@ -70,7 +72,7 @@ export default function EditFamily() {
 
     setValidated(true);
     setSubmitted(true); // Set the submission status to true
-    await update(event_id, id, form); // Wait for the update function to finish
+    await update(families, family_id, form); // Wait for the update function to finish
     navigate(`/Families/${event_id}`)
   };
   
