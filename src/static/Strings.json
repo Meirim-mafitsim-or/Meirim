@@ -23,6 +23,10 @@
         "en": "Login",
         "he": "התחברות"
     },
+    "logout": {
+        "en": "Logout",
+        "he": "התנתקות"
+    },
     "home":
     {
         "en": "Home",
@@ -227,5 +231,58 @@
     {
         "en":"Choose File",
         "he":"בחר קובץ"
+    },
+    "manage_campers":
+    {
+        "en":"Manage cmpers",
+        "he":"ניהול חניכים"
+    },
+    "add_camper":{
+        "en":"Add camper",
+        "he":"הוסף חניך"
+    },
+    "close":{
+        "en":"Close",
+        "he":"סגור"
+    },
+    "add":{
+        "en":"Add",
+        "he":"הוסף"
+    },
+    "gender":{
+        "en":"Gender",
+        "he":"מין"
+    },
+    "select_gender":{
+        "en":"Select gender",
+        "he":"בחר מין"
+    },
+    "male":{
+        "en":"Male",
+        "he":"זכר"
+    },
+    "female":{
+        "en":"Female",
+        "he":"נקבה"
+    },
+    "other":{
+        "en":"Other",
+        "he":"אחר"
+    },
+    "age":{
+        "en":"Age",
+        "he":"גיל"
+    },
+    "disability_rank":{
+        "en":"Disability rank",
+        "he":"רמת מוגבלות"
+    },
+    "delete":{
+        "en":"Delete",
+        "he":"מחק"
+    },
+    "select_all":{
+        "en":"Select all",
+        "he":"בחר הכל"
     }
 }

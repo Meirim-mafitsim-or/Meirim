@@ -13,7 +13,6 @@ export async function getEvents() {
     return Events;
 }
 
-
 export default function EventsList() {
     const { language } = useContext(LanguageContext);
     const [Events, setEvents] = useState([]);

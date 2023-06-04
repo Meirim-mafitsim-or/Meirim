@@ -5,27 +5,15 @@
     width: 70px;
     display: block;
     pointer-events: none;
-    /* float: right; */
 }
 
 .s-pic {
-    /* width: 100%; */
     height: 500px;
     object-fit: cover;
     object-position: center;
-    /* position: relative; */
-    /* padding-right: 60px; */
-    /* padding-top: 55px; */
-    /* padding-bottom: 40px; */
-    /* margin: 60px 0; */
-    /* border: 60px solid #0D2D46; */
 }
 .carusel{
     height: 500px;
-        /* padding-right: 60px;
-        padding-top: 55px;
-        padding-bottom: 40px; */
-    /* margin: 53px 0 0 0px; */
 }
 
 .home-paragraph {
@@ -42,40 +30,28 @@ html, body {
     color: #fff;
 }
 
-/* body {
-  background-color: #0D2D46;
-  margin: 0;
-  padding: 0;
-} */
 .home-color{
     background-color: #0D2D46; 
     color: #fff;
-    /* border-radius: 10px; */
     margin: 0 0 0 0;
    
 }
 .border-color{
     background-color: #1C5488;
 }
-.map{
-    /* width: 60%; */
-    /* height: 100%;
-    border-radius: 500px;
-    margin: 0 60px; */
-    /* padding-bottom: 200px; */
-}
 
 .event-card{
     height: 160px!important;
 }
 
-.event-card-overlay{
-    background-color: rgba(255,255,255,0.3);
-    object-fit: cover;
-    object-position: center;
-
-}
-
 .map-card{
     width:160px!important;
+}
+.event-card-overlay {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.event-card-image {
+    object-fit: cover;
+    object-position: center;
 }
