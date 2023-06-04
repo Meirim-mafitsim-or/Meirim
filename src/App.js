@@ -6,6 +6,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import About from "./pages/About";
 import Event from "./pages/Event";
+import CreatShabat from './pages/CreatShabat';
 import { LanguageProvider } from './common/LanguageContext';
 import { UserProvider } from './common/UserContext';
 import FamiliesManagment from './pages/FamiliesManagment';
@@ -28,7 +29,7 @@ function App() {
               <Route path="Families" element={<FamiliesManagment />} />
               <Route path="Families/:id" element={<Families />} />
               <Route path="Families/:id/:family" element={<EditFamily/>} />
-
+              <Route path="CreatShabat" element={<CreatShabat />} />
             </Route>
           </Routes>
         </BrowserRouter>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { LanguageContext } from './LanguageContext';
+import { UserContext } from './UserContext';
 import Header from './Header';
 
 // Test the Header component
@@ -17,11 +18,13 @@ describe('Header component', () => {
         };
 
         const { getByAltText, getByText } = render(
+            <UserContext.Provider value={{}}>
             <LanguageContext.Provider value={mockLanguageContextValue}>
                 <MemoryRouter>
                     <Header />
                 </MemoryRouter>
             </LanguageContext.Provider>
+            </UserContext.Provider>
         );
 
         // Assert that the logo is rendered
@@ -51,11 +54,13 @@ describe('Language dropdown', () => {
         };
 
         const { getByText } = render(
+            <UserContext.Provider value={{}}>
             <LanguageContext.Provider value={mockLanguageContextValue}>
                 <MemoryRouter>
                     <Header />
                 </MemoryRouter>
             </LanguageContext.Provider>
+            </UserContext.Provider>
         );
 
         // Assert that the language dropdown is rendered

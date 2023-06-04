@@ -182,7 +182,50 @@
     {
         "en": "send and confirm",
         "he": "שלח ואשר"
+    },
+    "creat_shabat":
+    {
+        "en":"Create Shabat",
+        "he":"צור שבת"
+    },
+    "place_name":
+    {
+        "en":"Place Name",
+        "he":"שם המקום"
+    },
+    "date":
+    {
+        "en":"Date",
+        "he":"תאריך"
+    },
+    "coordinator":
+    {
+        "en":"Coordinator",
+        "he":"רכז"
+    },
+    "coordinator_phone":
+    {
+        "en":"Coordinator Phone",
+        "he":"טלפון הרכז"
+    },
+    "image":
+    {
+        "en":"Image",
+        "he":"תמונה"
+    },
+    "campers":
+    {
+        "en":"Campers",
+        "he":"חניכים"
+    },
+    "select":
+    {
+        "en":"Select from list",
+        "he":"בחר מהרשימה"
+    },
+    "choose_file":
+    {
+        "en":"Choose File",
+        "he":"בחר קובץ"
     }
-
-
 }

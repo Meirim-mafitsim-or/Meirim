@@ -8,7 +8,7 @@ import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
 
 
-export default function FormExample() {
+export default function FormEvent() {
   const [validated, setValidated] = useState(false);
   const [submitted, setSubmitted] = useState(false); // Track form submission status
   const { language } = React.useContext(LanguageContext);

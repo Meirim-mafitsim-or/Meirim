@@ -1,0 +1,22 @@
+.App {
+    text-align: center;
+}
+.nav-logo {
+    width: 70px;
+    display: block;
+    pointer-events: none;
+    /* float: right; */
+}
+html, body {
+    margin: 0;
+    height: 100%;
+    background-color: #0D2D46;
+    color: #fff;
+}
+
+.page-color{
+    background-color: #0D2D46; 
+    color: #fff;
+    margin: 0 0 0 0;
+   
+}

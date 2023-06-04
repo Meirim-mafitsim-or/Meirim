@@ -34,7 +34,7 @@ function FamiliesManagment(){
                         .map((row, index) => (
                             <Row key={index} xs={1} md={4} >
                                 {row.map((event, index) => (
-                                    <Col key={index} className="p-1 m-1">
+                                    <Col key={index} className="p-1">
                                         <EventCard event={event} forward={`${event.id}`} buttonText={strings.show_details[language]}/>
                                     </Col>
                                 ))}
