@@ -6,7 +6,6 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
-import "bootstrap/dist/css/bootstrap.css";
 import Select from 'react-select';
 import citys from '../static/city.json';
 import { doc, setDoc } from "firebase/firestore";
