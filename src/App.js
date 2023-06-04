@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import About from "./pages/About";
 import Event from "./pages/Event";
 import CreatShabat from './pages/CreatShabat';
+import ManageCampers from './pages/ManageCampers';
 import FamiliesManagment from './pages/FamiliesManagment';
 import Families from './pages/Families';
 import EditFamily from './pages/EditFamily';
@@ -27,6 +28,7 @@ function App() {
           <Route path="Families/:id" element={<Families />} />
           <Route path="Families/:id/:family" element={<EditFamily/>} />
           {user && <Route path="CreatShabat" element={<CreatShabat />} />}
+          {user && <Route path="ManageCampers" element={<ManageCampers />} />}
           <Route path="*" element={<h1>Not Found</h1>} />
         </Route>
       </Routes>
