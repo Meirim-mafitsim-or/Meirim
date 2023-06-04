@@ -6,35 +6,27 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import About from "./pages/About";
 import Event from "./pages/Event";
-import CreatShabat from './pages/CreatShabat';
-import { LanguageProvider } from './common/LanguageContext';
-import { UserProvider } from './common/UserContext';
 import FamiliesManagment from './pages/FamiliesManagment';
 import Families from './pages/Families';
 import EditFamily from './pages/EditFamily';
 
-
 function App() {
   return (
-    <UserProvider>
-      <LanguageProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="Login" element={<Login />} />
-              <Route path="Contact" element={<Contact />} />
-              <Route path="About" element={<About />} />
-              <Route path="Event/:id" element={<Event />} />
-              <Route path="Families" element={<FamiliesManagment />} />
-              <Route path="Families/:id" element={<Families />} />
-              <Route path="Families/:id/:family" element={<EditFamily/>} />
-              <Route path="CreatShabat" element={<CreatShabat />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </LanguageProvider>
-    </UserProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="Login" element={<Login />} />
+          <Route path="Contact" element={<Contact />} />
+          <Route path="About" element={<About />} />
+          <Route path="Event/:id" element={<Event />} />
+          <Route path="Families" element={<FamiliesManagment />} />
+          <Route path="Families/:id" element={<Families />} />
+          <Route path="Families/:id/:family" element={<EditFamily/>} />
+          <Route path="*" element={<h1>Not Found</h1>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
