@@ -4,7 +4,6 @@ import Card from 'react-bootstrap/Card';
 import strings from '../static/Strings.json';
 import { useContext } from 'react';
 import { LanguageContext } from '../common/LanguageContext';
-import { UserContext } from '../common/UserContext';
 import { useState } from "react";
 import { app } from '../common/FirebaseApp';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
