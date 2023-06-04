@@ -37,6 +37,7 @@ export default function Header() {
               {menuItems.map((item, index) => 
               (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
               {user && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
+              {user ? <Nav.Link as={Link} to="/manageCampers">{strings.manage_campers[language]}</Nav.Link> : null}
               <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
             </Nav>
             <Nav>

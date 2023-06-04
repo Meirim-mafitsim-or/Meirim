@@ -36,14 +36,18 @@ export default function MyMap() {
   return (
     <Map
       height={500}
-      center={center}
-      zoom={zoom}
-      onBoundsChanged={({ center, zoom }) => {
-        setCenter(center)
-        setZoom(zoom)
+      center={center} 
+      zoom={zoom} 
+      onBoundsChanged={({ center, zoom }) => { 
+        setCenter(center) 
+        setZoom(zoom) 
+      }}
+      onClick={() => {
+        if (show) {
+          setShow(false);
+        }
       }}
     >
-
       {markers.map((marker, index) => (
         //on click show event card
         <Marker
