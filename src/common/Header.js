@@ -6,13 +6,13 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useContext } from 'react';
 import strings from '../static/Strings.json';
 import { LanguageContext } from './LanguageContext';
-import { Link } from 'react-router-dom';
 import { UserContext } from './UserContext';
-
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Header() {
   const { language, changeLanguage } = useContext(LanguageContext);
-  const { user } = useContext(UserContext);
+  const { user, logout} = useContext(UserContext);
+  const navigate = useNavigate();
   const menuItems = [
     { link: "/", text: strings.home[language] },
     { link: "/Contact", text: strings.contact[language] },
@@ -22,6 +22,11 @@ export default function Header() {
     { code: "he", text: "עברית" },
     { code: "en", text: "English" },
   ]
+
+  const handleLogout = () => {
+    navigate("/")
+    logout();
+  }
   return (
     <>
       <Navbar bg="light" expand="lg" sticky="top">
@@ -42,7 +47,9 @@ export default function Header() {
                   </NavDropdown.Item>
                 ))}
               </NavDropdown>
-              <Nav.Link as={Link} to="/Login">{strings.login[language]}</Nav.Link>
+              {user ? <Nav.Link onClick={handleLogout}>{strings.logout[language]}</Nav.Link> :
+                      <Nav.Link as={Link} to="/Login">{strings.login[language]}</Nav.Link>
+              }
             </Nav>
           </Navbar.Collapse>
       </Navbar>

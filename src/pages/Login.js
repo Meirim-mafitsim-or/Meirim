@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 function Login() {
-  const { changeUser } = useContext(UserContext);
   const { language } = useContext(LanguageContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,11 +23,7 @@ function Login() {
     e.preventDefault();
     try {
       signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        changeUser(user);
         navigate("/");
-
       })
         .catch((error) => {
           setErrorMessage(strings.authentication_error[language]); // Update the error message state

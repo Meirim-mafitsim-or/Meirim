@@ -19,7 +19,7 @@ export default function EventCard(props) {
     });
     return (
         <Card className="text-center text-dark event-card">
-            <Card.Img src={url} alt="Card image" className='h-100' />
+            <Card.Img src={url} alt="Card image" className='h-100 event-card-image' />
             <Card.ImgOverlay className='event-card-overlay'>
                 <Card.Title>{(language === "he") ? props.event.settlement_he : props.event.settlement_en}</Card.Title>
                 <Card.Text>
