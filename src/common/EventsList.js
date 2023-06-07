@@ -5,6 +5,7 @@ import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
 import EventCard from './EventCard';
 import { Row, Col } from 'react-bootstrap';
+import { UserContext } from './UserContext';
 
 export async function getEvents() {
     const EventsRef = collection(db, "events");
@@ -16,12 +17,16 @@ export async function getEvents() {
 export default function EventsList() {
     const { language } = useContext(LanguageContext);
     const [Events, setEvents] = useState([]);
+    const { user } = useContext(UserContext);
+
 
     useEffect(() => {
         let now = new Date();//get the date of today and add the events that are not over yet
         getEvents().then(Events => Events.filter(event => event.date.seconds > now.getTime() / 1000))
         .then(events=> setEvents(events));
     }, []);
+
+    // if user role:admin he dont have the button event card instead he have the button EditShabat
 
     return (
         <div className='p-10'>
@@ -33,9 +38,13 @@ export default function EventsList() {
                         <Row key={index} xs={1} md={4} >
                             {row.map((event, index) => (
                                 <Col key={index} className="p-1">
-                                    <EventCard event={event} forward={`Event/${event.id}`} buttonText={strings.reg_host[language]}/>
+                                    {user ? (
+                                    <EventCard event={event} forward={`EditShabat/${event.id}`} buttonText={strings.edit_shabat[language]} />
+                                    ) : (
+                                    <EventCard event={event} forward={`Event/${event.id}`} buttonText={strings.reg_host[language]} />
+                                    )}
                                 </Col>
-                            ))}
+                                ))}
                         </Row>
                     ))
             }

@@ -7,6 +7,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Toolbar from '@mui/material/Toolbar';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -16,6 +19,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DoneIcon from '@mui/icons-material/Done';
 import Checkbox from '@mui/material/Checkbox';
 import CloseIcon from '@mui/icons-material/Close';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import strings from '../static/Strings.json';
 import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
@@ -71,7 +75,8 @@ function AddModal({ columns, onAdd }) {
                                         ) :
                                             (column.type === 'textarea') ? (
                                                 <Form.Control as="textarea" name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} rows="4" required />
-                                            ) :
+                                            )
+                                                :
                                                 (
                                                     <Form.Control type={column.type} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required />
                                                 )}
@@ -94,57 +99,63 @@ function AddModal({ columns, onAdd }) {
     );
 }
 
-function ManagableTableHead({ selected, onSelectAllClick, columns, data }) {
+function ManagableTableHead({ selected, onSelectAllClick, columns, data, editable, actions }) {
     const { language } = useContext(LanguageContext);
-
+    const selectable = onSelectAllClick !== undefined;
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox" key={`head-checkbox`}>
-                    <Checkbox
-                        color="primary"
-                        indeterminate={
-                            selected.length > 0
-                            && selected.length < data.length
-                        }
-                        checked={
-                            data.length > 0
-                            && selected.length === data.length
-                        }
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': strings.select_all[language],
-                        }}
-                    />
-                </TableCell>
+                {selectable && (
+                    <TableCell padding="checkbox" key={`head-checkbox`}>
+                        <Checkbox
+                            color="primary"
+                            indeterminate={
+                                selected.length > 0
+                                && selected.length < data.length
+                            }
+                            checked={
+                                data.length > 0
+                                && selected.length === data.length
+                            }
+                            onChange={onSelectAllClick}
+                            inputProps={{
+                                'aria-label': strings.select_all[language],
+                            }}
+                        />
+                    </TableCell>
+                )}
 
                 {/* cell for edit button */}
-                <TableCell key="head-edit">
-                    {strings.edit[language]}
-                </TableCell>
-                {columns.map((col) => (
-                    <TableCell key={`head-${col.field}`}>{col.title}</TableCell>
-                ))}
+                {editable && (
+                    <TableCell key="head-edit">
+                        {strings.edit[language]}
+                    </TableCell>
+                )}
+                {actions && actions.map((action) => (<TableCell key={`head-${action.title}`}>{action.title}</TableCell>))}
+                {columns.map((col) => (<TableCell key={`head-${col.field}`}>{col.title}</TableCell>))}
             </TableRow>
         </TableHead>
 
     );
 }
 
-function ManagableTableRow({ columns, row, onEdit, selected, setSelected }) {
+function ManagableTableRow({ columns, row, onEdit, selected, setSelected, actions }) {
     const { language } = useContext(LanguageContext);
     const [item, setItem] = useState(row);
     const [editing, setEditing] = useState(false);
 
+    const editable = onEdit !== undefined;
+    const selectable = setSelected !== undefined;
     const labelId = `enhanced-table-checkbox-${row.id}`;
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setItem({ ...item, [name]: value });
+        setEditing({ ...item, [name]: value });
     };
 
     const handleEdit = () => {
-        onEdit(item);
+        setItem(editing)
+        onEdit(editing);
         setEditing(false);
     };
 
@@ -158,73 +169,118 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected }) {
             selected={selected}
             sx={{ cursor: 'pointer' }}
         >
-            <TableCell padding="checkbox" key={`${item.id}-checkbox`}>
-                <Checkbox
-                    onClick={setSelected}
-                    color="primary"
-                    checked={selected}
-                    inputProps={{
-                        'aria-labelledby': labelId,
-                    }}
-                />
-            </TableCell>
-            <TableCell key={`${item.id}-edit`}>
-                <Tooltip title={strings.edit[language]}>
-                    <>
-                        {editing === item.id ?
-                            (
-                                <>
-                                    <IconButton onClick={(event) => handleEdit()} >
-                                        <DoneIcon />{/* TODO save changes */}
+            {selectable && (
+                <TableCell padding="checkbox" key={`${item.id}-checkbox`}>
+                    <Checkbox
+                        onClick={setSelected}
+                        color="primary"
+                        checked={selected}
+                        inputProps={{
+                            'aria-labelledby': labelId,
+                        }}
+                    />
+                </TableCell>
+            )}
+            {editable && (
+                <TableCell key={`${item.id}-edit`}>
+                    <Tooltip title={strings.edit[language]}>
+                        <>
+                            {editing ?
+                                (
+                                    <>
+                                        <IconButton onClick={(event) => handleEdit()} >
+                                            <DoneIcon />{/* TODO save changes */}
+                                        </IconButton>
+                                        <IconButton onClick={(event) => setEditing(false)} >
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </>
+                                ) : (
+                                    <IconButton onClick={(event) => setEditing(item)} >
+                                        <EditIcon />
                                     </IconButton>
-                                    <IconButton onClick={(event) => setEditing(false)} >
-                                        <CloseIcon />
-                                    </IconButton>
-                                </>
-                            ) : (
-                                <IconButton onClick={(event) => setEditing(item.id)} >
-                                    <EditIcon />
-                                </IconButton>
-                            )
-                        }
-                    </>
-                </Tooltip>
-            </TableCell>
+                                )
+                            }
+                        </>
+                    </Tooltip>
+                </TableCell>
+            )}
+            {actions && actions.map((action) => (
+                <tableCell key={`${item.id}-${action.title}`}>
+                    <Tooltip title={action.title}>
+                        <IconButton onClick={(event) => action.onClick(item)} >
+                            {action.icon}
+                        </IconButton>
+                    </Tooltip>
+                </tableCell>
+            ))}
             {columns.map(function (column) {
                 return (
                     <TableCell key={`${item.id}-${column.field}`}>
-                        {editing === item.id ?
+                        {editing ?
                             (
                                 (column.type === 'select') ?
                                     <Select
                                         name={column.field}
-                                        value={item[column.field]}
+                                        value={editing[column.field]}
                                         type={column.type}
                                         onChange={handleInputChange}>
                                         {Object.keys(column.options).map((option) => (
                                             <MenuItem value={option} key={option}>{column.options[option]}</MenuItem>
                                         ))}
                                     </Select>
-                                    : 
-                                    (column.type === 'textarea') ?
-                                    <TextField
-                                        name={column.field}
-                                        defaultValue={item[column.field]}
-                                        type={column.type}
-                                        maxRows={4}
-                                        variant="standard"                              
-                                        onChange={handleInputChange} 
-                                        multiline={true} />
                                     :
-                                    <Input
-                                        name={column.field}
-                                        value={item[column.field]}
-                                        type={column.type}
-                                        onChange={handleInputChange} />
+                                    (column.type === 'textarea') ?
+                                        <TextField
+                                            name={column.field}
+                                            defaultValue={editing[column.field]}
+                                            type={column.type}
+                                            maxRows={4}
+                                            variant="standard"
+                                            onChange={handleInputChange}
+                                            multiline={true} />
+                                        :
+                                        <Input
+                                            name={column.field}
+                                            value={editing[column.field]}
+                                            type={column.type}
+                                            onChange={handleInputChange} />
                             )
                             : (column.type === 'select') ?
                                 column.options[item[column.field]]
-                                : item[column.field]}
+                                // : (column.type === 'textarea' && item[column.field].length) ?
+                                //     <Accordion style={{
+                                //         boxShadow: 'none',
+                                //         backgroundColor: 'transparent',
+                                //         textAlign: 'start',
+                                //         padding: 0,
+                                //         margin: 0,
+                                //         minHeight: 0,
+
+                                //     }}>
+                                //         <AccordionSummary
+                                //             expandIcon={<ExpandMoreIcon />}
+                                //             aria-controls="panel1a-content"
+                                //             id="panel1a-header"
+                                //             style={{
+                                //                 paddingBottom: 0,
+                                //                 margin: 0,
+                                //                 minHeight: 0,
+                                //             }}
+                                //             padding={0}
+                                //         >
+                                //             <Typography>
+                                //                 {item[column.field].split('\n')[0]} ...
+                                //             </Typography>
+                                //         </AccordionSummary>
+                                //         <AccordionDetails>
+                                //             {item[column.field].split('\n').map((line, index) => {
+                                //                 return index !== 0 ? <Typography key={index}>{line}</Typography> : null;
+                                //             })}
+                                //         </AccordionDetails>
+                                //     </Accordion>
+                                :
+                                item[column.field]}
                     </TableCell>
 
                 );
@@ -232,12 +288,13 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected }) {
         </TableRow>
     );
 }
+
 /**
  * this component is a table that can be edited and managed by the user, it receives the following props:
  * @param {*} columns an array of objects, each object has the following properties:
  * title: the title of the column
  * field: the field of the column
- * type: the type of the column, can be one of the following: 'text', 'number', 'boolean', 'date', 'select', 'longtext'
+ * type: the type of the column, can be one of the following: 'text', 'number', 'boolean', 'date', 'select', 'textarea'
  * options: an array of options for the select type
  * @param {*} data an array of objects, each object has the following properties:
  * id: the id of the object
@@ -245,27 +302,36 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected }) {
  * @param {*} onDelete a function that receives an array of ids and deletes the objects with those ids
  * @param {*} onEdit a function that receives an object and edits the object with the same id
  * @param {*} onAdd a function that receives an object and adds it to the table
+ * @param {*} actions an array of objects, each object has the following properties:
+ * title: the title of the action
+ * icon: the icon of the action
+ * onClick: a function that receives an object and performs the action on it
+ * @param {*} globalActions an array of objects, each object has the following properties:
+ * title: the title of the action
+ * icon: the icon of the action
+ * onClick: a function that receives an array of objects and performs the action on them
  * @returns table that can be edited and managed by the user
  */
-export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd }) {
+export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd, actions, globalActions, title, selectable = true }) {
     const language = useContext(LanguageContext);
 
+    const editable = onEdit !== undefined;
     const [selected, setSelected] = useState([]);
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = data.map((n) => n.id);
+            const newSelected = data;
             setSelected(newSelected);
             return;
         }
         setSelected([]);
     };
 
-    const handleSelect = (event, id) => {
-        const selectedIndex = selected.indexOf(id);
+    const handleSelect = (event, item) => {
+        const selectedIndex = selected.indexOf(item);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
+            newSelected = newSelected.concat(selected, item);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -280,7 +346,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd 
         setSelected(newSelected);
     };
 
-    const isSelected = (id) => selected.indexOf(id) !== -1;
+    const isSelected = (item) => selected.indexOf(item) !== -1;
 
     const handleEdit = (item) => {
         let id = item.id;
@@ -290,8 +356,8 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd 
     };
 
     const handleDelete = () => {
-        for (let id of selected) {
-            onDelete(id);
+        for (let item of selected) {
+            onDelete(item.id);
         }
         setSelected([]);
     }
@@ -305,7 +371,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd 
                     id="tableTitle"
                     component="div"
                 >
-                    {/* Title */}
+                    {title}
                 </Typography>
                 {selected.length > 0 && (
                     <Tooltip title={strings.delete[language]}>
@@ -316,31 +382,51 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd 
                         </>
                     </Tooltip>
                 )}
-                <Tooltip title={strings.add[language]}>
-                    <>
-                        <AddModal columns={columns} onAdd={onAdd} />
-                    </>
-                </Tooltip>
+                {globalActions && globalActions.map((action, index) => {
+                    return (
+                        <Tooltip title={action.title} key={index}>
+                            <>
+                                <IconButton onClick={(event) => action.onClick(selected)}>
+                                    {action.icon}
+                                </IconButton>
+                            </>
+                        </Tooltip>
+                    )
+                })}
+                {onAdd && (
+                    <Tooltip title={strings.add[language]}>
+                        <>
+                            <AddModal columns={columns} onAdd={onAdd} />
+                        </>
+                    </Tooltip>
+                )}
 
             </Toolbar>
             <TableContainer>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <ManagableTableHead selected={selected} onSelectAllClick={handleSelectAllClick} columns={columns} data={data} />
+                    <ManagableTableHead
+                        selected={selected}
+                        onSelectAllClick={selectable ? handleSelectAllClick : undefined}
+                        columns={columns}
+                        data={data}
+                        editable={editable}
+                        globalActions={globalActions}
+                    />
                     <TableBody>
                         {data.map((row, index) => (
                             <ManagableTableRow
                                 key={row.id}
                                 columns={columns}
                                 row={row}
-                                onEdit={handleEdit}
-                                selected={isSelected(row.id)}
-                                setSelected={(event) => handleSelect(event, row.id)}
+                                onEdit={editable ? handleEdit : undefined}
+                                selected={isSelected(row)}
+                                actions={actions}
+                                setSelected={selectable ? (event) => handleSelect(event, row) : undefined}
                             />
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
         </Paper>
-
     );
 }

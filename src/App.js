@@ -13,6 +13,13 @@ import Families from './pages/Families';
 import EditFamily from './pages/EditFamily';
 import { UserContext } from './common/UserContext';
 import { useContext } from 'react';
+import AdminRegistration from './pages/AdminRegistration';
+import EditShabat from './pages/EditShabat';
+import ManageCoordinators from './pages/ManageCoordinators';
+// import DataReport from './pages/DataReport';
+
+
+
 function App() {
   const {user} = useContext(UserContext);
   return (
@@ -28,8 +35,14 @@ function App() {
           <Route path="Families/:id" element={<Families />} />
           <Route path="Families/:id/:family" element={<EditFamily/>} />
           {user && <Route path="CreatShabat" element={<CreatShabat />} />}
+          {/* {user && <Route path="DataReport" element={<DataReport />} />} */}
           {user && <Route path="ManageCampers" element={<ManageCampers />} />}
+          {user && <Route path="ManageCoordinators" element={<ManageCoordinators />} />}
+          
+          <Route path="AdminRegistration" element={<AdminRegistration />} />
+          <Route path="EditShabat/:id" element={<EditShabat />} />
           <Route path="*" element={<h1>Not Found</h1>} />
+          
         </Route>
       </Routes>
     </BrowserRouter>

@@ -9,6 +9,7 @@ import { LanguageContext } from './LanguageContext';
 import { UserContext } from './UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 
+
 export default function Header() {
   const { language, changeLanguage } = useContext(LanguageContext);
   const { user, logout} = useContext(UserContext);
@@ -30,14 +31,19 @@ export default function Header() {
   return (
     <>
       <Navbar bg="light" expand="lg" sticky="top">
-          <img src={logo} alt="logo" className="nav-logo" />
+      <Link to="/">
+        <img src={logo} alt="logo" className="nav-logo" />
+      </Link>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               {menuItems.map((item, index) => 
               (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
               {user && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
+              <NavDropdown title={strings.management_users[language]} id="basic-nav-dropdown">
               {user ? <Nav.Link as={Link} to="/manageCampers">{strings.manage_campers[language]}</Nav.Link> : null}
+              {user ? <Nav.Link as={Link} to="/ManageCoordinators">{strings.manage_coordinators[language]}</Nav.Link> : null}
+              </NavDropdown>
               <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
             </Nav>
             <Nav>
@@ -51,6 +57,7 @@ export default function Header() {
               {user ? <Nav.Link onClick={handleLogout}>{strings.logout[language]}</Nav.Link> :
                       <Nav.Link as={Link} to="/Login">{strings.login[language]}</Nav.Link>
               }
+              {user && <Nav.Link as={Link} to="/AdminRegistration">{strings.sign_up[language]}</Nav.Link>}
             </Nav>
           </Navbar.Collapse>
       </Navbar>

@@ -169,8 +169,8 @@
     },
     "edit":
     {
-        "en":"Edit",
-        "he":"ערוך"
+        "en":"Edit Shabat",
+        "he":"ערוך שבת"
     },
     "edited_confirm_message":
     {
@@ -204,8 +204,8 @@
     },
     "coordinator":
     {
-        "en":"Coordinator",
-        "he":"רכז"
+        "en":"if the coordinator is not in the list, please add him first and then select him",
+        "he":"אם הרכז לא ברשימה, אנא הוסף אותו ואז בחר אותו"
     },
     "coordinator_phone":
     {
@@ -284,5 +284,96 @@
     "select_all":{
         "en":"Select all",
         "he":"בחר הכל"
+    },
+    "add_coordinator":
+    {
+        "en":"Add Coordinator",
+        "he":"הוסף רכז"
+    },
+    "email_already_in_use":
+    {
+        "en":"Email already in use",
+        "he":"אימייל כבר בשימוש"
+    },
+    "invalid_email":
+    {
+        "en":"Invalid email",
+        "he":"אימייל לא תקין"
+    },
+    "weak_password":
+    {
+        "en":"Password must be at least 6 characters",
+        "he":"סיסמא חייבת להיות לפחות 6 תווים"
+    },
+    "create_user_error":
+    {
+        "en":"Error creating user",
+        "he":"שגיאה ביצירת משתמש"
+    },
+    "sign_up":
+    {
+        "en":"Sign Up",
+        "he":"רישום"
+    },
+    "forgot_password"
+    :
+    {
+        "en":"Forgot Password?",
+        "he":"שכחת סיסמא?"
+    },
+    "edit_shabat":
+    {
+        "en":"Edit Shabat",
+        "he":"ערוך שבת"
+    },
+    "edit_family_and_match":
+    {
+        "en":"Edit Family and Match",
+        "he":"עריכת משפחות ושיבוצים"
+    },
+    "families":
+    {
+        "en":"Families",
+        "he":"משפחות"
+    },
+    "back":
+    {
+        "en":"Back to edit page",
+        "he":"חזור לעמוד העריכה"
+    },
+    "delete_shabat":
+    {
+        "en":"Delete Shabat",
+        "he":"מחק שבת"
+    },
+    "manage_coordinators":
+    {
+        "en":"Manage coordinators",
+        "he":"ניהול רכזים"
+    },
+    "data_reports":
+    {
+        "en":"Data reports",
+        "he":"דוחות נתונים"
+    },
+    "campers_per_event":
+    {
+        "en":"Campers per event",
+        "he":"חניכים לאירוע"
+    },
+    "families_per_event":
+    {
+        "en":"Families per event",
+        "he":"משפחות לאירוע"
+    },
+    "settlements":
+    {
+        "en":"Settlements",
+        "he":"יישובים"
+    },
+    "management_users":
+    {
+        "en":"Management users",
+        "he":"ניהול משתמשים"
     }
 }

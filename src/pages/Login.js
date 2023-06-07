@@ -8,6 +8,9 @@ import { useState } from "react";
 import { app } from '../common/FirebaseApp';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import {sendPasswordResetEmail } from "firebase/auth";
+import { Link } from 'react-router-dom';
+import { Row, Col } from 'react-bootstrap';
 
 
 function Login() {
@@ -17,6 +20,8 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const auth = getAuth(app);
+
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,6 +33,21 @@ function Login() {
           setErrorMessage(strings.authentication_error[language]); // Update the error message state
         });
 
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    try {
+      sendPasswordResetEmail(auth, email).then(() => {
+        // Password reset email sent!
+        // ..
+      })
+        .catch((error) => {
+          console.log(error);
+        });
     } catch (error) {
       console.error(error);
     }
@@ -56,9 +76,19 @@ function Login() {
               />
             </Form.Group>
             {errorMessage && <p className="text-danger">{errorMessage}</p> /* Show error message */}
-            <Button variant="primary" type="submit">
-              {strings.login[language]}
-            </Button>
+            {/* that the cols will be closer */}
+            <Row>
+              <Col className='col-lg-3'><Link onClick={handlePasswordReset}>{strings.forgot_password[language]}</Link></Col>
+              <Col >
+                <Button variant="primary" type="submit">
+                {strings.login[language]}
+              </Button>
+              </Col>
+              <Col className='col-lg-3'>
+              </Col>
+              
+            </Row>
+          
           </Form>
         </Card.Body>
       </Card>

@@ -21,12 +21,14 @@ export default function MyMap() {
 
   useEffect(() => {
     getEvents().then(Events => {
-      const sett = Events.map(event => event.settlement_en);
+      const sett = Events.map(event => event.settlement);
       const mark = [];
 
       //every one of the card have english name and hebrow name so i can use only english name
       for (let i = 0; i < sett.length; i++) {
         let settlement = citys.values.filter(city => city.english_name === sett[i]);
+        console.log(sett[i]);
+
           mark.push({ name: settlement[0].english_name, latlng: [settlement[0].latt, settlement[0].long], event: Events[i] })
       }
       setMarkers(mark);
@@ -63,7 +65,6 @@ export default function MyMap() {
           {/* when press stop to present event card */}
           <div onClick={() => { setShow(false); }}>
             <MapCard event={marker.event} />
-            X
           </div>
         </Overlay>
       ))}
