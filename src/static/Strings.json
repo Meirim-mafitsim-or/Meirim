@@ -164,8 +164,8 @@
     },
     "confirmed":
     {
-        "en":"confirmed",
-        "he":"אושר"
+        "en":"confirm registration",
+        "he":"אישור ההרשמה"
     },
     "edit":
     {
@@ -234,7 +234,7 @@
     },
     "manage_campers":
     {
-        "en":"Manage cmpers",
+        "en":"Manage campers",
         "he":"ניהול חניכים"
     },
     "add_camper":{
@@ -284,5 +284,60 @@
     "select_all":{
         "en":"Select all",
         "he":"בחר הכל"
+    },
+    "manage_families":{
+        "en":"Manage Families",
+        "he":"ניהול משפחות"
+    },
+    "assigning":
+    {
+        "en":"Assigning Camper",
+        "he":"שבץ חניך"
+    },
+    "save":
+    {
+        "en":"save",
+        "he":"שמור"
+    },
+    "cancel":
+    {
+        "en":"cancel",
+        "he":"בטל"
+    },
+    "disability": {
+        "en": "Disability",
+        "he": "רמת מוגבלות"
+    },
+    "choose": {
+        "en": "choose",
+        "he": "בחר"
+    },
+    "search_by_name": {
+        "en": "Search by Name",
+        "he": "חיפוש לפי שם"
+    },
+    "sort_by_age": {
+    "en": "Sort by Age",
+    "he": "מיון לפי גיל"
+    },
+    "filter_by_gender": {
+    "en": "Filter by Gender",
+    "he": "סינון לפי מין"
+    },
+    "ascending": {
+    "en": "Ascending",
+    "he": "עולה"
+    },
+    "descending": {
+    "en": "Descending",
+    "he": "יורד"
+    },
+    "all": {
+    "en": "All",
+    "he": "הכל"
+    },
+    "filter_by_disability": {
+    "en": "Sort by disability",
+    "he": "סינון לפי רמת מוגבלות"
     }
 }

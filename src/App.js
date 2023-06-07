@@ -24,9 +24,9 @@ function App() {
           <Route path="Contact" element={<Contact />} />
           <Route path="About" element={<About />} />
           <Route path="Event/:id" element={<Event />} />
-          <Route path="Families" element={<FamiliesManagment />} />
-          <Route path="Families/:id" element={<Families />} />
-          <Route path="Families/:id/:family" element={<EditFamily/>} />
+          {user && <Route path="Families" element={<FamiliesManagment />} />}
+          {user && <Route path="Families/:id" element={<Families />} />}
+          {user && <Route path="Families/:id/:family" element={<EditFamily/>} />}
           {user && <Route path="CreatShabat" element={<CreatShabat />} />}
           {user && <Route path="ManageCampers" element={<ManageCampers />} />}
           <Route path="*" element={<h1>Not Found</h1>} />
