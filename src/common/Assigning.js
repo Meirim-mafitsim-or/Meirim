@@ -5,6 +5,8 @@ import { BiUserPlus } from 'react-icons/bi';
 import { db } from '../common/FirebaseApp';
 import { updateDoc } from 'firebase/firestore';
 import { collection, doc, getDoc} from "firebase/firestore"; 
+import { setDoc } from 'firebase/firestore';
+
 
 
 export async function getCampers(event, setRegID) {
@@ -15,7 +17,7 @@ export async function getCampers(event, setRegID) {
   return Campers;
 }
 
-export default function Assigning({ show, onHide, language, event , selectedFamily}) {
+export default function Assigning({ show, onHide, language, event , selectedFamily, setFamilies, settlement}) {
   const [campers, setCampers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('age');
@@ -27,6 +29,12 @@ export default function Assigning({ show, onHide, language, event , selectedFami
       try {
         const fetchedCampers = await getCampers(event, setRegID);
         setCampers(fetchedCampers);
+        if (selectedFamily)
+        {
+          checkCamperIDInAssigningsArray(selectedFamily.last_name, selectedFamily.phone_number);
+
+        }
+
       } catch (error) {
         console.log(error);
       }
@@ -53,47 +61,141 @@ export default function Assigning({ show, onHide, language, event , selectedFami
     return 0;
   });
 
-    const handleUserPlusClick = async (index) => {
-      const updatedCampers = [...campers];
-      const familiesCol = collection(db, 'familiesRegistration');
-      const cur_families = doc(familiesCol, regID);
-  
-      const FamiliesSnapshot = await getDoc(cur_families);
-      const familiesData = FamiliesSnapshot.data();
-  
-      const families = familiesData.families;
 
-      if (updatedCampers[index].assigning)
-      {
-        console.log("", updatedCampers[index]);
-        const confirmed = window.confirm(strings.to_change_assigning[language]);
-        if (!confirmed) {
-          return; // Don't proceed further if not confirmed
-        }
-        const lastFamily = families.find((check_family) => check_family.id === updatedCampers[index].family);
-        if (lastFamily) {
-
-          lastFamily.assigning = false;
-          lastFamily.camper = null;
-        }
+  const getFamilyFromAssignings = async (settlement, camperID) => {
+    if (!selectedFamily) {
+      console.log('No selected family.');
+      return;
+    }
+  
+    const collectionRef = collection(db, 'assignings');
+    const docRef = doc(collectionRef, settlement);
+    const docSnapshot = await getDoc(docRef);
+  
+    if (!docSnapshot.exists()) {
+      console.log('Assigning document not found.');
+      return;
+    }
+  
+    const assigningsArray = docSnapshot.data().assignings;
+  
+    let assigningExists = null;
+  
+    assigningsArray.some((assigning) => {
+      if (
+        assigning.familyName === selectedFamily.last_name &&
+        assigning.phoneNumber === selectedFamily.phone_number
+      ) {
+        // Object matching the conditions found in the array
+        assigningExists = assigning;
+        return true; // Exit the loop
       }
-        
-        updatedCampers[index].assigning = true;
-        updatedCampers[index].family = selectedFamily.id;
-
-
-        // const desiredFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
-        const desiredFamily = families.find((check_family) => check_family.id === selectedFamily.id);
-
-        desiredFamily.camper =  updatedCampers[index].id;
-        desiredFamily.assigning = true;
+      return false;
+    });
+    return {assigning: assigningExists, assigningsArray};
+  }
+  
+  const addFamilyToAssignings = async (camperID) => {
+    if (!show)
+    {
+      return;
+    }
     
-        // Update the family object in the Firebase Firestore database
-        await updateDoc(event, { campers: updatedCampers });
-        await updateDoc(cur_families, { families: families });
-        onHide();
-        
+    const {assigning, assigningsArray} = await getFamilyFromAssignings();
+    const collectionRef = collection(db, 'assignings');
+    const docRef = doc(collectionRef, settlement);
+    if (!assigning) {
+      // Create a new object with the selected family details
+      const newAssigning = {
+        familyName: selectedFamily.last_name,
+        phoneNumber: selectedFamily.phone_number,
+        campersId: [camperID]
       };
+  
+      // Add the new object to the assigningsArray
+      assigningsArray.push(newAssigning);
+  
+      // Update the Firestore document
+      await updateDoc(docRef, { assignings: assigningsArray });
+  
+      console.log('New object added to assigningsArray:', newAssigning);
+    }
+    else
+    {
+        if (!assigning.campersId.includes(camperID))
+        {
+          assigning.campersId.push(camperID);
+          await updateDoc(docRef, { assignings: assigningsArray });
+        }
+    }
+  };
+  
+  const checkCamperIDInAssigningsArray = (last_name, phone_number) => {
+    if (!selectedFamily)
+    {
+      return; 
+    }
+    const {assigning, assigningsArray} = getFamilyFromAssignings();
+    if (!assigningsArray || assigningsArray.length === 0) {
+      console.log('Assignings array is empty.');
+      return false;
+    }
+  
+    const foundFamilies = assigningsArray.filter(
+      (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number);
+  
+    console.log("", foundFamilies);
+    return foundFamilies;
+  };
+
+  const handleUserPlusClick = async (index) => {
+    if (show)
+    {
+      addFamilyToAssignings(settlement, campers[index].id)//TODO - do it after the shabat!
+
+    }
+
+    const updatedCampers = [...campers];
+    const familiesCol = collection(db, 'familiesRegistration');
+    const cur_families = doc(familiesCol, regID);
+  
+    const FamiliesSnapshot = await getDoc(cur_families);
+    const familiesData = FamiliesSnapshot.data();
+    
+  
+    const families = familiesData.families;
+  
+    if (updatedCampers[index].assigning) {
+      const confirmed = window.confirm(strings.to_change_assigning[language]);
+      if (!confirmed) {
+        return; // Don't proceed further if not confirmed
+      }
+      const lastFamily = families.find((check_family) => check_family.id === updatedCampers[index].family);
+      if (lastFamily) {
+        lastFamily.assigning = false;
+        lastFamily.camper = null;
+      }
+    }
+  
+    updatedCampers[index].assigning = true;
+    updatedCampers[index].family = selectedFamily.id;
+  
+    const desiredFamilyIndex = families.findIndex((check_family) => check_family.id === selectedFamily.id);
+    if (desiredFamilyIndex !== -1) {
+      families[desiredFamilyIndex].camper = updatedCampers[index].id;
+      families[desiredFamilyIndex].assigning = true;
+    } 
+    
+  
+    // Update the family object in the Firebase Firestore database
+    await Promise.all([
+      updateDoc(event, { campers: updatedCampers }),
+      setDoc(cur_families, { families }),
+    ]);
+    onHide();
+    setFamilies(families);
+    
+  };
 
 
   return (
@@ -197,3 +299,5 @@ export default function Assigning({ show, onHide, language, event , selectedFami
     </Modal>
   );
 }
+
+

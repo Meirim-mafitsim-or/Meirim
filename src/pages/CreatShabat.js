@@ -8,7 +8,7 @@ import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
 import Select from 'react-select';
 import citys from '../static/city.json';
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../common/FirebaseApp';
@@ -27,6 +27,27 @@ export async function getCoordinators() {
   const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
   const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
   return Coordinators;
+}
+
+async function createAssigningDoc (settlement)  {
+  // Get a reference to the Firestore collection
+  const collectionRef = collection(db, 'assignings');
+
+  const data = {
+    assignings:[{
+    familyName: "",
+    phoneNumber: "",
+    campersId: []
+    }]
+  };
+  
+  const docRef = doc(collectionRef, settlement);
+  // Check if the document already exists
+  const docSnapshot = await getDoc(docRef);
+  if (docSnapshot.exists()) {
+    return;
+  }
+  await setDoc(doc(collectionRef, settlement), data);
 }
 
 
@@ -108,6 +129,7 @@ export default function FormCreatShabat() {
     };
 
     await addShabat(shabatData);
+    createAssigningDoc(city_en)
     navigate("/");
   };
 

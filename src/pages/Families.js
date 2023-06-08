@@ -12,14 +12,16 @@ import { FaChild } from 'react-icons/fa';
 import Assigning from '../common/Assigning';
 import strings from '../static/Strings.json';
 
+
 // Function to retrieve families data from Firestore
-async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent) {
+async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement) {
   const events = collection(db, 'events');
   const cur_event = doc(events, id);
   setEvent(cur_event);
   const EventsSnapshot = await getDoc(cur_event);
   const eventData = EventsSnapshot.data();
   const families_id = eventData.registrationId;
+  setSettlement(eventData.settlement)
   setFamiliesEvent(families_id);
 
   if (families_id) {
@@ -50,6 +52,7 @@ export default function Families() {
   const [familiesDoc, setFamiliesDoc] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState(null);
+  const [settlement, setSettlement] = useState(null);
   const navigate = useNavigate();
 
   // Extract the suffix from the current URL path
@@ -63,7 +66,8 @@ export default function Families() {
   // Fetch families data based on the extracted suffix
   useEffect(() => {
     const fetchData = async () => {
-      const familiesData = await getFamilies(pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent);
+      const familiesData = await getFamilies(
+        pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement);
       if (familiesData) {
         setFamilies(familiesData);
       }
@@ -133,6 +137,7 @@ export default function Families() {
     setShowModal(true);
   };
 
+
   return (
     <Container fluid>
       <h1>{strings.registered_families[language]}</h1>
@@ -195,7 +200,7 @@ export default function Families() {
                       onClick={() => handleAssigningModal(family)}
                     />
                   )}
-                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} />
+                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} setFamilies={setFamilies} settlement={settlement}/>
                 </TableCell>
                 <TableCell align="right">{family.camper}</TableCell>
               </TableRow>
@@ -206,3 +211,4 @@ export default function Families() {
     </Container>
   );
 }
+
