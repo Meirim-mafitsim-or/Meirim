@@ -339,5 +339,10 @@
     "filter_by_disability": {
     "en": "Sort by disability",
     "he": "סינון לפי רמת מוגבלות"
+    },
+    "curAssigning":
+    {
+        "en": "current assigning",
+        "he": "שיבוץ עדכני"
     }
 }

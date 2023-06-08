@@ -1,26 +1,25 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Container, Button,  } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import { db } from '../common/FirebaseApp';
-import { collection, doc, getDoc} from "firebase/firestore"; 
+import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useLocation } from 'react-router-dom';
 import strings from '../static/Strings.json';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { BiPencil  } from 'react-icons/bi';
+import { BiPencil } from 'react-icons/bi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BsCheckCircleFill } from 'react-icons/bs';
-import { updateDoc } from 'firebase/firestore';
 import { isEqual } from 'lodash';
 import { FaChild } from 'react-icons/fa';
-import Assigning from "../common/Assigning";
+import Assigning from '../common/Assigning';
+import { useNavigate } from 'react-router-dom';
 
 // Function to retrieve families data from Firestore
 export async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent) {
   const events = collection(db, 'events');
   const cur_event = doc(events, id);
-  setEvent(cur_event)
+  setEvent(cur_event);
   const EventsSnapshot = await getDoc(cur_event);
   const eventData = EventsSnapshot.data();
   const families_id = eventData.registrationId;
@@ -53,14 +52,14 @@ export default function Families() {
   const [familiesEvent, setFamiliesEvent] = useState(null);
   const [familiesDoc, setFamiliesDoc] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedFamilyIndex, setSelectedFamilyIndex] = useState(null);
-
+  const [selectedFamily, setSelectedFamily] = useState(null); // State for selected family
+  const navigate = useNavigate();
 
   // Extract the suffix from the current URL path
   useEffect(() => {
     const path = location.pathname;
     const parts = path.split('/');
-    const suffix = parts[parts.length-1];
+    const suffix = parts[parts.length - 1];
     setPathSuffix(suffix);
   }, [location]);
 
@@ -68,11 +67,15 @@ export default function Families() {
   useEffect(() => {
     if (pathSuffix) {
       getFamilies(pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent)
-      .then((families) => setFamilies(families))
-      .catch((error) => console.log(error));
+        .then((families) => setFamilies(families))
+        .catch((error) => console.log(error));
     }
   }, [pathSuffix]);
 
+  const editClick = async (family) => {
+    setSelectedFamily(family); // Update the selected family
+    navigate(`./${familiesEvent}`, { state: { familiesId: familiesEvent, selectedFamily: family, event_id: pathSuffix } });
+  };
 
   // Confirm a family's registration
   const confirm = async (index, bool) => {
@@ -89,9 +92,9 @@ export default function Families() {
       // Update the family object in the Firebase Firestore database
       await updateDoc(familiesDoc, { families });
     } else {
-      console.log("Family not found");
+      console.log('Family not found');
     }
-    
+
     const EventsSnapshot = await getDoc(event);
     const eventData = EventsSnapshot.data();
     const confirmedFamilies = eventData.families;
@@ -101,11 +104,14 @@ export default function Families() {
       await updateDoc(event, { families: updatedConfirmedFamilies });
     } else {
       desiredFamily.confirmed = true;
-      const updatedConfirmedFamilies = confirmedFamilies.filter(
-        (family) => !isEqual(family, desiredFamily)
-      );
+      const updatedConfirmedFamilies = confirmedFamilies.filter((family) => !isEqual(family, desiredFamily));
       await updateDoc(event, { families: updatedConfirmedFamilies });
     }
+  };
+
+  const handleAssigningModal = (family) => {
+    setSelectedFamily(family);
+    setShowModal(true);
   };
 
   return (
@@ -128,15 +134,13 @@ export default function Families() {
               <TableCell align="right">{strings.confirmed[language]}</TableCell>
               <TableCell align="right">{strings.edit[language]}</TableCell>
               <TableCell align="right">{strings.assigning[language]}</TableCell>
+              <TableCell align="right">{strings.curAssigning[language]}</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {families.map((family, index) => (
-              <TableRow
-                key={index}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
+              <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                 <TableCell align="right">{family.first_name}</TableCell>
                 <TableCell align="right">{family.last_name}</TableCell>
                 <TableCell align="right">{family.city}</TableCell>
@@ -147,37 +151,39 @@ export default function Families() {
                 <TableCell align="right">{family.email}</TableCell>
                 <TableCell align="right">{family.special_comment}</TableCell>
                 <TableCell align="right">
-                <BsCheckCircleFill
-                  style={{ cursor: 'pointer' }}
-                  size={30}
-                  color={family.confirmed ? 'green' : 'grey'}
-                  onClick={() => confirm(index, !family.confirmed)} // Pass the index and inverse of `family.confirmed`
-                />
+                  <BsCheckCircleFill
+                    style={{ cursor: 'pointer' }}
+                    size={30}
+                    color={family.confirmed ? 'green' : 'grey'}
+                    onClick={() => confirm(index, !family.confirmed)} // Pass the index and inverse of `family.confirmed`
+                  />
                 </TableCell>
                 <TableCell align="right">
-                  <Button as={Link} to={`${familiesEvent}`} variant="primary" state={{ family,familiesEvent ,pathSuffix}} >
-                    <BiPencil size={24} />
-                  </Button>
+                  <BiPencil
+                    size={24}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      editClick(family);
+                    }}
+                  />
                 </TableCell>
                 <TableCell align="right">
                   {family.confirmed && (
                     <FaChild
-                    size={24}
-                    color="#313B72"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {setSelectedFamilyIndex(index); // Set the selected index
-                                  setShowModal(true);}}
-                  />
+                      size={24}
+                      color="#313B72"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleAssigningModal(family)}
+                      />
                   )}
-                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} familyInd={selectedFamilyIndex} />
-
+                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} />
                 </TableCell>
+                <TableCell align="right">{family.camper}</TableCell>
+
               </TableRow>
             ))}
-            
           </TableBody>
         </Table>
-        
       </TableContainer>
     </Container>
   );

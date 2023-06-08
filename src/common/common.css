@@ -55,8 +55,8 @@ html, body {
     object-fit: cover;
     object-position: center;
 }
-
-.custom-modal .modal-dialog {
+  
+  .custom-modal .modal-dialog {
     width: 1000px;
-    max-width: 90%; 
+    max-width: 90%;
   }

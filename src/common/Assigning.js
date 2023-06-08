@@ -4,22 +4,23 @@ import strings from '../static/Strings.json';
 import { getDoc } from 'firebase/firestore';
 import { BiUserPlus } from 'react-icons/bi';
 import { updateDoc } from 'firebase/firestore';
+import _ from 'lodash';
 
 export async function getCampers(event, setFamilies) {
   const EventsSnapshot = await getDoc(event);
   const eventData = EventsSnapshot.data();
-  const Campers = eventData.campers;
   setFamilies(eventData.families);
+  const Campers = eventData.campers;
   return Campers;
 }
 
-export default function Assigning({ show, onHide, language, event, familyInd }) {
+export default function Assigning({ show, onHide, language, event , selectedFamily}) {
   const [campers, setCampers] = useState([]);
-  const [families, setFamilies] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('age');
   const [filterByGender, setFilterByGender] = useState('');
-  console.log(familyInd);
+  const [families, setFamilies] = useState(null);
+
   useEffect(() => {
     const fetchCampers = async () => {
       try {
@@ -54,13 +55,19 @@ export default function Assigning({ show, onHide, language, event, familyInd }) 
     const handleUserPlusClick = async (index) => {
         const updatedCampers = [...campers];
         updatedCampers[index].assinging = true;
-        updatedCampers[index].family = families[familyInd];
+        updatedCampers[index].family = selectedFamily;
+
+        const curFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
+        console.log("", families)
+        console.log("",selectedFamily)
+
+        curFamily.camper =  updatedCampers[index];
+        curFamily.assinging = true;
     
-        console.log("", updatedCampers)
-        setCampers(updatedCampers);
-        console.log("",event)
         // Update the family object in the Firebase Firestore database
         await updateDoc(event, { campers: updatedCampers });
+        await updateDoc(event, { families: families });
+        onHide();
         
       };
 
@@ -149,9 +156,6 @@ export default function Assigning({ show, onHide, language, event, familyInd }) 
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
-          {strings.save[language]}
-        </Button>
-        <Button variant="primary" onClick={onHide}>
           {strings.cancel[language]}
         </Button>
       </Modal.Footer>
