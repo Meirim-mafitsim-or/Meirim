@@ -4,10 +4,9 @@ import strings from '../static/Strings.json';
 import { BiUserPlus } from 'react-icons/bi';
 import { db } from '../common/FirebaseApp';
 import { updateDoc } from 'firebase/firestore';
-import { collection, doc, getDoc} from "firebase/firestore"; 
+import { collection, doc, getDoc } from 'firebase/firestore';
 import { setDoc } from 'firebase/firestore';
-
-
+import { BiCheck } from 'react-icons/bi';
 
 export async function getCampers(event, setRegID) {
   const EventsSnapshot = await getDoc(event);
@@ -17,24 +16,34 @@ export async function getCampers(event, setRegID) {
   return Campers;
 }
 
-export default function Assigning({ show, onHide, language, event , selectedFamily, setFamilies, settlement}) {
+export default function Assigning({
+  show,
+  onHide,
+  language,
+  event,
+  selectedFamily,
+  setFamilies,
+  settlement,
+}) {
   const [campers, setCampers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('age');
   const [filterByGender, setFilterByGender] = useState('');
   const [regID, setRegID] = useState(null);
+  const [historyAss, setHistoryAss] = useState([]);
+  const [showFilteredCampers, setShowFilteredCampers] = useState(false);
 
   useEffect(() => {
     const fetchCampers = async () => {
       try {
         const fetchedCampers = await getCampers(event, setRegID);
         setCampers(fetchedCampers);
-        if (selectedFamily)
-        {
-          checkCamperIDInAssigningsArray(selectedFamily.last_name, selectedFamily.phone_number);
-
+        if (show && selectedFamily) {
+          await checkCamperIDInAssigningsArray(
+            selectedFamily.last_name,
+            selectedFamily.phone_number
+          );
         }
-
       } catch (error) {
         console.log(error);
       }
@@ -43,14 +52,15 @@ export default function Assigning({ show, onHide, language, event , selectedFami
     fetchCampers(); // Call the fetchCampers function
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event]);
+  }, [event, selectedFamily]); // Include selectedFamily as a dependency
 
   // Filter campers based on search query and gender filter
   const filteredCampers = campers.filter(
     (camper) =>
       (camper.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         camper.lastName.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (!filterByGender || camper.gender === filterByGender)
+      (!filterByGender || camper.gender === filterByGender) &&
+      (!showFilteredCampers || historyAss.includes(camper.id))
   );
 
   // Sort campers based on the selected sorting option
@@ -61,26 +71,27 @@ export default function Assigning({ show, onHide, language, event , selectedFami
     return 0;
   });
 
-
-  const getFamilyFromAssignings = async (settlement, camperID) => {
+  // Fetch the assignings document for the selected settlement
+  const getFamilyFromAssignings = async (settlement) => {
     if (!selectedFamily) {
       console.log('No selected family.');
-      return;
+      return null;
     }
-  
+
     const collectionRef = collection(db, 'assignings');
     const docRef = doc(collectionRef, settlement);
     const docSnapshot = await getDoc(docRef);
-  
+
     if (!docSnapshot.exists()) {
       console.log('Assigning document not found.');
-      return;
+      return null;
     }
-  
-    const assigningsArray = docSnapshot.data().assignings;
-  
+
+    const assigningsData = docSnapshot.data();
+    const assigningsArray = assigningsData.assignings || []; // Initialize with an empty array
+
     let assigningExists = null;
-  
+
     assigningsArray.some((assigning) => {
       if (
         assigning.familyName === selectedFamily.last_name &&
@@ -92,16 +103,17 @@ export default function Assigning({ show, onHide, language, event , selectedFami
       }
       return false;
     });
-    return {assigning: assigningExists, assigningsArray};
-  }
-  
+
+    return { assigningExists, assigningsArray };
+  };
+
+  // Add a family to the assignings document
   const addFamilyToAssignings = async (camperID) => {
-    if (!show)
-    {
+    if (!show) {
       return;
     }
-    
-    const {assigning, assigningsArray} = await getFamilyFromAssignings();
+
+    const { assigning, assigningsArray } = await getFamilyFromAssignings(settlement);
     const collectionRef = collection(db, 'assignings');
     const docRef = doc(collectionRef, settlement);
     if (!assigning) {
@@ -109,62 +121,58 @@ export default function Assigning({ show, onHide, language, event , selectedFami
       const newAssigning = {
         familyName: selectedFamily.last_name,
         phoneNumber: selectedFamily.phone_number,
-        campersId: [camperID]
+        campersId: [camperID],
       };
-  
+
       // Add the new object to the assigningsArray
       assigningsArray.push(newAssigning);
-  
+
       // Update the Firestore document
       await updateDoc(docRef, { assignings: assigningsArray });
-  
+
       console.log('New object added to assigningsArray:', newAssigning);
-    }
-    else
-    {
-        if (!assigning.campersId.includes(camperID))
-        {
-          assigning.campersId.push(camperID);
-          await updateDoc(docRef, { assignings: assigningsArray });
-        }
+    } else {
+      if (!assigning.campersId.includes(camperID)) {
+        assigning.campersId.push(camperID);
+        await updateDoc(docRef, { assignings: assigningsArray });
+      }
     }
   };
-  
-  const checkCamperIDInAssigningsArray = (last_name, phone_number) => {
-    if (!selectedFamily)
-    {
-      return; 
-    }
-    const {assigning, assigningsArray} = getFamilyFromAssignings();
+
+  // Check if the camper ID exists in the assignings array for the selected family
+  const checkCamperIDInAssigningsArray = async (last_name, phone_number) => {
+    const { assigningExists, assigningsArray } = await getFamilyFromAssignings(settlement);
     if (!assigningsArray || assigningsArray.length === 0) {
-      console.log('Assignings array is empty.');
-      return false;
+      return;
     }
-  
-    const foundFamilies = assigningsArray.filter(
-      (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number);
-  
-    console.log("", foundFamilies);
-    return foundFamilies;
+
+    const foundAssigning = assigningsArray.find(
+      (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number
+    );
+
+    if (foundAssigning) {
+      await setHistoryAss(foundAssigning.campersId);
+      return foundAssigning.campersId;
+    }
+
+    return [];
   };
 
+  // Handle click event when the user clicks the "User Plus" icon to assign a camper to a family
   const handleUserPlusClick = async (index) => {
-    if (show)
-    {
-      addFamilyToAssignings(settlement, campers[index].id)//TODO - do it after the shabat!
-
+    if (show) {
+      addFamilyToAssignings(campers[index].id);
     }
 
     const updatedCampers = [...campers];
     const familiesCol = collection(db, 'familiesRegistration');
     const cur_families = doc(familiesCol, regID);
-  
+
     const FamiliesSnapshot = await getDoc(cur_families);
     const familiesData = FamiliesSnapshot.data();
-    
-  
+
     const families = familiesData.families;
-  
+
     if (updatedCampers[index].assigning) {
       const confirmed = window.confirm(strings.to_change_assigning[language]);
       if (!confirmed) {
@@ -176,17 +184,16 @@ export default function Assigning({ show, onHide, language, event , selectedFami
         lastFamily.camper = null;
       }
     }
-  
+
     updatedCampers[index].assigning = true;
     updatedCampers[index].family = selectedFamily.id;
-  
+
     const desiredFamilyIndex = families.findIndex((check_family) => check_family.id === selectedFamily.id);
     if (desiredFamilyIndex !== -1) {
       families[desiredFamilyIndex].camper = updatedCampers[index].id;
       families[desiredFamilyIndex].assigning = true;
-    } 
-    
-  
+    }
+
     // Update the family object in the Firebase Firestore database
     await Promise.all([
       updateDoc(event, { campers: updatedCampers }),
@@ -194,9 +201,7 @@ export default function Assigning({ show, onHide, language, event , selectedFami
     ]);
     onHide();
     setFamilies(families);
-    
   };
-
 
   return (
     <Modal show={show} onHide={onHide} centered className="custom-modal">
@@ -249,6 +254,18 @@ export default function Assigning({ show, onHide, language, event , selectedFami
             </div>
           </div>
         </div>
+        <div className="form-check mb-1">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="filterCheckbox"
+            checked={showFilteredCampers}
+            onChange={(e) => setShowFilteredCampers(e.target.checked)}
+          />
+          <label className="form-check-label" htmlFor="filterCheckbox">
+            {strings.show_only_campers_in_history[language]}
+          </label>
+        </div>
 
         <table className="table table-striped">
           <thead>
@@ -259,31 +276,26 @@ export default function Assigning({ show, onHide, language, event , selectedFami
               <th>{strings.gender[language]}</th>
               <th>{strings.age[language]}</th>
               <th>{strings.special_comment[language]}</th>
-              <th>{strings.curAssigning[language]}</th>
+              <th>{strings.assigned[language]}</th>
               <th>{strings.choose[language]}</th>
             </tr>
           </thead>
           <tbody>
             {sortedCampers.map((item, index) => (
-              <tr key={index}>
+              <tr key={item.id}>
                 <td>{item.id}</td>
                 <td>{item.firstName}</td>
                 <td>{item.lastName}</td>
                 <td>{item.gender}</td>
                 <td>{item.age}</td>
                 <td>{item.comments}</td>
-                <td>{
-
-
-                
-                }
-                
-                
-                </td>
+                <td>{item.assigning ? <BiCheck size={20} /> : null}</td>
                 <td>
-                  <BiUserPlus size={30} 
-                  onClick={() => handleUserPlusClick(index)}
-                  style={{ cursor: 'pointer' }}
+                  <BiUserPlus
+                    size={30}
+                    onClick={() => handleUserPlusClick(index)}
+                    style={{ cursor: 'pointer' }}
+                    color="#313B72"
                   />
                 </td>
               </tr>
@@ -293,11 +305,9 @@ export default function Assigning({ show, onHide, language, event , selectedFami
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
-          {strings.cancel[language]}
+          {strings.close[language]}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 }
-
-

@@ -340,23 +340,28 @@
     },
 
     "sort_by_age": {
-    "en": "Sort by Age",
-    "he": "מיון לפי גיל"
+        "en": "Sort by Age",
+        "he": "מיון לפי גיל"
+    },
+    "sort_by": {
+        "en": "sort by",
+        "he": "מיון"
     },
 
+
     "filter_by_gender": {
-    "en": "Filter by Gender",
-    "he": "סינון לפי מין"
+        "en": "Filter by Gender",
+        "he": "סינון לפי מין"
     },
 
     "ascending": {
-    "en": "Ascending",
-    "he": "עולה"
+        "en": "Ascending",
+        "he": "עולה"
     },
 
     "descending": {
-    "en": "Descending",
-    "he": "יורד"
+        "en": "Descending",
+        "he": "יורד"
     },
 
     "all": {
@@ -374,6 +379,11 @@
         "en": "current assigning",
         "he": "שיבוץ עדכני"
     },
+    "assigned":
+    {
+        "en": "assigned",
+        "he": "שובץ"
+    },
     
     "id":
     {
@@ -385,5 +395,15 @@
     {
         "en": "The camper has already been assigned, do you want to change the assignment?",
         "he": "החניך כבר שובץ, האם ברצונך לשנות את השיבוץ?"    
+    },
+    "show_only_campers_in_history":
+    {
+        "en":"Show only campers previously assigned to this family ",
+        "he":"הצג רק חניכים ששובצו בעבר למשפחה זו"
+    },
+    "no_results":
+    {
+        "en":"no results",
+        "he":"אין תוצאות"
     }
 }
