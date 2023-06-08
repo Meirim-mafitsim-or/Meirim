@@ -24,7 +24,9 @@ async function update(families_id, selectedFamily, form) {
     const familiesData = FamiliesSnapshot.data();
 
     const families = familiesData.families;
-    const desiredFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
+    // const desiredFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
+    const desiredFamily = families.find((check_family) => check_family.id === selectedFamily.id);
+    
     // Update the name property of desiredFamily
     if (desiredFamily) {
       desiredFamily.first_name = form.first_name.value;

@@ -100,11 +100,10 @@ export default function Families() {
     const confirmedFamilies = eventData.families;
 
     if (bool) {
-      const updatedConfirmedFamilies = [...confirmedFamilies, desiredFamily];
+      const updatedConfirmedFamilies = [...confirmedFamilies, desiredFamily.id];
       await updateDoc(event, { families: updatedConfirmedFamilies });
     } else {
-      desiredFamily.confirmed = true;
-      const updatedConfirmedFamilies = confirmedFamilies.filter((family) => !isEqual(family, desiredFamily));
+      const updatedConfirmedFamilies = confirmedFamilies.filter((id) => id !== desiredFamily.id);
       await updateDoc(event, { families: updatedConfirmedFamilies });
     }
   };

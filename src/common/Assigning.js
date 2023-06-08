@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import strings from '../static/Strings.json';
-import { getDoc } from 'firebase/firestore';
 import { BiUserPlus } from 'react-icons/bi';
+import { db } from '../common/FirebaseApp';
 import { updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc} from "firebase/firestore"; 
 import _ from 'lodash';
 
-export async function getCampers(event, setFamilies) {
+
+export async function getCampers(event, setRegID) {
   const EventsSnapshot = await getDoc(event);
   const eventData = EventsSnapshot.data();
-  setFamilies(eventData.families);
+  console.log("", eventData);
+  setRegID(eventData.registrationId);
   const Campers = eventData.campers;
   return Campers;
 }
@@ -19,12 +22,12 @@ export default function Assigning({ show, onHide, language, event , selectedFami
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('age');
   const [filterByGender, setFilterByGender] = useState('');
-  const [families, setFamilies] = useState(null);
+  const [regID, setRegID] = useState(null);
 
   useEffect(() => {
     const fetchCampers = async () => {
       try {
-        const fetchedCampers = await getCampers(event, setFamilies);
+        const fetchedCampers = await getCampers(event, setRegID);
         setCampers(fetchedCampers);
       } catch (error) {
         console.log(error);
@@ -55,18 +58,25 @@ export default function Assigning({ show, onHide, language, event , selectedFami
     const handleUserPlusClick = async (index) => {
         const updatedCampers = [...campers];
         updatedCampers[index].assinging = true;
-        updatedCampers[index].family = selectedFamily;
+        updatedCampers[index].family = selectedFamily.id;
 
-        const curFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
-        console.log("", families)
-        console.log("",selectedFamily)
+        const familiesCol = collection(db, 'familiesRegistration');
+        const cur_families = doc(familiesCol, regID);
+    
+        const FamiliesSnapshot = await getDoc(cur_families);
+        const familiesData = FamiliesSnapshot.data();
+    
+        const families = familiesData.families;
+        // const desiredFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
+        const desiredFamily = families.find((check_family) => check_family.id === selectedFamily.id);
+        console.log("", desiredFamily)
 
-        curFamily.camper =  updatedCampers[index];
-        curFamily.assinging = true;
+        desiredFamily.camper =  updatedCampers[index].id;
+        desiredFamily.assinging = true;
     
         // Update the family object in the Firebase Firestore database
         await updateDoc(event, { campers: updatedCampers });
-        await updateDoc(event, { families: families });
+        await updateDoc(cur_families, { families: families });
         onHide();
         
       };
@@ -127,6 +137,7 @@ export default function Assigning({ show, onHide, language, event , selectedFami
         <table className="table table-striped">
           <thead>
             <tr>
+              <th>{strings.id[language]}</th>
               <th>{strings.first_name[language]}</th>
               <th>{strings.last_name[language]}</th>
               <th>{strings.gender[language]}</th>
@@ -138,6 +149,7 @@ export default function Assigning({ show, onHide, language, event , selectedFami
           <tbody>
             {sortedCampers.map((item, index) => (
               <tr key={index}>
+                <td>{item.id}</td>
                 <td>{item.firstName}</td>
                 <td>{item.lastName}</td>
                 <td>{item.gender}</td>
