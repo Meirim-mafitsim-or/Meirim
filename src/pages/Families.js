@@ -1,22 +1,19 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import { db } from '../common/FirebaseApp';
 import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useLocation } from 'react-router-dom';
-import strings from '../static/Strings.json';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { BiPencil } from 'react-icons/bi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BsCheckCircleFill } from 'react-icons/bs';
-import { isEqual } from 'lodash';
 import { FaChild } from 'react-icons/fa';
 import Assigning from '../common/Assigning';
-import { useNavigate } from 'react-router-dom';
+import strings from '../static/Strings.json';
 
 // Function to retrieve families data from Firestore
-export async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent) {
+async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent) {
   const events = collection(db, 'events');
   const cur_event = doc(events, id);
   setEvent(cur_event);
@@ -52,7 +49,7 @@ export default function Families() {
   const [familiesEvent, setFamiliesEvent] = useState(null);
   const [familiesDoc, setFamiliesDoc] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedFamily, setSelectedFamily] = useState(null); // State for selected family
+  const [selectedFamily, setSelectedFamily] = useState(null);
   const navigate = useNavigate();
 
   // Extract the suffix from the current URL path
@@ -65,48 +62,71 @@ export default function Families() {
 
   // Fetch families data based on the extracted suffix
   useEffect(() => {
-    if (pathSuffix) {
-      getFamilies(pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent)
-        .then((families) => setFamilies(families))
-        .catch((error) => console.log(error));
-    }
+    const fetchData = async () => {
+      const familiesData = await getFamilies(pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent);
+      if (familiesData) {
+        setFamilies(familiesData);
+      }
+    };
+
+    fetchData().catch(error => console.log(error));
   }, [pathSuffix]);
 
   const editClick = async (family) => {
-    setSelectedFamily(family); // Update the selected family
+    setSelectedFamily(family);
     navigate(`./${familiesEvent}`, { state: { familiesId: familiesEvent, selectedFamily: family, event_id: pathSuffix } });
   };
 
-  // Confirm a family's registration
   const confirm = async (index, bool) => {
     const updatedFamilies = [...families];
-    const familyToUpdate = { ...updatedFamilies[index] }; // Clone the family object
+    const familyToUpdate = { ...updatedFamilies[index] };
+    const isAssigned = familyToUpdate.assigning;
     familyToUpdate.confirmed = bool;
+    familyToUpdate.assigning = false;
+    const lastCamper = familyToUpdate.camper;
+    familyToUpdate.camper = null;
     updatedFamilies[index] = familyToUpdate;
+  
+    // Update specific fields in familiesDoc
+    await updateDoc(familiesDoc, {
+      families: updatedFamilies.map((family) => ({
+        ...family,
+        confirmed: family.id === familyToUpdate.id ? bool : family.confirmed,
+        assigning: family.id === familyToUpdate.id ? false : family.assigning,
+        camper: family.id === familyToUpdate.id ? null : family.camper,
+      })),
+    });
+  
     setFamilies(updatedFamilies);
-
-    const desiredFamily = families[index];
-    console.log(desiredFamily, index);
-    if (desiredFamily) {
-      desiredFamily.confirmed = bool;
-      // Update the family object in the Firebase Firestore database
-      await updateDoc(familiesDoc, { families });
-    } else {
-      console.log('Family not found');
-    }
-
-    const EventsSnapshot = await getDoc(event);
-    const eventData = EventsSnapshot.data();
+  
+    const eventsSnapshot = await getDoc(event);
+    const eventData = eventsSnapshot.data();
     const confirmedFamilies = eventData.families;
-
+    const campers = [...eventData.campers];
+  
     if (bool) {
-      const updatedConfirmedFamilies = [...confirmedFamilies, desiredFamily.id];
+      const updatedConfirmedFamilies = [...confirmedFamilies, familyToUpdate.id];
       await updateDoc(event, { families: updatedConfirmedFamilies });
     } else {
-      const updatedConfirmedFamilies = confirmedFamilies.filter((id) => id !== desiredFamily.id);
-      await updateDoc(event, { families: updatedConfirmedFamilies });
+      if (isAssigned) {
+        const updatedCampers = campers.map((camper) => {
+          if (camper.id === lastCamper) {
+            return { ...camper, assigning: false, family: null };
+          }
+          return camper;
+        });
+        await updateDoc(event, {
+          families: confirmedFamilies.filter((family) => family !== familyToUpdate.id),
+          campers: updatedCampers,
+        });
+      } else {
+        await updateDoc(event, {
+          families: confirmedFamilies.filter((family) => family !== familyToUpdate.id),
+        });
+      }
     }
   };
+  
 
   const handleAssigningModal = (family) => {
     setSelectedFamily(family);
@@ -154,7 +174,7 @@ export default function Families() {
                     style={{ cursor: 'pointer' }}
                     size={30}
                     color={family.confirmed ? 'green' : 'grey'}
-                    onClick={() => confirm(index, !family.confirmed)} // Pass the index and inverse of `family.confirmed`
+                    onClick={() => confirm(index, !family.confirmed)}
                   />
                 </TableCell>
                 <TableCell align="right">
@@ -173,12 +193,11 @@ export default function Families() {
                       color="#313B72"
                       style={{ cursor: 'pointer' }}
                       onClick={() => handleAssigningModal(family)}
-                      />
+                    />
                   )}
                   <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} />
                 </TableCell>
                 <TableCell align="right">{family.camper}</TableCell>
-
               </TableRow>
             ))}
           </TableBody>

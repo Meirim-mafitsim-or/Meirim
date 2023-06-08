@@ -5,13 +5,11 @@ import { BiUserPlus } from 'react-icons/bi';
 import { db } from '../common/FirebaseApp';
 import { updateDoc } from 'firebase/firestore';
 import { collection, doc, getDoc} from "firebase/firestore"; 
-import _ from 'lodash';
 
 
 export async function getCampers(event, setRegID) {
   const EventsSnapshot = await getDoc(event);
   const eventData = EventsSnapshot.data();
-  console.log("", eventData);
   setRegID(eventData.registrationId);
   const Campers = eventData.campers;
   return Campers;
@@ -56,23 +54,39 @@ export default function Assigning({ show, onHide, language, event , selectedFami
   });
 
     const handleUserPlusClick = async (index) => {
-        const updatedCampers = [...campers];
-        updatedCampers[index].assinging = true;
+      const updatedCampers = [...campers];
+      const familiesCol = collection(db, 'familiesRegistration');
+      const cur_families = doc(familiesCol, regID);
+  
+      const FamiliesSnapshot = await getDoc(cur_families);
+      const familiesData = FamiliesSnapshot.data();
+  
+      const families = familiesData.families;
+
+      if (updatedCampers[index].assigning)
+      {
+        console.log("", updatedCampers[index]);
+        const confirmed = window.confirm(strings.to_change_assigning[language]);
+        if (!confirmed) {
+          return; // Don't proceed further if not confirmed
+        }
+        const lastFamily = families.find((check_family) => check_family.id === updatedCampers[index].family);
+        if (lastFamily) {
+
+          lastFamily.assigning = false;
+          lastFamily.camper = null;
+        }
+      }
+        
+        updatedCampers[index].assigning = true;
         updatedCampers[index].family = selectedFamily.id;
 
-        const familiesCol = collection(db, 'familiesRegistration');
-        const cur_families = doc(familiesCol, regID);
-    
-        const FamiliesSnapshot = await getDoc(cur_families);
-        const familiesData = FamiliesSnapshot.data();
-    
-        const families = familiesData.families;
+
         // const desiredFamily = families.find((check_family) =>_.isEqual(selectedFamily, check_family));
         const desiredFamily = families.find((check_family) => check_family.id === selectedFamily.id);
-        console.log("", desiredFamily)
 
         desiredFamily.camper =  updatedCampers[index].id;
-        desiredFamily.assinging = true;
+        desiredFamily.assigning = true;
     
         // Update the family object in the Firebase Firestore database
         await updateDoc(event, { campers: updatedCampers });
@@ -143,6 +157,7 @@ export default function Assigning({ show, onHide, language, event , selectedFami
               <th>{strings.gender[language]}</th>
               <th>{strings.age[language]}</th>
               <th>{strings.special_comment[language]}</th>
+              <th>{strings.curAssigning[language]}</th>
               <th>{strings.choose[language]}</th>
             </tr>
           </thead>
@@ -155,6 +170,14 @@ export default function Assigning({ show, onHide, language, event , selectedFami
                 <td>{item.gender}</td>
                 <td>{item.age}</td>
                 <td>{item.comments}</td>
+                <td>{
+
+
+                
+                }
+                
+                
+                </td>
                 <td>
                   <BiUserPlus size={30} 
                   onClick={() => handleUserPlusClick(index)}

@@ -222,124 +222,153 @@
         "en":"Campers",
         "he":"חניכים"
     },
+
     "select":
     {
         "en":"Select from list",
         "he":"בחר מהרשימה"
     },
+
     "choose_file":
     {
         "en":"Choose File",
         "he":"בחר קובץ"
     },
+
     "manage_campers":
     {
         "en":"Manage campers",
         "he":"ניהול חניכים"
     },
+
     "add_camper":{
         "en":"Add camper",
         "he":"הוסף חניך"
     },
+
     "close":{
         "en":"Close",
         "he":"סגור"
     },
+
     "add":{
         "en":"Add",
         "he":"הוסף"
     },
+
     "gender":{
         "en":"Gender",
         "he":"מין"
     },
+
     "select_gender":{
         "en":"Select gender",
         "he":"בחר מין"
     },
+
     "male":{
         "en":"Male",
         "he":"זכר"
     },
+
     "female":{
         "en":"Female",
         "he":"נקבה"
     },
+
     "other":{
         "en":"Other",
         "he":"אחר"
     },
+
     "age":{
         "en":"Age",
         "he":"גיל"
     },
+
     "disability_rank":{
         "en":"Disability rank",
         "he":"רמת מוגבלות"
     },
+
     "delete":{
         "en":"Delete",
         "he":"מחק"
     },
+
     "select_all":{
         "en":"Select all",
         "he":"בחר הכל"
     },
+
     "manage_families":{
         "en":"Manage Families",
         "he":"ניהול משפחות"
     },
+
     "assigning":
     {
         "en":"Assigning Camper",
         "he":"שבץ חניך"
     },
+
     "save":
     {
         "en":"save",
         "he":"שמור"
     },
+
     "cancel":
     {
         "en":"cancel",
         "he":"בטל"
     },
+
     "disability": {
         "en": "Disability",
         "he": "רמת מוגבלות"
     },
+
     "choose": {
         "en": "choose",
         "he": "בחר"
     },
+
     "search_by_name": {
         "en": "Search by Name",
         "he": "חיפוש לפי שם"
     },
+
     "sort_by_age": {
     "en": "Sort by Age",
     "he": "מיון לפי גיל"
     },
+
     "filter_by_gender": {
     "en": "Filter by Gender",
     "he": "סינון לפי מין"
     },
+
     "ascending": {
     "en": "Ascending",
     "he": "עולה"
     },
+
     "descending": {
     "en": "Descending",
     "he": "יורד"
     },
+
     "all": {
-    "en": "All",
-    "he": "הכל"
+        "en": "All",
+        "he": "הכל"
     },
+
     "filter_by_disability": {
-    "en": "Sort by disability",
-    "he": "סינון לפי רמת מוגבלות"
+        "en": "Sort by disability",
+        "he": "סינון לפי רמת מוגבלות"
     },
+
     "curAssigning":
     {
         "en": "current assigning",
@@ -350,5 +379,11 @@
     {
         "en": "ID",
         "he": "מספר זהות"
+    },
+
+    "to_change_assigning":
+    {
+        "en": "The camper has already been assigned, do you want to change the assignment?",
+        "he": "החניך כבר שובץ, האם ברצונך לשנות את השיבוץ?"    
     }
 }

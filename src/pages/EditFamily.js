@@ -11,7 +11,6 @@ import { updateDoc } from 'firebase/firestore';
 import { collection, doc, getDoc} from "firebase/firestore"; 
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom"
-import _ from 'lodash';
 
 
 
@@ -67,8 +66,9 @@ export default function EditFamily() {
 
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
+      setValidated(true);
+      return;
       
     }
 
