@@ -4,7 +4,7 @@ import strings from '../static/Strings.json';
 import { BiUserPlus } from 'react-icons/bi';
 import { db } from '../common/FirebaseApp';
 import { updateDoc } from 'firebase/firestore';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { setDoc } from 'firebase/firestore';
 import { BiCheck } from 'react-icons/bi';
 
@@ -12,8 +12,24 @@ export async function getCampers(event, setRegID) {
   const EventsSnapshot = await getDoc(event);
   const eventData = EventsSnapshot.data();
   setRegID(eventData.registrationId);
-  const Campers = eventData.campers;
-  return Campers;
+  const campersID  = eventData.campers;
+  const campersSnapshot = await getDocs(collection(db, 'campers'));
+
+  const campersData = [];
+  
+  campersSnapshot.forEach((doc) => {
+    campersData.push(doc.data());
+  });
+
+  const joinedCampers = campersID.map((camperID) => {
+    const foundCamper = campersData.find((camper) => camper.id === camperID.id);
+    return {
+      ...camperID,
+      ...foundCamper
+    };
+  });
+  
+  return joinedCampers;
 }
 
 export default function Assigning({
