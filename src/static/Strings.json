@@ -581,5 +581,10 @@
     {
         "en":"Number of events",
         "he":"מספר אירועים"
+    },
+    "editFamily":
+    {
+        "en":"edit family details",
+        "he":"ערוך פרטי משפחה"
     }
 }

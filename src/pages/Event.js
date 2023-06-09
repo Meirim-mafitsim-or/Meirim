@@ -13,6 +13,7 @@ import { collection, getDocs } from "firebase/firestore";
 import {useParams} from "react-router-dom";
 import { useEffect } from 'react';
 import { getFamiliesRegistration } from '../common/Database';
+import { v4 as uuidv4 } from 'uuid';
 
 // export async function getFamiliesRegistration() {
 //   const FamiliesRegistrationRef = collection(db, "familiesRegistration");
@@ -65,7 +66,8 @@ export default function FormEvent() {
       phone_number: phone_number,
       email: email,
       special_comment: special_comment,
-    };
+      id:  uuidv4().substring(0, 9),
+    };    
 
     await addFamiley(famileyData,id);
     navigate("/");
