@@ -3,6 +3,7 @@ import { render, fireEvent } from '@testing-library/react';
 import Event from './Event';
 import { LanguageContext } from '../common/LanguageContext';
 import { UserContext } from '../common/UserContext';
+import { MemoryRouter } from "react-router-dom";
 
 // Mock the LanguageContext value
 const mockLanguageContextValue = {
@@ -14,7 +15,9 @@ describe('FormExample component', () => {
     const { getByLabelText, getByText } = render(
       <UserContext.Provider value={{}}>
         <LanguageContext.Provider value={mockLanguageContextValue}>
+          <MemoryRouter>
           <Event />
+          </MemoryRouter>
         </LanguageContext.Provider>
       </UserContext.Provider>
 

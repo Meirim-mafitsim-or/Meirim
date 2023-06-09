@@ -15,7 +15,7 @@ describe('EventCard component', () => {
 
         // Mock the props for the EventCard
         const event = {
-            settlement_en: 'Hashmonaim',
+            settlement: 'Hashmonaim',
             date: { seconds: 0 }, 
             image: 'https://firebasestorage.googleapis.com/v0/b/meirim-b3c4f.appspot.com/o/settlements%2Fpetah_tiqwa.jpg?alt=media&token=9aeb3d03-92e1-4cba-9b93-182f8a97220b',
         };

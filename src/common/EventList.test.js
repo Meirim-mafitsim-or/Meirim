@@ -1,5 +1,5 @@
 import { collection, getDocs } from 'firebase/firestore';
-import{ getEvents } from './EventsList';
+import{ getEvents } from './Database';
 
 jest.mock('./FirebaseApp', () => ({
     db: jest.fn(),

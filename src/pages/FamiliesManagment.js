@@ -2,17 +2,10 @@ import React from 'react';
 import { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col,  } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
-import { db } from '../common/FirebaseApp';
-import { collection, getDocs } from "firebase/firestore";
 import EventCard from "../common/EventCard";
 import strings from '../static/Strings.json';
+import { getEvents } from '../common/Database';
 
-export async function getEvents() {
-    const EventsRef = collection(db, "events");
-    const EventsSnapshot = await getDocs(EventsRef);
-    const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-    return Events;
-}
 
 function FamiliesManagment(){
 
