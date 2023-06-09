@@ -1,6 +1,6 @@
 import React, { createContext, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-
+import { getUser } from "./Database"
 
 export const UserContext = createContext();
 
@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
   const auth = getAuth();
   onAuthStateChanged(auth, (usr) => {
     if (usr) {
-      setUser(usr);
+      getUser(usr).then((user) => setUser(user));
     } else {
       // User is signed out
       setUser(null);
@@ -27,6 +27,3 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
-
-
-
