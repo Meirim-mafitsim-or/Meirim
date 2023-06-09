@@ -6,7 +6,6 @@ import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { BiPencil } from 'react-icons/bi';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import { FaChild } from 'react-icons/fa';
 import Assigning from '../common/Assigning';

@@ -1,17 +1,16 @@
 import './common.css';
 import Carousel from 'react-bootstrap/Carousel';
 import React, { useState, useEffect } from 'react';
-import { db } from './FirebaseApp';
 import { storage } from './FirebaseApp';
-import { collection, getDocs } from "firebase/firestore";
 import { ref, getDownloadURL } from 'firebase/storage';
+import {getPic } from './Database';
 
-async function getPic() {
-    const picRef = collection(db, "carusels");
-    const picSnapshot = await getDocs(picRef);
-    const pic = picSnapshot.docs.map(doc => doc.data());
-    return pic;
-}
+// async function getPic() {
+//     const picRef = collection(db, "carusels");
+//     const picSnapshot = await getDocs(picRef);
+//     const pic = picSnapshot.docs.map(doc => doc.data());
+//     return pic;
+// }
 
 export default function SlidePicture(props) {
     const [urls, setUrls] = useState([]);

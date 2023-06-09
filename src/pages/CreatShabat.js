@@ -8,26 +8,14 @@ import strings from '../static/Strings.json';
 import { LanguageContext } from '../common/LanguageContext';
 import Select from 'react-select';
 import citys from '../static/city.json';
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc,addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../common/FirebaseApp';
-import { collection, getDocs } from "firebase/firestore";
-
-
-export async function getCampers() {
-  const CampersRef = collection(db, "campers");
-  const CampersSnapshot = await getDocs(CampersRef);
-  const Campers = CampersSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-  return Campers;
-}
-
-export async function getCoordinators() {
-  const CoordinatorsRef = collection(db, "coordinators");
-  const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
-  const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-  return Coordinators;
-}
+import { collection} from "firebase/firestore";
+import AddCoordinator from './AddCoordinator';
+import Spinner from 'react-bootstrap/Spinner';
+import {getCampers , getCoordinators} from '../common/Database';
 
 async function createAssigningDoc (settlement)  {
   // Get a reference to the Firestore collection
@@ -62,6 +50,7 @@ export default function FormCreatShabat() {
   const [choosenCoordinator, setChoosenCoordinators] = useState([]);
   const navigate = useNavigate();
   const [Coordinators, setCoordinators] = useState([]);
+  const [showCoordinatorModal, setShowCoordinatorModal] = useState(false);
 
 
 
@@ -73,7 +62,7 @@ export default function FormCreatShabat() {
   /* ----------------------------------------for the option--------------------------------------------- */
   const citysOptions = citys.values.map((city, index) => {
     if (language === "he") {
-      return { "value": city.name, "label": city.name }
+      return { "value": city.english_name, "label": city.name }
     }
     else {
       return { "value": city.english_name, "label": city.english_name }
@@ -84,9 +73,9 @@ export default function FormCreatShabat() {
   const options = Campers.map((camper, index) => ({
     "value": camper, "label": camper.firstName
   }));
-
+   
   const optionsCoordinators = Coordinators.map((coordinator, index) => ({
-    "value": coordinator, "label": coordinator.name
+    "value": coordinator, "label": coordinator.first_name + " " + coordinator.last_name + " - " + coordinator.place_name
   }));
 
   /* ----------------------------------------after submit--------------------------------------------- */
@@ -108,28 +97,31 @@ export default function FormCreatShabat() {
     const downloadURL = await getDownloadURL(storageRef);// Get the download URL of the uploaded image
 
 
-    let city_he, city_en;
-    if (language === "he") {
-      city_en = citys.values.filter(city => city.name === place_name).map(city => city.english_name)[0];
-      city_he = place_name;
-    }
-    else {
-      city_he = citys.values.filter(city => city.english_name === place_name).map(city => city.name)[0];
-      city_en = place_name;
-    }
 
+    let city_he = place_name;
+    if (language === "he") {
+      setPlace_name(citys.values.filter(city => city.name === city_he).map(city => city.english_name)[0]) ;
+    }
+    const id = await createRegistration();
+
+    const campersField = choosenCampers.map((camper, index) => ({
+      id: camper.value.id,//here add id
+      familie: "",
+      assigning: false,
+    }));
 
     const shabatData = {
-      settlement_en: city_en,
-      settlement_he: city_he,
+      settlement: place_name,
       date: new Date(date),
       image: downloadURL,
       coordinator: choosenCoordinator.value,
-      campers: choosenCampers.map((camper, index) => camper.value),
+      campers: campersField,
+      registrationId: id.id,
+      families: [],
     };
 
     await addShabat(shabatData);
-    createAssigningDoc(city_en)
+    createAssigningDoc(place_name)
     navigate("/");
   };
 
@@ -137,6 +129,17 @@ export default function FormCreatShabat() {
     const events = collection(db, 'events');
     await setDoc(doc(events), shabatData);
   }
+  async function createRegistration() {
+    let registration = {
+      families: [],
+      settlement: place_name,
+    }
+    const addRegistration = collection(db, 'familiesRegistration');
+    // await setDoc(doc(addRegistration), registration);
+    let id = await addDoc(addRegistration, registration);
+    return id;
+  }
+
   /* ----------------------------------------creat shabat form--------------------------------------------- */
   return (
     <div className="App home-paragraph home-color text-dark pt-5">
@@ -150,7 +153,7 @@ export default function FormCreatShabat() {
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             {/* place */}
             <Row className="mb-3">
-              <Form.Group as={Col} md="4" controlId="place_name">
+              <Form.Group as={Col} controlId="place_name">
                 <div className="container">
                   <div className="m-auto w-100">
                     <Form.Label>{strings.place_name[language]}</Form.Label>
@@ -161,23 +164,14 @@ export default function FormCreatShabat() {
                   </div>
                 </div>
               </Form.Group>
-              {/* choose coordinator */}
-              <Form.Group as={Col} md="4" controlId="coordinator_name">
-                <div className="container">
-                  <div className="m-auto w-100">
-                    <Form.Label>{strings.coordinator[language]}</Form.Label>
-                    <Select options={optionsCoordinators}
-                      onChange={(e) => { setChoosenCoordinators(e) }}
-                      placeholder={strings.select[language]}
-                    />
-                  </div>
-                </div>
-              </Form.Group>
+              </Row>
               {/* choose campers */}
-              <Form.Group as={Col} md="4" controlId="validationCustom05">
+              <Row className="mb-3">
+              <Form.Group as={Col} controlId="validationCustom05">
                 <div className="container">
                   <div className="m-auto w-100">
                     <Form.Label>{strings.campers[language]}</Form.Label>
+                    {/* select first all the campers and than can delete the one you dont want */}
                     <Select
                       isMulti
                       onChange={(e) => setChoosenCampers(e)}
@@ -188,6 +182,37 @@ export default function FormCreatShabat() {
                 </div>
               </Form.Group>
             </Row>
+              {/* choose coordinator */}
+              <Row className="mb-3">
+                <Form.Label>{strings.coordinator[language]}</Form.Label>
+                {/* <Row className="mb-3"> */}
+              <Form.Group as={Col} controlId="coordinator_name">
+                <div className="container">
+                  <div className="p-4 m-auto w-100">
+                      <Button variant="outline-secondary" onClick={()=>setShowCoordinatorModal(true)}>
+                        {strings.add_coordinator[language]}
+                      </Button>
+                    <AddCoordinator onSuccess={()=>{
+                      getCoordinators().then(Coordinators => setCoordinators(Coordinators))
+                    }} place_name={place_name} show={showCoordinatorModal} setShow={setShowCoordinatorModal}/>
+                  </div>
+                </div>
+              </Form.Group>
+              <Form.Group as={Col} md="9" controlId="coordinator_name">
+                <div className="container">
+                  <div className="p-4 m-auto w-100">
+                    {/* <Form.Label>{strings.coordinator[language]}</Form.Label> */}
+                    <Select options={optionsCoordinators}
+                      onChange={(e) => { setChoosenCoordinators(e) }}
+                      placeholder={strings.select[language]}>
+                        {/* <option value={strings.select[language]}>{strings.select[language]}</option> */}
+                      </Select>
+                  </div>
+                </div>
+              </Form.Group>
+              {/* </Row> */}
+              {/* choose coordinator */}
+              </Row>
 
             <Row className="mb-3">
               {/* date */}
@@ -206,8 +231,8 @@ export default function FormCreatShabat() {
               <Form.Group as={Col} md="6" controlId="image">
                 <Form.Label>{strings.image[language]}</Form.Label>
                 <Form.Control type="file" placeholder={strings.choose_file[language]}
-                  required 
-                  />
+                  required
+                />
                 <Form.Control.Feedback type="invalid">
                 </Form.Control.Feedback>
               </Form.Group>
@@ -215,7 +240,17 @@ export default function FormCreatShabat() {
 
             <Form.Group className="mb-3">
             </Form.Group>
-            <Button type="submit">{strings.creat_shabat[language]}</Button>
+            <Button variant='outline-secondary' type="submit" disabled={submitted}>
+            {submitted &&
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                            }
+              {strings.creat_shabat[language]}</Button>
           </Form>
         </Card.Body>
       </Card>

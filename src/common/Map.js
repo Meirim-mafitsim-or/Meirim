@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import citys from '../static/city.json';
-import { db } from './FirebaseApp';
-import { collection, getDocs } from "firebase/firestore";
 import { Map, Marker, Overlay } from "pigeon-maps"
 import MapCard from './MapCard';
-
-
-async function getEvents() {
-  const EventsRef = collection(db, "events");
-  const EventsSnapshot = await getDocs(EventsRef);
-  const Events = EventsSnapshot.docs.map(doc => doc.data());
-  return Events;
-}
+import { getEvents } from './Database';
 
 export default function MyMap() {
   const [center, setCenter] = useState([30.8516, 36.0461])
@@ -21,7 +12,7 @@ export default function MyMap() {
 
   useEffect(() => {
     getEvents().then(Events => {
-      const sett = Events.map(event => event.settlement_en);
+      const sett = Events.map(event => event.settlement);
       const mark = [];
 
       //every one of the card have english name and hebrow name so i can use only english name
@@ -63,7 +54,6 @@ export default function MyMap() {
           {/* when press stop to present event card */}
           <div onClick={() => { setShow(false); }}>
             <MapCard event={marker.event} />
-            X
           </div>
         </Overlay>
       ))}
