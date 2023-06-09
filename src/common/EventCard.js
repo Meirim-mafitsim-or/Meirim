@@ -29,15 +29,23 @@ export default function EventCard(props) {
     }
 
     return (
-        <Card className="text-center text-dark event-card">
-            <Card.Img src={url} alt="Card image" className='h-100 event-card-image' />
-            <Card.ImgOverlay className='event-card-overlay'>
+        <Card className="text-center text-dark event-card h-100">
+            <Card.Img src={url} alt="Card image" className='event-card-image' />
+            {/* <Card.ImgOverlay className='event-card-overlay'>
                 <Card.Title>{city}</Card.Title>
                 <Card.Text>
                     {new Date(props.event.date.seconds * 1000).toUTCString()}
                 </Card.Text>
                 <Button as={Link} to={`${props.forward}`} variant="primary" >{`${props.buttonText}`}</Button>
-            </Card.ImgOverlay>
+            </Card.ImgOverlay> */}
+            <Card.Body>
+                <Card.Title>{city}</Card.Title>
+                <Card.Text>
+                    {new Date(props.event.date.seconds * 1000).toUTCString()}
+                </Card.Text>
+                <Button as={Link} to={`${props.forward}`} variant="primary" >{`${props.buttonText}`}</Button>
+            </Card.Body>
+
         </Card>
     )
 }

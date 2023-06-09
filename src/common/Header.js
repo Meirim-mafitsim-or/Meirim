@@ -40,12 +40,14 @@ export default function Header() {
               {menuItems.map((item, index) => 
               (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
               {user && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
+              {user ? <Nav.Link as={Link} to="/DataReport">{strings.data_reports[language]}</Nav.Link> : null}
               <NavDropdown title={strings.management_users[language]} id="basic-nav-dropdown">
               {user ? <Nav.Link as={Link} to="/manageCampers">{strings.manage_campers[language]}</Nav.Link> : null}
               {user ? <Nav.Link as={Link} to="/ManageCoordinators">{strings.manage_coordinators[language]}</Nav.Link> : null}
               </NavDropdown>
               <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
             </Nav>
+            {/* <Nav.Brand className="nav-brand">{user ? "user" : ""}</Nav.Brand> */}
             <Nav>
               <NavDropdown title={strings.language[language]} id="basic-nav-dropdown">
                 {langItems.map((item, index) => (

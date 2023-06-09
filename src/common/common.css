@@ -2,14 +2,14 @@
     text-align: center;
 }
 .nav-logo {
-    width: 70px;
-    display: block;
+    width:          70px;
+    display:        block;
     pointer-events: none;
 }
 
 .s-pic {
-    height: 500px;
-    object-fit: cover;
+    height:          500px;
+    object-fit:      cover;
     object-position: center;
 }
 .carusel{
@@ -17,23 +17,23 @@
 }
 
 .home-paragraph {
-    font-size: 1.2rem;
-    line-height: 1.5;
+    font-size:     1.2rem;
+    line-height:   1.5;
     margin-bottom: 1rem;
-    margin: 0 100px;
+    margin:        0 100px;
 }
 
 html, body {
     margin: 0;
     height: 100%;
-    background-color: #0D2D46;
+    /* background-color: #0D2D46; */
     color: #fff;
 }
 
 .home-color{
     background-color: #0D2D46; 
-    color: #fff;
-    margin: 0 0 0 0;
+    color:            #fff;
+    margin:             0 0 0 0;
    
 }
 .border-color{
@@ -52,6 +52,7 @@ html, body {
 }
 
 .event-card-image {
-    object-fit: cover;
+    object-fit:      cover;
     object-position: center;
+    height: 40vh;
 }

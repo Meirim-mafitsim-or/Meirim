@@ -24,7 +24,7 @@ export default function ManageCoordinators() {
     },
     {
       title: strings.phone_number[language],
-      field: 'phone_number',
+      field: 'phone',
       type: 'text'
     },
     {
@@ -70,11 +70,9 @@ export default function ManageCoordinators() {
         <ManagebleTable
           data={coordinators}
           columns={coordinators_columns}
-        //   onAdd={handleAddCoordinator}
           globalActions={actions}
           onEdit={handleUpdateCoordinator}
           onDelete={handleDeleteCoordinator} />
-      {/* } */}
     </Container>
   )
 }

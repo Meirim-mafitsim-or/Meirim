@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'video-react/dist/video-react.css'; // import css
 import { LanguageProvider } from './common/LanguageContext';
 import { UserProvider } from './common/UserContext';
 import reportWebVitals from './reportWebVitals';
@@ -25,9 +26,9 @@ const theme = createTheme({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <React.StrictMode className="root">
-    <CacheProvider value={cacheRtl}>
-      <ThemeProvider theme={theme}>
+  <React.StrictMode             className="root">
+    <CacheProvider              value={cacheRtl}>
+      <ThemeProvider            theme={theme}>
         <UserProvider>
           <LanguageProvider>
             <App />

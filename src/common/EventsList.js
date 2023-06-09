@@ -6,13 +6,14 @@ import { LanguageContext } from '../common/LanguageContext';
 import EventCard from './EventCard';
 import { Row, Col } from 'react-bootstrap';
 import { UserContext } from './UserContext';
+import { getEvents } from './Database';
 
-export async function getEvents() {
-    const EventsRef = collection(db, "events");
-    const EventsSnapshot = await getDocs(EventsRef);
-    const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-    return Events;
-}
+// export async function getEvents() {
+//     const EventsRef = collection(db, "events");
+//     const EventsSnapshot = await getDocs(EventsRef);
+//     const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//     return Events;
+// }
 
 export default function EventsList() {
     const { language } = useContext(LanguageContext);
@@ -27,15 +28,16 @@ export default function EventsList() {
     }, []);
 
     // if user role:admin he dont have the button event card instead he have the button EditShabat
+    const cards_per_row = 3;
 
     return (
         <div className='p-10'>
             <h1>{strings.events[language]}</h1>
             {   /* reshape the data to be 4 events per row */
-                Events.reduce((rows, key, index) => (index % 4 === 0 ? rows.push([key])
+                Events.reduce((rows, key, index) => (index % cards_per_row === 0 ? rows.push([key])
                     : rows[rows.length - 1].push(key)) && rows, [])
                     .map((row, index) => (
-                        <Row key={index} xs={1} md={4} >
+                        <Row key={index} xs={1} md={cards_per_row} >
                             {row.map((event, index) => (
                                 <Col key={index} className="p-1">
                                     {user ? (

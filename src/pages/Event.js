@@ -12,13 +12,14 @@ import { db } from '../common/FirebaseApp';
 import { collection, getDocs } from "firebase/firestore";
 import {useParams} from "react-router-dom";
 import { useEffect } from 'react';
+import { getFamiliesRegistration } from '../common/Database';
 
-export async function getFamiliesRegistration() {
-  const FamiliesRegistrationRef = collection(db, "familiesRegistration");
-  const FamiliesRegistrationSnapshot = await getDocs(FamiliesRegistrationRef);
-  const FamiliesRegistration = FamiliesRegistrationSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-  return FamiliesRegistration;
-}
+// export async function getFamiliesRegistration() {
+//   const FamiliesRegistrationRef = collection(db, "familiesRegistration");
+//   const FamiliesRegistrationSnapshot = await getDocs(FamiliesRegistrationRef);
+//   const FamiliesRegistration = FamiliesRegistrationSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//   return FamiliesRegistration;
+// }
 
 export default function FormEvent() {
   let { id } = useParams();
@@ -121,6 +122,12 @@ export default function FormEvent() {
             <Form.Group as={Col} md="3" controlId="validationCustom04">
               <Form.Label>{strings.street[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.street[language]} required onChange={(e) => setStreet(e.target.value)}/>
+              <Form.Control.Feedback type="invalid">
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group as={Col} md="3" controlId="validationCustom03">
+              <Form.Label>{strings.city[language]}</Form.Label>
+              <Form.Control type="text" placeholder={strings.city[language]} required onChange={(e) => setCity(e.target.value)}/>
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>

@@ -2,21 +2,11 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Container, Button,  } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
-import { db } from '../common/FirebaseApp';
-import { collection, doc, getDoc} from "firebase/firestore"; 
 import { useLocation } from 'react-router-dom';
 import strings from '../static/Strings.json';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
-
-
-export async function getFamilies(id) {
-    const events = collection(db, 'events');
-    const cur_event = doc(events, id);
-    const EventsSnapshot = await getDoc(cur_event);
-    const eventData = EventsSnapshot.data();
-    return eventData.families || [];
-  }
+import { getFamilies } from '../common/Database';
 
 
 export default function Families() {
@@ -92,7 +82,10 @@ export default function Families() {
                 ))}
                 </TableBody>
             </Table>
+            {/* //button that return the user to the previous page */}
+
             </TableContainer>
+            <Button as={Link} to={`/EditShabat/${pathSuffix}`} variant="primary" >{strings.back[language]}</Button>
         </Container>
     );
 }

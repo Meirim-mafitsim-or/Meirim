@@ -15,21 +15,22 @@ import { db, storage } from '../common/FirebaseApp';
 import { collection, getDocs } from "firebase/firestore";
 import AddCoordinator from './AddCoordinator';
 import Spinner from 'react-bootstrap/Spinner';
+import {getCampers , getCoordinators} from '../common/Database';
 
 
-export async function getCampers() {
-  const CampersRef = collection(db, "campers");
-  const CampersSnapshot = await getDocs(CampersRef);
-  const Campers = CampersSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-  return Campers;
-}
+// export async function getCampers() {
+//   const CampersRef = collection(db, "campers");
+//   const CampersSnapshot = await getDocs(CampersRef);
+//   const Campers = CampersSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//   return Campers;
+// }
 
-export async function getCoordinators() {
-  const CoordinatorsRef = collection(db, "coordinators");
-  const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
-  const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-  return Coordinators;
-}
+// export async function getCoordinators() {
+//   const CoordinatorsRef = collection(db, "coordinators");
+//   const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
+//   const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//   return Coordinators;
+// }
 
 
 export default function FormCreatShabat() {
@@ -96,13 +97,21 @@ export default function FormCreatShabat() {
       setPlace_name(citys.values.filter(city => city.name === city_he).map(city => city.english_name)[0]) ;
     }
     const id = await createRegistration();
+    //field campers have 3 fields: id, fameilies 
+
+    const campersField = choosenCampers.map((camper, index) => ({
+      id: camper.value.id,//here add id
+      familie: "",
+      assigning: false,
+    }));
+
     console.log(id.id);
     const shabatData = {
       settlement: place_name,
       date: new Date(date),
       image: downloadURL,
       coordinator: choosenCoordinator.value,
-      campers: choosenCampers.map((camper, index) => camper.value),
+      campers: campersField,
       registrationId: id.id,
       families: [],
     };

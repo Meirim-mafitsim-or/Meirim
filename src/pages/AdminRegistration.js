@@ -9,26 +9,27 @@ import { initializeApp } from "firebase/app";
 import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import Card from 'react-bootstrap/Card';
+import { createCoordinator } from '../common/Database';
 
-async function addCoordinator(registration, setError, onSuccessfulAdd,password) {
-    const users = collection(db, 'users');
-    const secondaryApp = initializeApp(firebaseConfig, "Secondary");
-    const tempAuth = getAuth(secondaryApp);
-    createUserWithEmailAndPassword(tempAuth, registration.email, password).then(async (userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        tempAuth.signOut();
-        registration.role = "admin";
+// async function addCoordinator(registration, setError, onSuccessfulAdd,password) {
+//     const users = collection(db, 'users');
+//     const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+//     const tempAuth = getAuth(secondaryApp);
+//     createUserWithEmailAndPassword(tempAuth, registration.email, password).then(async (userCredential) => {
+//         // Signed in 
+//         const user = userCredential.user;
+//         tempAuth.signOut();
+//         registration.role = "admin";
         
-        await setDoc(doc(users,user.uid), registration);
-        getDocs(doc(users,user.uid)).then((doc) => { console.log(doc.data()) });
-        onSuccessfulAdd();
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        setError(errorCode);
-      });
-}
+//         await setDoc(doc(users,user.uid), registration);
+//         getDocs(doc(users,user.uid)).then((doc) => { console.log(doc.data()) });
+//         onSuccessfulAdd();
+//       })
+//       .catch((error) => {
+//         const errorCode = error.code;
+//         setError(errorCode);
+//       });
+// }
 
 const campers_columns = ['first_name', 'last_name', 'email', 'phone', 'password', 'place_name'];
 export default function AddCamperModal({onSuccess}) {
@@ -71,7 +72,7 @@ export default function AddCamperModal({onSuccess}) {
             last_name: last_name,
             email: email,
         }
-        await addCoordinator(registration, handleError, onSuccessfulAdd,password);
+        await createCoordinator(registration, handleError, onSuccessfulAdd,password);
         navigate("/");
       };
 

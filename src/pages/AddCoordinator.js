@@ -13,35 +13,36 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { on } from 'events';
 import Select from 'react-select';
 import citys from '../static/city.json';
+import { createCoordinator } from '../common/Database';
 
 
-async function addCoordinator(coordinatorData, setError, onSuccessfulAdd,password) {
-    const coordinator = collection(db, 'coordinators');
-    const secondaryApp = initializeApp(firebaseConfig, "Secondary");
-    const tempAuth = getAuth(secondaryApp);
+// async function addCoordinator(coordinatorData, setError, onSuccessfulAdd,password) {
+//     const coordinator = collection(db, 'coordinators');
+//     const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+//     const tempAuth = getAuth(secondaryApp);
 
-    createUserWithEmailAndPassword(tempAuth, coordinatorData.email, password).then(async (userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        tempAuth.signOut();
+//     createUserWithEmailAndPassword(tempAuth, coordinatorData.email, password).then(async (userCredential) => {
+//         // Signed in 
+//         const user = userCredential.user;
+//         tempAuth.signOut();
 
-        const userCollection = collection(db, 'users');
-        const userData = {
-            ...coordinatorData,
-            role: "coordinator",
-        }
+//         const userCollection = collection(db, 'users');
+//         const userData = {
+//             ...coordinatorData,
+//             role: "coordinator",
+//         }
             
-        await setDoc(doc(userCollection,user.uid), userData);
+//         await setDoc(doc(userCollection,user.uid), userData);
 
-        coordinatorData.userId = user.uid;
-        await setDoc(doc(coordinator), coordinatorData);
-        onSuccessfulAdd();
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        setError(errorCode);
-      });
-}
+//         coordinatorData.userId = user.uid;
+//         await setDoc(doc(coordinator), coordinatorData);
+//         onSuccessfulAdd();
+//       })
+//       .catch((error) => {
+//         const errorCode = error.code;
+//         setError(errorCode);
+//       });
+// }
 
 const campers_columns = ['first_name', 'last_name', 'email', 'phone', 'place_name'];
 export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
@@ -103,7 +104,7 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
             place_en =citys.values.filter(city => city.name === place_name).map(city => city.english_name)[0];
         }
         camper['place_name'] = place_en;
-        await addCoordinator(camper, handleError, onSuccessfulAdd,password);
+        await createCoordinator(camper, handleError, onSuccessfulAdd,password);
     };
 
 

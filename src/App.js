@@ -16,7 +16,7 @@ import { useContext } from 'react';
 import AdminRegistration from './pages/AdminRegistration';
 import EditShabat from './pages/EditShabat';
 import ManageCoordinators from './pages/ManageCoordinators';
-// import DataReport from './pages/DataReport';
+import DataReport from './pages/DataReport';
 
 
 
@@ -35,7 +35,7 @@ function App() {
           <Route path="Families/:id" element={<Families />} />
           <Route path="Families/:id/:family" element={<EditFamily/>} />
           {user && <Route path="CreatShabat" element={<CreatShabat />} />}
-          {/* {user && <Route path="DataReport" element={<DataReport />} />} */}
+          {user && <Route path="DataReport" element={<DataReport />} />}
           {user && <Route path="ManageCampers" element={<ManageCampers />} />}
           {user && <Route path="ManageCoordinators" element={<ManageCoordinators />} />}
           

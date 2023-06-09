@@ -12,7 +12,7 @@ import { doc, setDoc, } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../common/FirebaseApp';
-import { collection, getDocs } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { useEffect } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
@@ -21,29 +21,30 @@ import TableModal from '../common/TableModal';
 import AddIcon from '@mui/icons-material/Add';
 import { deleteDoc } from "firebase/firestore";
 import Spinner from 'react-bootstrap/Spinner';
+import { getEventById,getCoordinators,getCampers,getCampersById } from '../common/Database';
 
 
-export async function getEvents(eventId) {
-    const EventsRef = collection(db, "events");
-    const EventsSnapshot = await getDocs(EventsRef);
-    const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-    const event = Events.filter(event => event.id === eventId);
-    return event;
-}
+// export async function getEventById(eventId) {
+//     const EventsRef = collection(db, "events");
+//     const EventsSnapshot = await getDocs(EventsRef);
+//     const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//     const event = Events.filter(event => event.id === eventId);
+//     return event;
+// }
 
-export async function getCoordinators() {
-    const CoordinatorsRef = collection(db, "coordinators");
-    const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
-    const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-    return Coordinators;
-}
+// export async function getCoordinators() {
+//     const CoordinatorsRef = collection(db, "coordinators");
+//     const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
+//     const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//     return Coordinators;
+// }
 
-export async function getCampers() {
-    const CampersRef = collection(db, "campers");
-    const CampersSnapshot = await getDocs(CampersRef);
-    const Campers = CampersSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-    return Campers;
-}
+// export async function getCampers() {
+//     const CampersRef = collection(db, "campers");
+//     const CampersSnapshot = await getDocs(CampersRef);
+//     const Campers = CampersSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+//     return Campers;
+// }
 
 function formatDate(seconds) {
     const date = new Date(seconds * 1000);
@@ -69,11 +70,7 @@ export default function FormEvent() {
     const [validated, setValidated] = useState(false);
     const [submitted, setSubmitted] = useState(false); // Track form submission status
     const { language } = React.useContext(LanguageContext);
-    const [first_name, setFirst_name] = useState("");
-    const [last_name, setLast_name] = useState("");
-    const [city, setCity] = useState("");
     const navigate = useNavigate();
-    const [EventState, setEvents] = useState([]);
     const [shabatDitails, setShabatDitails] = useState(ShabatDitails_columns.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
     const [Coordinators, setCoordinators] = useState([]);
     const [families, setFamilies] = useState([]);
@@ -83,6 +80,7 @@ export default function FormEvent() {
     const [showModal, setShowModal] = useState(false);
     const [restCampers, setRestCampers] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
+    const [campersData, setCampersData] = useState([]);
 
     const campers_columns = [
         {
@@ -184,12 +182,7 @@ export default function FormEvent() {
     useEffect(() => {
         const fetchEventData = async () => {
             try {
-                const event = await getEvents(id);
-                setEvents(event);
-                if (language === "he")
-                    setCity(citys.values.filter(city => city.english_name === event[0].settlement).map(city => city.name)[0]);
-                else
-                    setCity(event[0].settlement);
+                const event = await getEventById(id);
 
                 setShabatDitails({
                     coordinator: event[0].coordinator,
@@ -197,21 +190,20 @@ export default function FormEvent() {
                     image: event[0].image,
                     settlement: event[0].settlement,
                 });
-                // setFamilies(event[0].families);
-                setCampers(event[0].campers);
+                const camperss = await getCampersById(event[0].campers.map((camper) => camper.id));
+                setCampers(camperss);
+                setCampersData(event[0].campers);
+
                 setFamilies(event[0].families);
                 getCampers().then(Campers => setAllCampers(Campers));
-                // setAllCampers(all);
-                // getCampers().then(Campers => Campers.filter(camper => !(campersId.includes(camper.id)))).then(camp => setRestCampers(camp)).then(() => console.log(restCampers));
-
-
+        
             } catch (error) {
                 console.error('Error fetching event:', error);
             }
         };
         fetchEventData();
         getCoordinators().then(Coordinators => setCoordinators(Coordinators));
-    }, []);
+    }, [ id]);//here add to do marging
 
 
 
@@ -267,12 +259,25 @@ export default function FormEvent() {
             });
         }
 
+        const listCampers = campers.map((camper) => {
+            if(camper.id in campersData.map((c)=>c.id)){
+                return campersData.find((c)=>c.id === camper.id);
+            }
+            else{
+                return{
+                    id: camper.id,
+                    familie :"",
+                    assigning: false,
+                }
+            }
+        });
+
         const shabatData = {
             coordinator: shabatDitails.coordinator,
             date: shabatDitails.date,
             image: downloadURL,
             settlement: shabatDitails.settlement,
-            campers: campers,
+            campers: listCampers,
             families: families,
         };
 
@@ -302,7 +307,6 @@ export default function FormEvent() {
             return { "value": city.english_name, "label": city.english_name }
         }
     });
-    //   console.log(shabatDitails);
     const optionsCoordinators = Coordinators.map((coordinator, index) => ({
         "value": coordinator, "label": coordinator.first_name + " " + coordinator.last_name + " - " + coordinator.place_name
     }));
@@ -378,7 +382,7 @@ export default function FormEvent() {
 
                                 <Form.Group as={Col} controlId="image">
                                     {/* <Form.Label>{strings.image[language]}</Form.Label> */}
-                                    <img src={imageChanged ? previewImage : shabatDitails.image} className="mt-2 mb-4 rounded w-100 h-70" alt="shabat image" height="250" />
+                                    <img src={imageChanged ? previewImage : shabatDitails.image} className="mt-2 mb-4 rounded w-100 h-70" alt="shabat" height="250" />
                                     <Form.Control className="w-65"
                                         type="file"
                                         placeholder={shabatDitails.image}

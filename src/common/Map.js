@@ -4,14 +4,15 @@ import { db } from './FirebaseApp';
 import { collection, getDocs } from "firebase/firestore";
 import { Map, Marker, Overlay } from "pigeon-maps"
 import MapCard from './MapCard';
+import { getEvents } from './Database';
 
 
-async function getEvents() {
-  const EventsRef = collection(db, "events");
-  const EventsSnapshot = await getDocs(EventsRef);
-  const Events = EventsSnapshot.docs.map(doc => doc.data());
-  return Events;
-}
+// async function getEvents() {
+//   const EventsRef = collection(db, "events");
+//   const EventsSnapshot = await getDocs(EventsRef);
+//   const Events = EventsSnapshot.docs.map(doc => doc.data());
+//   return Events;
+// }
 
 export default function MyMap() {
   const [center, setCenter] = useState([30.8516, 36.0461])

@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom"
 
 
 async function update(event_id, id, form) {
-
     const events = collection(db, 'events');
     const cur_event = doc(events, event_id);
     const EventsSnapshot = await getDoc(cur_event);

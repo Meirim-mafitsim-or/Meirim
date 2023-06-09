@@ -375,5 +375,85 @@
     {
         "en":"Management users",
         "he":"ניהול משתמשים"
+    },
+    "events_in_year":
+    {
+        "en":"Events in year",
+        "he":"אירועים בשנה"
+    },
+    "january":
+    {
+        "en":"January",
+        "he":"ינואר"
+    },
+    "february":
+    {
+        "en":"February",
+        "he":"פברואר"
+    },
+    "march":
+    {
+        "en":"March",
+        "he":"מרץ"
+    },
+    "april":
+    {
+        "en":"April",
+        "he":"אפריל"
+    },
+    "may":
+    {
+        "en":"May",
+        "he":"מאי"
+    },
+    "june":
+    {
+        "en":"June",
+        "he":"יוני"
+    },
+    "july":
+    {
+        "en":"July",
+        "he":"יולי"
+    },
+    "august":
+    {
+        "en":"August",
+        "he":"אוגוסט"
+    },
+    "september":
+    {
+        "en":"September",
+        "he":"ספטמבר"
+    },
+    "october":
+    {
+        "en":"October",
+        "he":"אוקטובר"
+    },
+    "november":
+    {
+        "en":"November",
+        "he":"נובמבר"
+    },
+    "december":
+    {
+        "en":"December",
+        "he":"דצמבר"
+    },
+    "welcome":
+    {
+        "en":"Welcome to meirim website",
+        "he":"ברוכים הבאים לאתר מאירים"
+    },
+    "all_events":
+    {
+        "en":"All Events",
+        "he":"כל האירועים"
+    },
+    "months":
+    {
+        "en":["January","February","March","April","May","June","July","August","September","October","November","December"],
+        "he":["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"]
     }
 }

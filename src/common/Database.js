@@ -1,5 +1,7 @@
-import { db } from "./FirebaseApp";
-import { collection, getDocs, setDoc, doc, deleteDoc,where, query } from "firebase/firestore";
+import { db,firebaseConfig } from "./FirebaseApp";
+import { collection, getDocs, setDoc, doc, deleteDoc,where, query,getDoc } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 export async function getCampers() {
     const campersRef = collection(db, "campers");
@@ -70,6 +72,83 @@ export async function updateCoordinator(coordinatorId, coordinator) {
     } catch (error) {
         console.error(error);
     }
+}
+export async function getEvents() {
+    const EventsRef = collection(db, "events");
+    const EventsSnapshot = await getDocs(EventsRef);
+    const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+    return Events;
+}
+
+export async function getPic() {
+    const picRef = collection(db, "carusels");
+    const picSnapshot = await getDocs(picRef);
+    const pic = picSnapshot.docs.map(doc => doc.data());
+    return pic;
+}
+
+export async function getFamiliesRegistration() {
+    const FamiliesRegistrationRef = collection(db, "familiesRegistration");
+    const FamiliesRegistrationSnapshot = await getDocs(FamiliesRegistrationRef);
+    const FamiliesRegistration = FamiliesRegistrationSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+    return FamiliesRegistration;
+  }
+
+  export async function getFamilies(id) {
+    const events = collection(db, 'events');
+    const cur_event = doc(events, id);
+    const EventsSnapshot = await getDoc(cur_event);
+    const eventData = EventsSnapshot.data();
+    return eventData.families || [];
+  }
+
+  export async function createCoordinator(coordinatorData, setError, onSuccessfulAdd,password) {
+    const coordinator = collection(db, 'coordinators');
+    const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+    const tempAuth = getAuth(secondaryApp);
+
+    createUserWithEmailAndPassword(tempAuth, coordinatorData.email, password).then(async (userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        tempAuth.signOut();
+
+        const userCollection = collection(db, 'users');
+        const userData = {
+            ...coordinatorData,
+            role: "coordinator",
+        }
+            
+        await setDoc(doc(userCollection,user.uid), userData);
+
+        coordinatorData.userId = user.uid;
+        await setDoc(doc(coordinator), coordinatorData);
+        onSuccessfulAdd();
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        setError(errorCode);
+      });
+}
+export async function getEventById(eventId) {
+    const EventsRef = collection(db, "events");
+    const EventsSnapshot = await getDocs(EventsRef);
+    const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+    const event = Events.filter(event => event.id === eventId);
+    return event;
+}
+
+export async function getCampersById(campersIds) {
+    console.log(campersIds);
+    const promises = campersIds.map((camperId) => {
+        // const CampersRef = collection(db, "campers", camperId);
+        const camperRef = doc(db, "campers", camperId);
+        return getDoc(camperRef);
+    });
+    const campers = await Promise.all(promises);
+    let data =  campers.map((camper)=> Object.assign(camper.data(),{id:camper.id}));
+    console.log("campersDatabase",data);
+    return data
+    return campers.map((camper) => Object.assign({ id: camper.id }, camper.data()));
 }
 
 
