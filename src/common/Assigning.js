@@ -141,7 +141,7 @@ export default function Assigning({
 
   // Check if the camper ID exists in the assignings array for the selected family
   const checkCamperIDInAssigningsArray = async (last_name, phone_number) => {
-    const { assigningExists, assigningsArray } = await getFamilyFromAssignings(settlement);
+    const { _, assigningsArray } = await getFamilyFromAssignings(settlement);
     if (!assigningsArray || assigningsArray.length === 0) {
       return;
     }
