@@ -17,8 +17,11 @@ export async function getCampers(event, setRegID) {
 
   const campersData = [];
   
-  campersSnapshot.forEach((doc) => {
-    campersData.push(doc.data());
+  campersSnapshot.forEach((camperDoc) => {
+    const camperData = camperDoc.data();
+    const camperId = camperDoc.id;
+    const camperDataWithId = { ...camperData, id: camperId };
+    campersData.push(camperDataWithId);
   });
 
   const joinedCampers = campersID.map((camperID) => {
@@ -28,9 +31,8 @@ export async function getCampers(event, setRegID) {
       ...foundCamper
     };
   });
-  
   return joinedCampers;
-  
+
 }
 
 export default function Assigning({
@@ -158,20 +160,29 @@ export default function Assigning({
 
   // Check if the camper ID exists in the assignings array for the selected family
   const checkCamperIDInAssigningsArray = async (last_name, phone_number) => {
-    // eslint-disable-next-line no-unused-vars
-    const { assigningExists: ignored, assigningsArray } = await getFamilyFromAssignings(settlement);
-    if (!assigningsArray || assigningsArray.length === 0) {
-      return;
-    }
+    const result = await getFamilyFromAssignings(settlement);
 
-    const foundAssigning = assigningsArray.find(
-      (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number
-    );
+    if (result !== null) {
+      // eslint-disable-next-line no-unused-vars
+      const { assigningExists: ignored, assigningsArray } = await getFamilyFromAssignings(settlement);
+      
+      if (!assigningsArray || assigningsArray.length === 0) {
+        return;
+      }
 
-    if (foundAssigning) {
-      await setHistoryAss(foundAssigning.campersId);
-      return foundAssigning.campersId;
+      const foundAssigning = assigningsArray.find(
+        (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number
+      );
+
+      if (foundAssigning) {
+        await setHistoryAss(foundAssigning.campersId);
+        return foundAssigning.campersId;
+      }
+    } else 
+    {
+      return [];
     }
+    
 
     return [];
   };
