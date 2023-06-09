@@ -148,3 +148,14 @@ export async function getCampersById(campersIds) {
 }
 
 
+export async function getUser(user) {
+    try {
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return Object.assign(user, docSnap.data());
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}

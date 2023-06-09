@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Container, Spinner } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { addCamper, getCampers, updateCamper, deleteCamper } from '../common/Database';
 import ManagebleTable from '../common/ManagebleTable';
 import { LanguageContext } from '../common/LanguageContext';
@@ -66,18 +66,14 @@ export default function ManageCampers() {
 
   return (
     <Container>
-      {campers.length <= 0 ?
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-        :
         <ManagebleTable
+          title={strings.campers[language]}
           data={campers}
           columns={campers_columns}
           onAdd={handleAddCamper}
           onEdit={handleUpdateCapmer}
-          onDelete={handleDeleteCamper} />
-      }
+          onDelete={handleDeleteCamper}
+        />
     </Container>
   )
 }
