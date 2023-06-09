@@ -30,6 +30,7 @@ export async function getCampers(event, setRegID) {
   });
   
   return joinedCampers;
+  
 }
 
 export default function Assigning({
