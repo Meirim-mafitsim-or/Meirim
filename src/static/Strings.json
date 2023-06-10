@@ -80,7 +80,7 @@
     "was_there":
     {
         "en": "The places we were",
-        "he": "המקומות בהן היינו"
+        "he": "המקומות בהם היינו"
     },
     "first_name":
     {
@@ -581,5 +581,10 @@
     {
         "en":"Number of events",
         "he":"מספר אירועים"
+    },
+    "editFamily":
+    {
+        "en":"edit family details",
+        "he":"ערוך פרטי משפחה"
     }
 }

@@ -62,18 +62,21 @@ export default function Families() {
     setPathSuffix(suffix);
   }, [location]);
 
-  // Fetch families data based on the extracted suffix
-  useEffect(() => {
-    const fetchData = async () => {
+// Fetch families data based on the extracted suffix
+useEffect(() => {
+  const fetchData = async () => {
+    if (pathSuffix) { // Check if pathSuffix is not empty or null
       const familiesData = await getFamilies(
         pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement);
       if (familiesData) {
         setFamilies(familiesData);
       }
-    };
+    }
+  };
 
-    fetchData().catch(error => console.log(error));
-  }, [pathSuffix]);
+  fetchData().catch(error => console.log(error));
+}, [pathSuffix]);
+
 
   const editClick = async (family) => {
     setSelectedFamily(family);
@@ -89,7 +92,6 @@ export default function Families() {
     const lastCamper = familyToUpdate.camper;
     familyToUpdate.camper = null;
     updatedFamilies[index] = familyToUpdate;
-  
     // Update specific fields in familiesDoc
     await updateDoc(familiesDoc, {
       families: updatedFamilies.map((family) => ({
@@ -106,7 +108,6 @@ export default function Families() {
     const eventData = eventsSnapshot.data();
     const confirmedFamilies = eventData.families;
     const campers = [...eventData.campers];
-  
     if (bool) {
       const updatedConfirmedFamilies = [...confirmedFamilies, familyToUpdate.id];
       await updateDoc(event, { families: updatedConfirmedFamilies });
@@ -155,7 +156,7 @@ export default function Families() {
               <TableCell align="right">{strings.email[language]}</TableCell>
               <TableCell align="right">{strings.special_comment[language]}</TableCell>
               <TableCell align="right">{strings.confirmed[language]}</TableCell>
-              <TableCell align="right">{strings.edit[language]}</TableCell>
+              <TableCell align="right">{strings.editFamily[language]}</TableCell>
               <TableCell align="right">{strings.assigning[language]}</TableCell>
               <TableCell align="right">{strings.curAssigning[language]}</TableCell>
               <TableCell></TableCell>
