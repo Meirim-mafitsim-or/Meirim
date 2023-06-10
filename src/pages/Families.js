@@ -10,8 +10,11 @@ import { BsCheckCircleFill } from 'react-icons/bs';
 import { FaChild } from 'react-icons/fa';
 import Assigning from '../common/Assigning';
 import strings from '../static/Strings.json';
-
-
+import { Modal, Button, Form, Toast } from 'react-bootstrap';
+import { FaSms } from 'react-icons/fa';
+import { functions } from '../common/FirebaseApp';
+import { httpsCallable } from "firebase/functions";
+ 
 // Function to retrieve families data from Firestore
 async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement) {
   const events = collection(db, 'events');
@@ -53,7 +56,12 @@ export default function Families() {
   const [selectedFamily, setSelectedFamily] = useState(null);
   const [settlement, setSettlement] = useState(null);
   const navigate = useNavigate();
-
+ 
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [customMessage, setCustomMessage] = useState('');
+  const [showSMSModal, setShowSMSModal] = useState(false);
+ 
   // Extract the suffix from the current URL path
   useEffect(() => {
     const path = location.pathname;
@@ -130,11 +138,41 @@ useEffect(() => {
       }
     }
   };
-  
-
+ 
+  const closeModal = () => {
+    setShowSMSModal(false);
+  };
+ 
   const handleAssigningModal = (family) => {
     setSelectedFamily(family);
-    setShowModal(true);
+    setShowSMSModal(true);
+  };
+ 
+  const handleSendShabbatMessage = () => {
+    console.log('Sending Shabbat details to selected campers');
+ 
+    // Logic to send "hi you are invited to a Shabbat at 15/5/2025"
+    // Show success toast
+    const sendSMS = httpsCallable(functions, 'sendMessagesWithTemplate');
+    const template = "hi [#name#], you've been asigned with [#camper#] camper, please contact him/her to arrange the meeting. [#coordinator#] coordinator";
+    const Recipients = [
+      { name: selectedFamily.first_name, Phone: selectedFamily, camper: "Yonatan", coordinator: "Dave" },
+    ];
+    sendSMS({
+      template: template,
+      recipients: Recipients
+    }).then((result) => {
+      console.log(result);
+    })
+ 
+    setShowSuccessToast(true);
+    closeModal();
+  };
+ 
+  const handleSendCustomMessage = () => {
+    console.log('Sending custom message to selected campers:', customMessage);
+    // Logic to send the custom message
+    closeModal();
   };
 
 
@@ -158,6 +196,7 @@ useEffect(() => {
               <TableCell align="right">{strings.confirmed[language]}</TableCell>
               <TableCell align="right">{strings.editFamily[language]}</TableCell>
               <TableCell align="right">{strings.assigning[language]}</TableCell>
+              <TableCell align="right">{strings.sendSMS[language]}</TableCell>
               <TableCell align="right">{strings.curAssigning[language]}</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -200,8 +239,82 @@ useEffect(() => {
                       onClick={() => handleAssigningModal(family)}
                     />
                   )}
-                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} setFamilies={setFamilies} settlement={settlement}/>
+                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} setFamilies={setFamilies} settlement={settlement} />
                 </TableCell>
+                <TableCell align="right">
+ 
+                  <FaSms
+                    size={24}
+                    color="#313B72"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      setShowSMSModal(true);
+                      setSelectedFamily(family);
+                    }}
+                  />
+                  <Modal show={showSMSModal} onHide={() => setShowModal(false)}>
+                    <Modal.Header closeButton>
+                      <Modal.Title>Send SMS</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <Form.Group>
+                        <Form.Label>Choose an option:</Form.Label>
+                        <Form.Select
+                          value={selectedOption}
+                          onChange={(e) => setSelectedOption(e.target.value)}
+                        >
+                          <option value="">Select an option</option>
+                          <option value="shabbat">Send Shabbat details</option>
+                          <option value="custom">Free text</option>
+                        </Form.Select>
+                      </Form.Group>
+                      {selectedOption === 'custom' && (
+                        <Form.Group>
+                          <Form.Label>Enter your custom message:</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={customMessage}
+                            onChange={(e) => setCustomMessage(e.target.value)}
+                          />
+                        </Form.Group>
+                      )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={closeModal}>
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={
+                          selectedOption === 'shabbat'
+                            ? handleSendShabbatMessage
+                            : handleSendCustomMessage
+                        }
+                        disabled={!selectedOption}
+                      >
+                        Send
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+                  <Toast
+                    show={showSuccessToast}
+                    onClose={() => setShowSuccessToast(false)}
+                    delay={3000}
+                    autohide
+                    style={{
+                      position: 'fixed',
+                      bottom: '10px',
+                      right: '10px',
+                    }}
+                  >
+                    <Toast.Header>
+                      <strong className="me-auto">Success</strong>
+                    </Toast.Header>
+                    <Toast.Body>Shabbat details sent successfully!</Toast.Body>
+                  </Toast>
+                </TableCell>
+ 
                 <TableCell align="right">{family.camper}</TableCell>
               </TableRow>
             ))}

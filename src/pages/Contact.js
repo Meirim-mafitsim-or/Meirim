@@ -6,6 +6,7 @@ import Card from 'react-bootstrap/Card';
 import strings from '../static/Strings.json';
 import { useContext, useState } from 'react';
 import { LanguageContext } from '../common/LanguageContext';
+import { addMessage } from '../common/Database';
 
 function Contact() {
   const { language } = useContext(LanguageContext);
@@ -13,6 +14,19 @@ function Contact() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    let message = event.target.message.value;
+    let email = event.target.email.value;
+    let name = event.target.name.value;
+    let phone_number = event.target.phone_number.value;
+    let date = new Date();
+    const messageData = {
+      message: message,
+      email: email,
+      name: name,
+      phone_number: phone_number,
+      date: date,
+    };
+    addMessage(messageData);
     setSubmitted(true);
   };
 
@@ -27,19 +41,18 @@ function Contact() {
             <Form onSubmit={handleSubmit}>
               <Row className="mb-3">
                 <Col>
-                  <Form.Control placeholder={strings.full_name[language]} />
+                  <Form.Control name="name" id='name' placeholder={strings.full_name[language]} />
                 </Col>
                 <Col>
-                  <Form.Control placeholder={strings.email[language]} />
+                  <Form.Control name="email" id='email' placeholder={strings.email[language]} />
                 </Col>
                 <Col>
-                  <Form.Control placeholder={strings.phone_number[language]} />
+                  <Form.Control name="phone_number" id='phone_number' placeholder={strings.phone_number[language]} />
                 </Col>
               </Row>
               <Row className="mb-3">
                 <Col>
-                  <Form.Control
-                    placeholder={strings.message[language]}
+                  <Form.Control name="message" id='message' placeholder={strings.message[language]}
                     as="textarea"
                     rows={3}
                   />

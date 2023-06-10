@@ -159,3 +159,19 @@ export async function getUser(user) {
         console.error(error);
     }
 }
+
+export async function addMessage(message) {
+    try {
+        const docRef = collection(db, 'messages');
+        await setDoc(doc(docRef), message);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function getMessages() {
+    const messagesRef = collection(db, "messages");
+    const messagesSnapshot = await getDocs(messagesRef);
+    const messages = messagesSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+    return messages;
+}

@@ -41,6 +41,7 @@ export default function Header() {
               (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
               {user && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
               {user ? <Nav.Link as={Link} to="/DataReport">{strings.data_reports[language]}</Nav.Link> : null}
+              {user ? <Nav.Link as={Link} to="/Messages">{strings.messages[language]}</Nav.Link> : null}
               {user ? <NavDropdown title={strings.management_users[language]} id="basic-nav-dropdown"> 
               {user ? <Nav.Link as={Link} to="/manageCampers">{strings.manage_campers[language]}</Nav.Link> : null}
               {user ? <Nav.Link as={Link} to="/Families">{strings.manage_families[language]}</Nav.Link> : null}
