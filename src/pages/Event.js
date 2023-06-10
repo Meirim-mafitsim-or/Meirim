@@ -67,6 +67,9 @@ export default function FormEvent() {
       email: email,
       special_comment: special_comment,
       id:  uuidv4().substring(0, 9),
+      confirmed: false,
+      assigning: false,
+      camper: null,
     };    
 
     await addFamiley(famileyData,id);
