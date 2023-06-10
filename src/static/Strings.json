@@ -586,5 +586,20 @@
     {
         "en":"edit family details",
         "he":"ערוך פרטי משפחה"
+    },
+    "notify_families":
+    {
+        "en":"Notify families",
+        "he":"הודע למשפחות"
+    },
+    "sendSMS":
+    {
+        "en":"Send SMS",
+        "he":"שלח SMS"
+    },
+    "messages":
+    {
+        "en":"Messages",
+        "he":"הודעות"
     }
 }

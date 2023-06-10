@@ -17,6 +17,7 @@ import AdminRegistration from './pages/AdminRegistration';
 import EditShabat from './pages/EditShabat';
 import ManageCoordinators from './pages/ManageCoordinators';
 import DataReport from './pages/DataReport';
+import Messages from './pages/MessagesView';
 
 
 
@@ -38,7 +39,7 @@ function App() {
           {user && <Route path="DataReport" element={<DataReport />} />}
           {user && <Route path="ManageCampers" element={<ManageCampers />} />}
           {user && <Route path="ManageCoordinators" element={<ManageCoordinators />} />}
-          
+          {user && <Route path="Messages" element={<Messages />} />}
           <Route path="AdminRegistration" element={<AdminRegistration />} />
           <Route path="EditShabat/:id" element={<EditShabat />} />
           <Route path="*" element={<h1>Not Found</h1>} />
