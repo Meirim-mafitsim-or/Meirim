@@ -132,8 +132,9 @@ export default function DataReport() {
             const currentMonth = now.getMonth();
             const lastYear = new Date(currentYear - 1, (currentMonth+1)%12, 1);
 
-            const eventsInYear = Events.filter(event => event.date.toDate() >= lastYear);
+            const eventsInYear = Events.filter(event => event.date.toDate() >= lastYear && event.date.toDate() <= now);
             let labels = [0,1,2,3,4,5,6,7,8,9,10,11].map(month => (currentMonth+month + 1)%12);
+            //and this year
             const eventsGroupByMonth = labels.map(month => eventsInYear.filter(event => event.date.toDate().getMonth() === month).length);
             setNumOfEventsInHalfYear(eventsGroupByMonth);
             if (language === "he") {

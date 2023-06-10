@@ -21,7 +21,7 @@ import TableModal from '../common/TableModal';
 import AddIcon from '@mui/icons-material/Add';
 import { deleteDoc } from "firebase/firestore";
 import Spinner from 'react-bootstrap/Spinner';
-import { getEventById,getCoordinators,getCampers,getCampersById } from '../common/Database';
+import { getEventById,getCoordinators,getCampers,getCampersById,getFamiliesRegistrationByIds } from '../common/Database';
 
 
 // export async function getEventById(eventId) {
@@ -183,7 +183,6 @@ export default function FormEvent() {
         const fetchEventData = async () => {
             try {
                 const event = await getEventById(id);
-
                 setShabatDitails({
                     coordinator: event[0].coordinator,
                     date: event[0].date,
@@ -193,8 +192,8 @@ export default function FormEvent() {
                 const camperss = await getCampersById(event[0].campers.map((camper) => camper.id));
                 setCampers(camperss);
                 setCampersData(event[0].campers);
-
-                setFamilies(event[0].families);
+                const familiesRegs = await getFamiliesRegistrationByIds(event[0].families, event[0].registrationId);
+                setFamilies(familiesRegs);
                 getCampers().then(Campers => setAllCampers(Campers));
         
             } catch (error) {
@@ -278,7 +277,7 @@ export default function FormEvent() {
             image: downloadURL,
             settlement: shabatDitails.settlement,
             campers: listCampers,
-            families: families,
+            families: families.map((family) => family.id),
         };
 
         await apdateShabat(shabatData);
@@ -326,6 +325,7 @@ export default function FormEvent() {
                             <Col md="6">
                                 <Row className="mb-8 mt-2">
                                     <Form.Group as={Col} controlId="first_name">
+                                        {/* <Form.Label>{strings.place_name[language]}</Form.Label> */}
                                         <Select
                                             options={citysOptions}
                                             required
@@ -343,6 +343,7 @@ export default function FormEvent() {
                                 </Row>
                                 <Row className="mb-7 mt-5">
                                     <Form.Group as={Col} controlId="coordinator" className="mt-5">
+                                        {/* <Form.Label>{strings.coordinator[language]}</Form.Label> */}
                                         <Select
                                             options={optionsCoordinators}
                                             required
