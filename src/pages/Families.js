@@ -92,17 +92,6 @@ useEffect(() => {
     const lastCamper = familyToUpdate.camper;
     familyToUpdate.camper = null;
     updatedFamilies[index] = familyToUpdate;
-    console.log("", familyToUpdate);
-    console.log("", updatedFamilies);
-
-    const a =  updatedFamilies.map((family) => ({
-      ...family,
-      confirmed: family.id === familyToUpdate.id ? bool : family.confirmed,
-      assigning: family.id === familyToUpdate.id ? false : family.assigning,
-      camper: family.id === familyToUpdate.id ? null : family.camper,
-    }));
-
-    console.log("", a);
     // Update specific fields in familiesDoc
     await updateDoc(familiesDoc, {
       families: updatedFamilies.map((family) => ({
