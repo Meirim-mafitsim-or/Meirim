@@ -33,6 +33,7 @@ export default function DataReport() {
     const { language } = useContext(LanguageContext);
     const [campersNum, setCampersNum] = useState([]);
     const [settlement, setSettlement] = useState([]);
+    const [settlementByDate , setSettlementByDate] = useState([]); //[strings.january[language], strings.february[language], strings.march[language], strings.april[language], strings.may[language], strings.june[language], strings.july[language], strings.august[language], strings.september[language], strings.october[language], strings.november[language], strings.december[language
     const [familiesNum, setFamiliesNum] = useState([]);
     const [numOfEventsInHalfYear, setNumOfEventsInHalfYear] = useState([]);
     const [labels, setLabels] = useState([]); //[strings.january[language], strings.february[language], strings.march[language], strings.april[language], strings.may[language], strings.june[language], strings.july[language], strings.august[language], strings.september[language], strings.october[language], strings.november[language], strings.december[language]
@@ -43,7 +44,7 @@ export default function DataReport() {
 
 
     const campersData = {
-        labels: settlement,
+        labels: settlementByDate,
         datasets: [
             {
                 label: strings.campers[language],
@@ -61,7 +62,7 @@ export default function DataReport() {
     };
 
     const familiesData = {
-        labels: settlement,
+        labels: settlementByDate,
         datasets: [
             {
                 label: strings.families[language],
@@ -121,11 +122,16 @@ export default function DataReport() {
         const fetchEventData = async () => {
             const Events = await getEvents();
             setCampersNum(Events.map(event => event.campers.length));
-            setSettlement(Events.map(event => event.settlement));
             setFamiliesNum(Events.map(event => event.families.length));
             if (language === "he") {
-                setSettlement(Events.map((event) => citys.values.filter((city) => city.english_name === event.settlement).map((city) => city.name)[0]));
+                setSettlementByDate(Events.map(event => (citys.values.find(city => city.english_name === event.settlement).name) + " - " + event.date.toDate().toLocaleDateString()));
+                setSettlement(Events.map(event => citys.values.find(city => city.english_name === event.settlement).name));
             }
+            else {
+                setSettlement(Events.map(event => event.settlement));
+                setSettlementByDate(Events.map(event => (event.settlement) + " - " + event.date.toDate().toLocaleDateString()));
+            }
+            
           
             const now = new Date();
             const currentYear = now.getFullYear();

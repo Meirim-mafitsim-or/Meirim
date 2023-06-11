@@ -601,5 +601,20 @@
     {
         "en":"Messages",
         "he":"הודעות"
+    },
+    "select_place":
+    {
+        "en":"Select place",
+        "he":"בחר מקום"
+    },
+    "select_coordinator":
+    {
+        "en":"Select coordinator",
+        "he":"בחר רכז"
+    },
+    "select_campers":
+    {
+        "en":"Select campers",
+        "he":"בחר חניכים"
     }
 }

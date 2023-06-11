@@ -156,10 +156,10 @@ export default function FormCreatShabat() {
               <Form.Group as={Col} controlId="place_name">
                 <div className="container">
                   <div className="m-auto w-100">
-                    <Form.Label>{strings.place_name[language]}</Form.Label>
+                    {/* <Form.Label>{strings.place_name[language]}</Form.Label> */}
                     <Select options={citysOptions}
                       onChange={(e) => { setPlace_name(e.value) }}
-                      placeholder={strings.select[language]}
+                      placeholder={strings.select_place[language]}
                     />
                   </div>
                 </div>
@@ -170,13 +170,13 @@ export default function FormCreatShabat() {
               <Form.Group as={Col} controlId="validationCustom05">
                 <div className="container">
                   <div className="m-auto w-100">
-                    <Form.Label>{strings.campers[language]}</Form.Label>
+                    {/* <Form.Label>{strings.campers[language]}</Form.Label> */}
                     {/* select first all the campers and than can delete the one you dont want */}
                     <Select
                       isMulti
                       onChange={(e) => setChoosenCampers(e)}
                       options={options}
-                      placeholder={strings.select[language]}
+                      placeholder={strings.select_campers[language]}
                     />
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function FormCreatShabat() {
                     {/* <Form.Label>{strings.coordinator[language]}</Form.Label> */}
                     <Select options={optionsCoordinators}
                       onChange={(e) => { setChoosenCoordinators(e) }}
-                      placeholder={strings.select[language]}>
+                      placeholder={strings.select_coordinator[language]}>
                         {/* <option value={strings.select[language]}>{strings.select[language]}</option> */}
                       </Select>
                   </div>
