@@ -382,7 +382,6 @@ export default function FormEvent() {
                             <Col md="6" mr="8">
 
                                 <Form.Group as={Col} controlId="image">
-                                    {/* <Form.Label>{strings.image[language]}</Form.Label> */}
                                     <img src={imageChanged ? previewImage : shabatDitails.image} className="mt-2 mb-4 rounded w-100 h-70" alt="shabat" height="250" />
                                     <Form.Control className="w-65"
                                         type="file"
