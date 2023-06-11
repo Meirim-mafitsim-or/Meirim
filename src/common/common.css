@@ -26,15 +26,28 @@
 html, body {
     margin: 0;
     height: 100%;
-    /* background-color: #0D2D46; */
+    background-color: #0D2D46;
+    /* background-color: linear-gradient(90deg,#0D2D46,yellow); */
+    /* background-image: linear-gradient(90deg, rgba(205, 234, 16, 0.4) 0%, #0D2D46 100%); */
+
     color: #fff;
+    /* background-image: url('https://t4.ftcdn.net/jpg/02/63/16/79/360_F_263167929_5aR33gNcaJa3MfAKw5MTz3JF51qTjhbe.jpg'); */
 }
 
 .home-color{
     background-color: #0D2D46; 
     color:            #fff;
     margin:             0 0 0 0;
-   
+    /* background-image: url('https://t4.ftcdn.net/jpg/02/63/16/79/360_F_263167929_5aR33gNcaJa3MfAKw5MTz3JF51qTjhbe.jpg'); */
+    /* background-image: linear-gradient(90deg, rgba(205, 234, 16, 0.4) 0%, #0D2D46 100%); */
+
+}
+.footer{
+    background-color: #abbdca;
+    color: #0e0d0d;
+    /* height: 100px; */
+    /* padding: 10px; */
+
 }
 .border-color{
     background-color: #1C5488;

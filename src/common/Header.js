@@ -16,7 +16,6 @@ export default function Header() {
   const navigate = useNavigate();
   const menuItems = [
     { link: "/", text: strings.home[language] },
-    { link: "/Contact", text: strings.contact[language] },
     { link: "/About", text: strings.about[language] },
   ]
   const langItems = [
