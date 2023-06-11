@@ -145,7 +145,7 @@ useEffect(() => {
  
   const handleAssigningModal = (family) => {
     setSelectedFamily(family);
-    setShowSMSModal(true);
+    setShowModal(true);
   };
  
   const handleSendShabbatMessage = () => {
