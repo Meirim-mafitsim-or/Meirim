@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button , Row, Col, Modal } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import strings from '../static/Strings.json';
 
