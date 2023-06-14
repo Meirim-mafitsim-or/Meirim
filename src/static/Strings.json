@@ -169,8 +169,8 @@
     },
     "edit":
     {
-        "en":"Edit Shabat",
-        "he":"ערוך שבת"
+        "en":"Edit",
+        "he":"ערוך"
     },
     "edited_confirm_message":
     {
@@ -502,66 +502,6 @@
         "en":"Events in year",
         "he":"אירועים בשנה"
     },
-    "january":
-    {
-        "en":"January",
-        "he":"ינואר"
-    },
-    "february":
-    {
-        "en":"February",
-        "he":"פברואר"
-    },
-    "march":
-    {
-        "en":"March",
-        "he":"מרץ"
-    },
-    "april":
-    {
-        "en":"April",
-        "he":"אפריל"
-    },
-    "may":
-    {
-        "en":"May",
-        "he":"מאי"
-    },
-    "june":
-    {
-        "en":"June",
-        "he":"יוני"
-    },
-    "july":
-    {
-        "en":"July",
-        "he":"יולי"
-    },
-    "august":
-    {
-        "en":"August",
-        "he":"אוגוסט"
-    },
-    "september":
-    {
-        "en":"September",
-        "he":"ספטמבר"
-    },
-    "october":
-    {
-        "en":"October",
-        "he":"אוקטובר"
-    },
-    "november":
-    {
-        "en":"November",
-        "he":"נובמבר"
-    },
-    "december":
-    {
-        "en":"December",
-        "he":"דצמבר"
-    },
     "welcome":
     {
         "en":"Welcome to meirim website",
@@ -616,5 +556,75 @@
     {
         "en":"Select campers",
         "he":"בחר חניכים"
+    },
+    "camper_id":
+    {
+        "en":"Camper ID",
+        "he":"תעודת זהות"
+    },
+    "birth_date":
+    {
+        "en":"Birth date",
+        "he":"תאריך לידה"
+    },
+    "frame":
+    {
+        "en":"Frame",
+        "he":"מסגרת"
+    },
+    "disability_definition":
+    {
+        "en":"Disability definition",
+        "he":"הגדרת מוגבלות"
+    },
+    "functioning_level":
+    {
+        "en":"Functioning level",
+        "he":"רמת תפקוד"
+    },
+    "allergies":
+    {
+        "en":"Allergies / Sensitivities",
+        "he":"אלרגיות / רגישויות"
+    },
+    "parent_name":
+    {
+        "en":"Parent name",
+        "he":"שם ההורה"
+    },
+    "parent_phone":
+    {
+        "en":"Parent phone",
+        "he":"טלפון ההורה"
+    },
+    "branch":
+    {
+        "en":"Branch",
+        "he":"סניף"
+    },
+    "tutor":
+    {
+        "en":"Tutor",
+        "he":"חונך"
+    },
+    "tutor_phone":
+    {
+        "en":"Tutor phone",
+        "he":"טלפון חונך"
+    },
+    "high":
+    {
+        "en":"High",
+        "he":"גבוהה"
+    },
+    "medium":
+    {
+        "en":"Medium",
+        "he":"בינונית"
+    },
+    "low":
+    {
+        "en":"Low",
+        "he":"נמוכה"
     }
 }

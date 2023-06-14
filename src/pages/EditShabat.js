@@ -83,43 +83,29 @@ export default function FormEvent() {
     const [campersData, setCampersData] = useState([]);
 
     const campers_columns = [
-        {
-            title: strings.first_name[language],
-            field: 'firstName',
-            type: 'text'
+        {title: strings.camper_id[language], field: 'camper_id', type: 'text'},
+        {title: strings.first_name[language], field: 'firstName', type: 'text'},
+        {title: strings.last_name[language], field: 'lastName', type: 'text'},
+        {title: strings.birth_date[language], field: 'birthDate', type: 'date'},
+        {title: strings.gender[language], field: 'gender', type: 'select', options: 
+          {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
         },
-        {
-            title: strings.last_name[language],
-            field: 'lastName',
-            type: 'text'
+        {title: strings.city[language],field: 'city',type: 'text'},
+        {title: strings.address[language],field: 'address',type: 'text'},
+        {title: strings.frame[language], field: 'frame', type: 'text' },
+        { title: strings.disability_definition[language], field: 'disabilityDefinition', type: 'text' },
+        { title: strings.functioning_level[language], field: 'functioningLevel', type: 'select',
+          options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
         },
-        {
-            title: strings.age[language],
-            field: 'age',
-            type: 'number'
-        },
-        {
-            title: strings.disability_rank[language],
-            field: 'disabilityRank',
-            type: 'number'
-        },
-        {
-            title: strings.gender[language],
-            field: 'gender',
-            type: 'select',
-            options: {
-                'male': strings.male[language],
-                'female': strings.female[language],
-                'other': strings.other[language]
-            }
-        },
-        {
-            title: strings.special_comment[language],
-            field: 'comments',
-            type: 'textarea'
-        }
-    ]
-    const families_columns = [
+        { title: strings.allergies[language], field: 'allergies', type: 'text' },
+        { title: strings.parent_name[language], field: 'parentName', type: 'text' },
+        { title: strings.parent_phone[language], field: 'parentPhone', type: 'text' },
+        { title: strings.branch[language], field: 'branch', type: 'text' },
+        { title: strings.tutor[language], field: 'tutor', type: 'text' },
+        { title: strings.tutor_phone[language], field: 'tutorPhone', type: 'text' },
+        { title: strings.special_comment[language], field: 'comments', type: 'textarea' }
+      ]
+        const families_columns = [
         {
             title: strings.first_name[language],
             field: 'first_name',
@@ -216,15 +202,15 @@ export default function FormEvent() {
         setCampers([...campers, camper]);
     }
 
-    const handleDeleteCamper = (camperId) => {
-
-        for (let i = 0; i < campers.length; i++) {
-            if (campers[i].id === camperId) {
-                campers.splice(i, 1);
-                break;
-            }
-        }
-        setCampers(campers);
+    const handleDeleteCampers = (camperIds) => {
+        // for (let i = 0; i < campers.length; i++) {
+        //         if (campers[i].id === camperId) {
+        //                 campers.splice(i, 1);
+        //                 break;
+        //             }
+        //         }
+        let newCampers = campers.filter((camper) => !camperIds.includes(camper.id));
+        setCampers(newCampers);
     }
 
     const handleSubmit = async (event) => {
@@ -422,7 +408,7 @@ export default function FormEvent() {
                                             <ManagableTable
                                                 columns={campers_columns}
                                                 data={campers}
-                                                onDelete={handleDeleteCamper}
+                                                onDelete={handleDeleteCampers}
                                                 globalActions={tableActions} />
                                             <TableModal
                                                 onAdd={handleAddCamper}
@@ -449,7 +435,7 @@ export default function FormEvent() {
                                     aria-hidden="true"
                                 />
                             }
-                            {strings.edit[language]}</Button>
+                            {strings.edit_shabat[language]}</Button>
                         <Button variant='outline-secondary' onClick={handleDeleteEvent} disabled={submitted}>
                             {submitted &&
                                 <Spinner

@@ -12,8 +12,25 @@ export async function getCampers() {
 
 export async function addCamper(camper) {
     try {
+        const camper_id = camper.id;
         const docRef = collection(db, 'campers');
-        await setDoc(doc(docRef), camper);
+        await setDoc(doc(docRef, camper_id), camper);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function addManyCampers(campers) {
+    try {
+        // console.log("addManyCampers", campers);
+        const docRef = collection(db, 'campers');
+        const prom = campers.map(camper => {
+            const camper_id = ""+camper.id;
+            delete camper.id;
+            console.log("camper_id", camper_id);
+            return setDoc(doc(docRef, camper_id), camper);
+        });
+        await Promise.all(prom);
     } catch (error) {
         console.error(error);
     }
@@ -23,6 +40,19 @@ export async function deleteCamper(camperId) {
     try {
         const docRef = doc(db, 'campers', camperId);
         await deleteDoc(docRef);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function deleteCampers(camperIds) {
+    try {
+        const docRef = collection(db, 'campers');
+        camperIds.map(async camperId => {
+            const camperDocRef = doc(docRef, camperId);
+            return deleteDoc(camperDocRef);
+        });
+        await Promise.all(camperIds);
     } catch (error) {
         console.error(error);
     }
