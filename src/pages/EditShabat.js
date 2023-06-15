@@ -54,6 +54,15 @@ function formatDate(seconds) {
     return `${year}-${month}-${day}`;
 }
 
+function campersEscapeDate(campers){
+    return campers.map((camper) => {
+      if (camper.birthDate)
+        camper.birthDate = new Date(camper.birthDate.seconds * 1000);
+      return camper;
+    });
+  }
+  
+
 function getCityName(settlement, language) {
     if (language === "he") {
         return citys.values.filter(city => city.english_name === settlement).map(city => city.name)[0];
@@ -175,12 +184,12 @@ export default function FormEvent() {
                     image: event[0].image,
                     settlement: event[0].settlement,
                 });
-                const camperss = await getCampersById(event[0].campers.map((camper) => camper.id));
+                const camperss = await getCampersById(event[0].campers.map((camper) => camper.id)).then(campersEscapeDate);
                 setCampers(camperss);
                 setCampersData(event[0].campers);
                 const familiesRegs = await getFamiliesRegistrationByIds(event[0].families, event[0].registrationId);
                 setFamilies(familiesRegs);
-                getCampers().then(Campers => setAllCampers(Campers));
+                getCampers().then(campersEscapeDate).then(Campers => setAllCampers(Campers));
         
             } catch (error) {
                 console.error('Error fetching event:', error);
@@ -191,9 +200,6 @@ export default function FormEvent() {
     }, [ id]);//here add to do marging
 
 
-
-    // then(Campers => Campers.filter(camper => !(campersId.includes(camper.id)))).then(camp => setRestCampers(camp)).then(() => console.log(restCampers));
-    // setRestCampers(allCampers.filter(camper => !(campers.map((c)=>c.id).includes(camper.id))));
     useEffect(() => {
         setRestCampers(allCampers.filter(camper => !(campers.map((c) => c.id).includes(camper.id))));
     }, [allCampers, campers]);
@@ -203,12 +209,6 @@ export default function FormEvent() {
     }
 
     const handleDeleteCampers = (camperIds) => {
-        // for (let i = 0; i < campers.length; i++) {
-        //         if (campers[i].id === camperId) {
-        //                 campers.splice(i, 1);
-        //                 break;
-        //             }
-        //         }
         let newCampers = campers.filter((camper) => !camperIds.includes(camper.id));
         setCampers(newCampers);
     }
