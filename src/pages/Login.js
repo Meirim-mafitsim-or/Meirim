@@ -53,7 +53,7 @@ function Login() {
     }
   };
   return (
-    <div className="App home-paragraph home-color pt-5">
+    <div className="home-paragraph mt-5">
       <Card className="text-center w-50 m-auto text-dark">
         <Card.Body>
           <Form onSubmit={handleLogin}>

@@ -38,9 +38,7 @@ export default function AddModal({ onAdd, campers, show, setShow}) {
     const handleSubmit = (event) => {
         event.preventDefault();
         const newContent = rowSelectionModel.map((id) => campers.find((camper) => camper.id === id));
-        for (const camper of newContent) {
-            onAdd(camper);
-        }
+            onAdd(newContent);
         handleClose();
     };
 

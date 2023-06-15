@@ -32,7 +32,7 @@ export default function EventsList() {
                         <Row key={index} xs={1} md={cards_per_row} >
                             {row.map((event, index) => (
                                 <Col key={index} className="p-3">
-                                    {user ? (
+                                    {user && user.role==='admin'?   (
                                     <EventCard event={event} forward={`EditShabat/${event.id}`} buttonText={strings.edit_shabat[language]} />
                                     ) : (
                                     <EventCard event={event} forward={`Event/${event.id}`} buttonText={strings.reg_host[language]} />

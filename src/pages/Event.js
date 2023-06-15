@@ -15,12 +15,6 @@ import { useEffect } from 'react';
 import { getFamiliesRegistration } from '../common/Database';
 import { v4 as uuidv4 } from 'uuid';
 
-// export async function getFamiliesRegistration() {
-//   const FamiliesRegistrationRef = collection(db, "familiesRegistration");
-//   const FamiliesRegistrationSnapshot = await getDocs(FamiliesRegistrationRef);
-//   const FamiliesRegistration = FamiliesRegistrationSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-//   return FamiliesRegistration;
-// }
 
 export default function FormEvent() {
   let { id } = useParams();
@@ -123,7 +117,7 @@ export default function FormEvent() {
 
 
   return (
-    <div className="App home-paragraph home-color text-dark pt-5">
+    <div className="home-paragraph m-0 mt-5">
     <Card className="text-center w-75 m-auto">
       <Card.Body>
       {submitted ? ( // Render the thank you message if the form is submitted

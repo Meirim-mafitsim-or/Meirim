@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Container} from 'react-bootstrap';
-import { getCoordinators, updateCoordinator, deleteCoordinator } from '../common/Database';
+import { getCoordinators, updateCoordinator, deleteCoordinator , getEvents } from '../common/Database';
 import ManagebleTable from '../common/ManagebleTable';
 import { LanguageContext } from '../common/LanguageContext';
 import strings from '../static/Strings.json';
 import AddCoordinatorModal from './AddCoordinator';
 import AddIcon from '@mui/icons-material/Add';
 import citys from '../static/city.json';
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from '../common/FirebaseApp';
 
 export default function ManageCoordinators() {
   const [coordinators, setCoordinators] = useState([]);
@@ -63,7 +65,22 @@ export default function ManageCoordinators() {
   }
 
   const handleDeleteCoordinator = (coordinatorId) => {
-    deleteCoordinator(coordinatorId).then(getCoordinators).then(coordinators => setCoordinators(coordinators));
+    const confirmed = window.confirm(strings.delete_confirm_coordinator[language]);
+    if (confirmed){
+        getEvents().then(events => {
+          events.forEach(event => {
+            //delete fromv the shabats that the date is bigger then now
+            const now = new Date();
+            if (event.coordinator.id === coordinatorId && event.date.seconds > now.getTime() / 1000){
+              updateDoc(doc(db, "events", event.id), {
+                coordinator: null
+              });
+
+            }
+          })
+        })
+        deleteCoordinator(coordinatorId).then(getCoordinators).then(coordinators => setCoordinators(coordinators));
+    }
   }
 
   return (

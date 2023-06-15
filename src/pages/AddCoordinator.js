@@ -10,14 +10,19 @@ import { createCoordinator } from '../common/Database';
 const campers_columns = ['first_name', 'last_name', 'email', 'phone', 'place_name'];
 export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
     const { language } = useContext(LanguageContext);
-    // const [show, setShow] = useState(false);
     const [camper, setCamper] = useState(campers_columns.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
-    // const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState('');
     const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
     const [place_name, setPlace_name] = useState("");
+    const [validated, setValidated] = useState(false);
+    const [invalid, setInvalid] = useState({
+        first_name: false,
+        last_name: false,
+        phone: false,
+        // email: false,
+        place_name: false,
+    });
 
     const citysOptions = citys.values.map((city, index) => {
         if (language === "he") {
@@ -55,8 +60,17 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
         event.preventDefault();
 
         const onSuccessfulAdd = () => {
-            setCamper(campers_columns.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
             handleClose();
+            setCamper(campers_columns.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
+            setInvalid({
+                first_name: false,
+                last_name: false,
+                phone: false,
+                place_name: false,
+            });
+            setValidated(false);
+            setPassword("");
+            setPlace_name("");
             onSuccess();
         };
         let place_en = "";
@@ -64,35 +78,70 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
             place_en =citys.values.filter(city => city.name === place_name).map(city => city.english_name)[0];
         }
         camper['place_name'] = place_en;
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        // validate all fields
+        let tmpInv = {
+          first_name: false,
+          last_name: false,
+          phone: camper.phone.match(/^[0-9]{10}$/) == null,
+        //   email: campers_columns["email"].match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/) == null,
+          place_name: false,
+        };
+        if(camper.first_name === ""){
+            tmpInv.first_name = true;
+        }
+        if(camper.last_name === ""){
+            tmpInv.last_name = true;
+        }
+        if(place_name === ""){
+            tmpInv.place_name = true;
+        }
+        setInvalid(tmpInv);
+        
+        // if any field is invalid, don't submit
+        if (Object.values(tmpInv).includes(true)) {
+          setValidated(false);
+          return;
+        }
+        // camper['events'] = [];//the coordinator have list of events
+        setValidated(true);
         await createCoordinator(camper, handleError, onSuccessfulAdd,password);
+        
     };
 
 
     return (
         <>
-          
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>{strings.add_coordinator[language]}</Modal.Title>
                 </Modal.Header>
-                <Form onSubmit={handleSubmit}>
+                <Form validated={validated} className='needs-validation' onSubmit={handleSubmit}>
                     <Modal.Body>
                         <Row className='mb-3'>
                             <Col>
                                 <FloatingLabel label={strings.first_name[language]} controlId='formFirstName'>
-                                    <Form.Control type="text" name="first_name" value={camper.first_name} onChange={handleInputChange} placeholder='FirstName' required />
+                                    <Form.Control type="text" name="first_name" value={camper.first_name} onChange={handleInputChange} placeholder='FirstName'
+                                    isInvalid={invalid.first_name} required 
+                                    />
                                 </FloatingLabel>
                             </Col>
                             <Col>
                                 <FloatingLabel controlId="formLastName" label={strings.last_name[language]}>
-                                    <Form.Control type="text" name="last_name" value={camper.last_name} onChange={handleInputChange} placeholder='LastName' required />
+                                    <Form.Control type="text" name="last_name" value={camper.last_name} onChange={handleInputChange} placeholder='LastName' required 
+                                    isInvalid={invalid.last_name}   />
                                 </FloatingLabel>
                             </Col>
                         </Row>
                         <Row className='mb-3'>
                         <Col>
                                 <FloatingLabel controlId="formPhone" label={strings.phone_number[language]}>
-                                    <Form.Control type="text" name="phone" value={camper.phone} onChange={handleInputChange} placeholder='DisabilityRank' required />
+                                    <Form.Control type="text" name="phone" value={camper.phone} onChange={handleInputChange} placeholder='DisabilityRank' required 
+                                    isInvalid={invalid.phone}   />
                                 </FloatingLabel>
                             </Col>
                             <Col>
@@ -101,6 +150,8 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
                                 <Select options={citysOptions}
                                     onChange={(e) => { setPlace_name(e.value) }}
                                     placeholder={strings.select[language]}
+                                    isInvalid={invalid.place_name}
+                                    required
                                 />
                                 </FloatingLabel>
                             </Col>
@@ -127,7 +178,7 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
                         <Button variant="secondary" onClick={handleClose}>
                             {strings.close[language]}
                         </Button>
-                        <Button className='mr-3' variant="primary" onClick={handleSubmit}>
+                        <Button type="submit" className='mr-3' variant="primary">
                             {strings.add[language]}
                         </Button>
                     </Modal.Footer>
