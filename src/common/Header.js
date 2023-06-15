@@ -16,7 +16,6 @@ export default function Header() {
   const navigate = useNavigate();
   const menuItems = [
     { link: "/", text: strings.home[language] },
-    { link: "/Contact", text: strings.contact[language] },
     { link: "/About", text: strings.about[language] },
   ]
   const langItems = [
@@ -39,13 +38,13 @@ export default function Header() {
             <Nav className="me-auto">
               {menuItems.map((item, index) => 
               (<Nav.Link as={Link} key={index} to={item.link}>{item.text}</Nav.Link>))}
-              {user && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
-              {user ? <Nav.Link as={Link} to="/DataReport">{strings.data_reports[language]}</Nav.Link> : null}
-              {user ? <Nav.Link as={Link} to="/Messages">{strings.messages[language]}</Nav.Link> : null}
+              {user && user.role==='admin' && <Nav.Link as={Link} to="/CreatShabat">{strings.creat_shabat[language]}</Nav.Link>}
+              {user ? user.role==='admin' && <Nav.Link as={Link} to="/DataReport">{strings.data_reports[language]}</Nav.Link> : null}
+              {user ? user.role==='admin' && <Nav.Link as={Link} to="/Messages">{strings.messages[language]}</Nav.Link> : null}
               {user ? <NavDropdown title={strings.management_users[language]} id="basic-nav-dropdown"> 
-              {user ? <Nav.Link as={Link} to="/manageCampers">{strings.manage_campers[language]}</Nav.Link> : null}
+              {user ? user.role==='admin' && <Nav.Link as={Link} to="/manageCampers">{strings.manage_campers[language]}</Nav.Link> : null}
               {user ? <Nav.Link as={Link} to="/Families">{strings.manage_families[language]}</Nav.Link> : null}
-              {user ? <Nav.Link as={Link} to="/ManageCoordinators">{strings.manage_coordinators[language]}</Nav.Link> : null}
+              {user ? user.role==='admin' && <Nav.Link as={Link} to="/ManageCoordinators">{strings.manage_coordinators[language]}</Nav.Link> : null}
               </NavDropdown> : null}
               <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
             </Nav>
@@ -61,7 +60,7 @@ export default function Header() {
               {user ? <Nav.Link onClick={handleLogout}>{strings.logout[language]}</Nav.Link> :
                       <Nav.Link as={Link} to="/Login">{strings.login[language]}</Nav.Link>
               }
-              {user && <Nav.Link as={Link} to="/AdminRegistration">{strings.sign_up[language]}</Nav.Link>}
+              {user && user.role==='admin' && <Nav.Link as={Link} to="/AdminRegistration">{strings.sign_up[language]}</Nav.Link>}
             </Nav>
           </Navbar.Collapse>
       </Navbar>

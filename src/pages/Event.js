@@ -26,6 +26,17 @@ export default function FormEvent() {
   let { id } = useParams();
   const [validated, setValidated] = useState(false);
   const [submitted, setSubmitted] = useState(false); // Track form submission status
+  const [invalid, setInvalid] = useState({
+    first_name: false,
+    last_name: false,
+    city: false,
+    street: false,
+    house_number: false,
+    apartment_number: false,
+    phone_number: false,
+    email: false,
+    special_comment: false,
+  });
   const { language } = React.useContext(LanguageContext);
   const [first_name, setFirst_name] = useState("");
   const [last_name, setLast_name] = useState("");
@@ -52,7 +63,25 @@ export default function FormEvent() {
       event.preventDefault();
       event.stopPropagation();
     }
-
+    // validate all fields
+    let tmpInv = {
+      first_name: false,
+      last_name: false,
+      city: false,
+      street: false,
+      house_number: false,
+      apartment_number: false,
+      phone_number: phone_number.match(/^[0-9]{10}$/) == null,
+      email: email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/) == null,
+    };
+    setInvalid(tmpInv);
+    
+    // if any field is invalid, don't submit
+    if (Object.values(tmpInv).includes(true)) {
+      setValidated(false);
+      return;
+    }
+    
     setValidated(true);
     setSubmitted(true); // Set the submission status to true
 
@@ -92,24 +121,6 @@ export default function FormEvent() {
     }
   }
 
-  // async function addFamiley(famileyData, eventId) {
-  //   const docRef = await addDoc(collection(db, "families"), famileyData);
-  //   const familyId = docRef.id;
-  //   const EventsRef = collection(db, "events");
-  //   const EventsSnapshot = await getDocs(EventsRef);
-  //   const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-  //   const event = Events.filter(event => event.id === eventId);
-  //   const eventRegId = event[0].registrationId;//the refence to the registration collection
-    
-  //   for (let i = 0; i < familiesRegistration.length; i++) {
-  //     if (familiesRegistration[i].id === eventRegId) {
-  //       familiesRegistration[i].families.push(familyId);
-  //       await setDoc(doc(db, "familiesRegistration", eventRegId), {
-  //         families: familiesRegistration[i].families
-  //       });
-  //     }
-  //   }
-  // }
 
   return (
     <div className="App home-paragraph home-color text-dark pt-5">
@@ -120,7 +131,7 @@ export default function FormEvent() {
           ) : (
             <p>{strings.registration[language]}</p>
           )}
-        <Form noValidate validated={validated} onSubmit={handleSubmit}>
+        <Form validated={validated} onSubmit={handleSubmit} className='needs-validation'>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="first_name">
               <Form.Label>{strings.first_name[language]}</Form.Label>
@@ -129,6 +140,7 @@ export default function FormEvent() {
                 type="text"
                 placeholder={strings.first_name[language]}
                 onChange={(e) => setFirst_name(e.target.value)}
+                isInvalid={invalid.first_name}
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="last_name">
@@ -138,26 +150,31 @@ export default function FormEvent() {
                 type="text"
                 placeholder={strings.last_name[language]}
                 onChange={(e) => setLast_name(e.target.value)}
+                isInvalid={invalid.last_name}
               />
             </Form.Group>
           </Row>
           <Row className="mb-3">
             <Form.Group as={Col} md="3" controlId="validationCustom04">
               <Form.Label>{strings.street[language]}</Form.Label>
-              <Form.Control type="text" placeholder={strings.street[language]} required onChange={(e) => setStreet(e.target.value)}/>
+              <Form.Control type="text" placeholder={strings.street[language]} required onChange={(e) => setStreet(e.target.value)}
+              isInvalid={invalid.street}
+              />
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="3" controlId="validationCustom03">
               <Form.Label>{strings.city[language]}</Form.Label>
-              <Form.Control type="text" placeholder={strings.city[language]} required onChange={(e) => setCity(e.target.value)}/>
+              <Form.Control type="text" placeholder={strings.city[language]} required onChange={(e) => setCity(e.target.value)}
+              isInvalid={invalid.city}/>
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="3" controlId="validationCustom05">
               <Form.Label>{strings.house_number[language]}</Form.Label>
               <Form.Control type="number" placeholder={strings.house_number[language]} required 
-              onChange={(e) => setHouse_number(e.target.value)}/>
+              onChange={(e) => setHouse_number(e.target.value)}
+              isInvalid={invalid.house_number}/>
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
@@ -165,7 +182,8 @@ export default function FormEvent() {
             <Form.Group as={Col} md="3" controlId="apartment_number">
               <Form.Label>{strings.apartment_number[language]}</Form.Label>
               <Form.Control type="number" placeholder={strings.apartment_number[language]} 
-              onChange={(e) => setApartment_number(e.target.value)}/>
+              onChange={(e) => setApartment_number(e.target.value)}
+              isInvalid={invalid.apartment_number}/>
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
@@ -175,17 +193,19 @@ export default function FormEvent() {
             <Form.Group as={Col} md="4" controlId="validationCustom07">
               <Form.Label>{strings.phone_number[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.phone_number[language]} required 
-              onChange={(e) => setPhone_number(e.target.value)}/>
+              onChange={(e) => setPhone_number(e.target.value)}
+              isInvalid={invalid.phone_number}/>
+              <Form.Control.Feedback type="invalid">
+              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustom08">
               <Form.Label>{strings.email[language]}</Form.Label>
               <Form.Control type="text" placeholder={strings.email[language]} required 
-              onChange={(e) => setEmail(e.target.value)}/>
+              onChange={(e) => setEmail(e.target.value)}
+              isInvalid={invalid.email}/>
               <Form.Control.Feedback type="invalid">
               </Form.Control.Feedback>
             </Form.Group>
-
-
           </Row>
 
           <Row className="mb-3">

@@ -1,5 +1,5 @@
-import { db,firebaseConfig } from "./FirebaseApp";
-import { collection, getDocs, setDoc, doc, deleteDoc,where, query,getDoc } from "firebase/firestore";
+import { db, firebaseConfig } from "./FirebaseApp";
+import { collection, getDocs, setDoc, doc, deleteDoc, where, query, getDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -12,8 +12,25 @@ export async function getCampers() {
 
 export async function addCamper(camper) {
     try {
+        const camper_id = camper.id;
         const docRef = collection(db, 'campers');
-        await setDoc(doc(docRef), camper);
+        await setDoc(doc(docRef, camper_id), camper);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function addManyCampers(campers) {
+    try {
+        // console.log("addManyCampers", campers);
+        const docRef = collection(db, 'campers');
+        const prom = campers.map(camper => {
+            const camper_id = ""+camper.id;
+            delete camper.id;
+            console.log("camper_id", camper_id);
+            return setDoc(doc(docRef, camper_id), camper);
+        });
+        await Promise.all(prom);
     } catch (error) {
         console.error(error);
     }
@@ -23,6 +40,19 @@ export async function deleteCamper(camperId) {
     try {
         const docRef = doc(db, 'campers', camperId);
         await deleteDoc(docRef);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function deleteCampers(camperIds) {
+    try {
+        const docRef = collection(db, 'campers');
+        camperIds.map(async camperId => {
+            const camperDocRef = doc(docRef, camperId);
+            return deleteDoc(camperDocRef);
+        });
+        await Promise.all(camperIds);
     } catch (error) {
         console.error(error);
     }
@@ -92,17 +122,17 @@ export async function getFamiliesRegistration() {
     const FamiliesRegistrationSnapshot = await getDocs(FamiliesRegistrationRef);
     const FamiliesRegistration = FamiliesRegistrationSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
     return FamiliesRegistration;
-  }
+}
 
-  export async function getFamilies(id) {
+export async function getFamilies(id) {
     const events = collection(db, 'events');
     const cur_event = doc(events, id);
     const EventsSnapshot = await getDoc(cur_event);
     const eventData = EventsSnapshot.data();
     return eventData.families || [];
-  }
+}
 
-  export async function createCoordinator(coordinatorData, setError, onSuccessfulAdd,password) {
+export async function createCoordinator(coordinatorData, setError, onSuccessfulAdd, password) {
     const coordinator = collection(db, 'coordinators');
     const secondaryApp = initializeApp(firebaseConfig, "Secondary");
     const tempAuth = getAuth(secondaryApp);
@@ -117,17 +147,17 @@ export async function getFamiliesRegistration() {
             ...coordinatorData,
             role: "coordinator",
         }
-            
-        await setDoc(doc(userCollection,user.uid), userData);
+
+        await setDoc(doc(userCollection, user.uid), userData);
 
         coordinatorData.userId = user.uid;
         await setDoc(doc(coordinator), coordinatorData);
         onSuccessfulAdd();
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        setError(errorCode);
-      });
+    })
+        .catch((error) => {
+            const errorCode = error.code;
+            setError(errorCode);
+        });
 }
 export async function getEventById(eventId) {
     const EventsRef = collection(db, "events");
@@ -143,7 +173,8 @@ export async function getCampersById(campersIds) {
         return getDoc(camperRef);
     });
     const campers = await Promise.all(promises);
-    let data =  campers.map((camper)=> Object.assign(camper.data(),{id:camper.id}));
+    let data = campers.map((camper) => Object.assign(camper.data(), { id: camper.id }));
+    console.log(data);
     return data;
 }
 
@@ -174,4 +205,13 @@ export async function getMessages() {
     const messagesSnapshot = await getDocs(messagesRef);
     const messages = messagesSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
     return messages;
+}
+
+export async function getFamiliesRegistrationByIds(familiesIds, familiesRegistrationId) {
+    const familiesRegistrationRef = doc(db, "familiesRegistration", familiesRegistrationId);
+    const familiesRegistration = await getDoc(familiesRegistrationRef);
+    const familiesRegistrationData = familiesRegistration.data();
+    const families = familiesRegistrationData.families;
+    const familiesData = families.filter(family => familiesIds.includes(family.id));
+    return familiesData;
 }

@@ -3,51 +3,33 @@ import strings from '../static/Strings.json';
 import { LanguageContext } from './LanguageContext';
 import {Form, Modal,  Button } from 'react-bootstrap';
 import { DataGrid } from '@mui/x-data-grid';
-
-
-  const columns = [
-    {
-      field: 'firstName',
-      headerName: 'First name',
-      width: 110,
-      editable: true,
-    },
-    {
-      field: 'lastName',
-      headerName: 'Last name',
-      width: 110,
-      editable: true,
-    },
-    {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-      width: 110,
-      editable: true,
-    },
-    {
-        field: 'disabilityRank',
-        headerName: 'Disability Rank',
-        type: 'number',
-        width: 110,
-    },
-    {
-        field: 'comments',
-        headerName: 'Comments',
-        type: 'string',
-        width: 110,
-    },
-    {
-        field: 'gender',
-        headerName: 'Gender',
-        type: 'string',
-        width: 110,
-    },
-  ];
-
  
 export default function AddModal({ onAdd, campers, show, setShow}) {
     const { language } = useContext(LanguageContext);
+    const columns = [
+      {headerName: strings.camper_id[language], field: 'camper_id', type: 'text'},
+      {headerName: strings.first_name[language], field: 'firstName', type: 'text'},
+      {headerName: strings.last_name[language], field: 'lastName', type: 'text'},
+      {headerName: strings.birth_date[language], field: 'birthDate', type: 'date'},
+      {headerName: strings.gender[language], field: 'gender', type: 'select', options: 
+        {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
+      },
+      {headerName: strings.city[language],field: 'city',type: 'text'},
+      {headerName: strings.address[language],field: 'address',type: 'text'},
+      {headerName: strings.frame[language], field: 'frame', type: 'text' },
+      { headerName: strings.disability_definition[language], field: 'disabilityDefinition', type: 'text' },
+      { headerName: strings.functioning_level[language], field: 'functioningLevel', type: 'select',
+        options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
+      },
+      { headerName: strings.allergies[language], field: 'allergies', type: 'text' },
+      { headerName: strings.parent_name[language], field: 'parentName', type: 'text' },
+      { headerName: strings.parent_phone[language], field: 'parentPhone', type: 'text' },
+      { headerName: strings.branch[language], field: 'branch', type: 'text' },
+      { headerName: strings.tutor[language], field: 'tutor', type: 'text' },
+      { headerName: strings.tutor_phone[language], field: 'tutorPhone', type: 'text' },
+      { headerName: strings.special_comment[language], field: 'comments', type: 'textarea' }
+    ]
+  
     const [rowSelectionModel, setRowSelectionModel] = useState([]);
 
     const handleClose = () => setShow(false);
@@ -78,6 +60,23 @@ export default function AddModal({ onAdd, campers, show, setShow}) {
                               pagination: {
                                 paginationModel: { page: 0, pageSize: 5 },
                               },
+                              columns: {
+                                columnVisibilityModel: {
+                                  // Hide columns status and traderName, the other columns will remain visible
+                                  camper_id: false,
+                                  city: false,
+                                  address: false,
+                                  disabilityDefinition: false,
+                                  allergies: false,
+                                  parentName: false,
+                                  parentPhone: false,
+                                  branch: false,
+                                  tutor: false,
+                                  tutorPhone: false,
+                                  comments: false,
+
+                                },
+                              },                          
                             }}
                             pageSizeOptions={[5, 10]}
                             checkboxSelection
@@ -85,6 +84,7 @@ export default function AddModal({ onAdd, campers, show, setShow}) {
                                 setRowSelectionModel(newRowSelectionModel);
                               }}
                               rowSelectionModel={rowSelectionModel}
+                              
                           />
                       
                     </Modal.Body>

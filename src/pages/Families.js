@@ -145,7 +145,7 @@ useEffect(() => {
  
   const handleAssigningModal = (family) => {
     setSelectedFamily(family);
-    setShowSMSModal(true);
+    setShowModal(true);
   };
  
   const handleSendShabbatMessage = () => {
@@ -156,7 +156,7 @@ useEffect(() => {
     const sendSMS = httpsCallable(functions, 'sendMessagesWithTemplate');
     const template = "hi [#name#], you've been asigned with [#camper#] camper, please contact him/her to arrange the meeting. [#coordinator#] coordinator";
     const Recipients = [
-      { name: selectedFamily.first_name, Phone: selectedFamily, camper: "Yonatan", coordinator: "Dave" },
+      { name: selectedFamily.first_name, Phone: selectedFamily.phone_number, camper: "Yonatan", coordinator: "Dave" },
     ];
     sendSMS({
       template: template,

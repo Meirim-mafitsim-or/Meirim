@@ -21,7 +21,7 @@ import TableModal from '../common/TableModal';
 import AddIcon from '@mui/icons-material/Add';
 import { deleteDoc } from "firebase/firestore";
 import Spinner from 'react-bootstrap/Spinner';
-import { getEventById,getCoordinators,getCampers,getCampersById } from '../common/Database';
+import { getEventById,getCoordinators,getCampers,getCampersById,getFamiliesRegistrationByIds } from '../common/Database';
 
 
 // export async function getEventById(eventId) {
@@ -83,43 +83,29 @@ export default function FormEvent() {
     const [campersData, setCampersData] = useState([]);
 
     const campers_columns = [
-        {
-            title: strings.first_name[language],
-            field: 'firstName',
-            type: 'text'
+        {title: strings.camper_id[language], field: 'camper_id', type: 'text'},
+        {title: strings.first_name[language], field: 'firstName', type: 'text'},
+        {title: strings.last_name[language], field: 'lastName', type: 'text'},
+        {title: strings.birth_date[language], field: 'birthDate', type: 'date'},
+        {title: strings.gender[language], field: 'gender', type: 'select', options: 
+          {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
         },
-        {
-            title: strings.last_name[language],
-            field: 'lastName',
-            type: 'text'
+        {title: strings.city[language],field: 'city',type: 'text'},
+        {title: strings.address[language],field: 'address',type: 'text'},
+        {title: strings.frame[language], field: 'frame', type: 'text' },
+        { title: strings.disability_definition[language], field: 'disabilityDefinition', type: 'text' },
+        { title: strings.functioning_level[language], field: 'functioningLevel', type: 'select',
+          options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
         },
-        {
-            title: strings.age[language],
-            field: 'age',
-            type: 'number'
-        },
-        {
-            title: strings.disability_rank[language],
-            field: 'disabilityRank',
-            type: 'number'
-        },
-        {
-            title: strings.gender[language],
-            field: 'gender',
-            type: 'select',
-            options: {
-                'male': strings.male[language],
-                'female': strings.female[language],
-                'other': strings.other[language]
-            }
-        },
-        {
-            title: strings.special_comment[language],
-            field: 'comments',
-            type: 'textarea'
-        }
-    ]
-    const families_columns = [
+        { title: strings.allergies[language], field: 'allergies', type: 'text' },
+        { title: strings.parent_name[language], field: 'parentName', type: 'text' },
+        { title: strings.parent_phone[language], field: 'parentPhone', type: 'text' },
+        { title: strings.branch[language], field: 'branch', type: 'text' },
+        { title: strings.tutor[language], field: 'tutor', type: 'text' },
+        { title: strings.tutor_phone[language], field: 'tutorPhone', type: 'text' },
+        { title: strings.special_comment[language], field: 'comments', type: 'textarea' }
+      ]
+        const families_columns = [
         {
             title: strings.first_name[language],
             field: 'first_name',
@@ -183,7 +169,6 @@ export default function FormEvent() {
         const fetchEventData = async () => {
             try {
                 const event = await getEventById(id);
-
                 setShabatDitails({
                     coordinator: event[0].coordinator,
                     date: event[0].date,
@@ -193,8 +178,8 @@ export default function FormEvent() {
                 const camperss = await getCampersById(event[0].campers.map((camper) => camper.id));
                 setCampers(camperss);
                 setCampersData(event[0].campers);
-
-                setFamilies(event[0].families);
+                const familiesRegs = await getFamiliesRegistrationByIds(event[0].families, event[0].registrationId);
+                setFamilies(familiesRegs);
                 getCampers().then(Campers => setAllCampers(Campers));
         
             } catch (error) {
@@ -217,15 +202,15 @@ export default function FormEvent() {
         setCampers([...campers, camper]);
     }
 
-    const handleDeleteCamper = (camperId) => {
-
-        for (let i = 0; i < campers.length; i++) {
-            if (campers[i].id === camperId) {
-                campers.splice(i, 1);
-                break;
-            }
-        }
-        setCampers(campers);
+    const handleDeleteCampers = (camperIds) => {
+        // for (let i = 0; i < campers.length; i++) {
+        //         if (campers[i].id === camperId) {
+        //                 campers.splice(i, 1);
+        //                 break;
+        //             }
+        //         }
+        let newCampers = campers.filter((camper) => !camperIds.includes(camper.id));
+        setCampers(newCampers);
     }
 
     const handleSubmit = async (event) => {
@@ -278,7 +263,7 @@ export default function FormEvent() {
             image: downloadURL,
             settlement: shabatDitails.settlement,
             campers: listCampers,
-            families: families,
+            families: families.map((family) => family.id),
         };
 
         await apdateShabat(shabatData);
@@ -326,6 +311,7 @@ export default function FormEvent() {
                             <Col md="6">
                                 <Row className="mb-8 mt-2">
                                     <Form.Group as={Col} controlId="first_name">
+                                        {/* <Form.Label>{strings.place_name[language]}</Form.Label> */}
                                         <Select
                                             options={citysOptions}
                                             required
@@ -343,6 +329,7 @@ export default function FormEvent() {
                                 </Row>
                                 <Row className="mb-7 mt-5">
                                     <Form.Group as={Col} controlId="coordinator" className="mt-5">
+                                        {/* <Form.Label>{strings.coordinator[language]}</Form.Label> */}
                                         <Select
                                             options={optionsCoordinators}
                                             required
@@ -381,7 +368,6 @@ export default function FormEvent() {
                             <Col md="6" mr="8">
 
                                 <Form.Group as={Col} controlId="image">
-                                    {/* <Form.Label>{strings.image[language]}</Form.Label> */}
                                     <img src={imageChanged ? previewImage : shabatDitails.image} className="mt-2 mb-4 rounded w-100 h-70" alt="shabat" height="250" />
                                     <Form.Control className="w-65"
                                         type="file"
@@ -422,7 +408,7 @@ export default function FormEvent() {
                                             <ManagableTable
                                                 columns={campers_columns}
                                                 data={campers}
-                                                onDelete={handleDeleteCamper}
+                                                onDelete={handleDeleteCampers}
                                                 globalActions={tableActions} />
                                             <TableModal
                                                 onAdd={handleAddCamper}
@@ -449,7 +435,7 @@ export default function FormEvent() {
                                     aria-hidden="true"
                                 />
                             }
-                            {strings.edit[language]}</Button>
+                            {strings.edit_shabat[language]}</Button>
                         <Button variant='outline-secondary' onClick={handleDeleteEvent} disabled={submitted}>
                             {submitted &&
                                 <Spinner

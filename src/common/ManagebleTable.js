@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -19,16 +19,38 @@ import CloseIcon from '@mui/icons-material/Close';
 import strings from '../static/Strings.json';
 import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
+import TablePagination from '@mui/material/TablePagination';
 import TextField from '@mui/material/TextField';
 import { LanguageContext } from './LanguageContext';
 import { Select } from '@mui/material';
 import { Col, FloatingLabel, Form, Modal, Row, Button } from 'react-bootstrap';
-function AddModal({ columns, onAdd }) {
+
+function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+function getComparator(order, orderBy) {
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+
+function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIcon /> }) {
     const { language } = useContext(LanguageContext);
     const [show, setShow] = useState(false);
     const fields = columns.map((column) => column.field);
-    const [content, setContent] = useState(fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
-    const handleClose = () => setShow(false);
+    const [content, setContent] = useState(item ? item : fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
+    const handleClose = () => {
+        setShow(false);
+        setContent(fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
+    }
     const handleShow = () => setShow(true);
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -36,14 +58,13 @@ function AddModal({ columns, onAdd }) {
     };
     const handleSubmit = (event) => {
         event.preventDefault();
-        onAdd(content);
-        setContent(fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
+        onSubmit(content);
         handleClose();
     };
     return (
         <>
             <IconButton onClick={handleShow}>
-                <AddIcon />
+                {icon}
             </IconButton>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -51,29 +72,32 @@ function AddModal({ columns, onAdd }) {
                 </Modal.Header>
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>
-                        {columns.map((column) => (
-                            <Row className='mb-3' key={`modal-${column.field}`}>
-                                <Col>
-                                    <FloatingLabel label={column.title} controlId={column.field}>
-                                        {column.type === 'select' ? (
-                                            <Form.Select id={column.id + "-" + column.field} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required>
-                                                <option value="" disabled>{strings.select[language]} {column.title}</option>
-                                                {Object.keys(column.options).map((option) => (
-                                                    <option value={option} key={option}>{column.options[option]}</option>
-                                                ))}
-                                            </Form.Select>
-                                        ) :
-                                            (column.type === 'textarea') ? (
-                                                <Form.Control as="textarea" name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} rows="4" required />
-                                            )
-                                                :
-                                                (
-                                                    <Form.Control type={column.type} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required />
-                                                )}
-                                    </FloatingLabel>
-                                </Col>
-                            </Row>
-                        ))}
+                        {columns.reduce((rows, key, index) => (index % inputs_per_row === 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, [])
+                            .map((row, row_idx) => (
+                                <Row className='mb-3' key={`modal-row-${row_idx}`}>
+                                    {row.map((column, col_idx) => (
+                                        <Col key={col_idx}>
+                                            <FloatingLabel label={column.title} controlId={column.field} style={{ color: 'grey' }}  >
+                                                {column.type === 'select' ? (
+                                                    <Form.Select id={column.id + "-" + column.field} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required>
+                                                        <option value="" disabled>{strings.select[language]} {column.title}</option>
+                                                        {Object.keys(column.options).map((option) => (
+                                                            <option value={option} key={option}>{column.options[option]}</option>
+                                                        ))}
+                                                    </Form.Select>
+                                                ) :
+                                                    (column.type === 'textarea') ? (
+                                                        <Form.Control as="textarea" name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} rows="4" required />
+                                                    )
+                                                        :
+                                                        (
+                                                            <Form.Control type={column.type} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required />
+                                                        )}
+                                            </FloatingLabel>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            ))}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>
@@ -88,7 +112,9 @@ function AddModal({ columns, onAdd }) {
         </>
     );
 }
-function ManagableTableHead({ selected, onSelectAllClick, columns, data, editable, actions }) {
+
+
+function ManagableTableHead({ selected, onSelectAllClick, columns, data, editable, actions, editModal }) {
     const { language } = useContext(LanguageContext);
     const selectable = onSelectAllClick !== undefined;
     return (
@@ -125,7 +151,7 @@ function ManagableTableHead({ selected, onSelectAllClick, columns, data, editabl
         </TableHead>
     );
 }
-function ManagableTableRow({ columns, row, onEdit, selected, setSelected, actions }) {
+function ManagableTableRow({ columns, row, onEdit, selected, setSelected, actions, editModal }) {
     const { language } = useContext(LanguageContext);
     const [item, setItem] = useState(row);
     const [editing, setEditing] = useState(false);
@@ -135,13 +161,14 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setEditing({ ...editing, [name]: value });
+        console.log(editing);
     };
     const handleEdit = () => {
         setItem(editing)
         onEdit(editing);
         setEditing(false);
     };
-    return (
+    return (<>
         <TableRow
             hover
             role="checkbox"
@@ -167,7 +194,7 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                 <TableCell key={`${item.id}-edit`}>
                     <Tooltip title={strings.edit[language]}>
                         <>
-                            {editing ?
+                            {editing && !editModal ?
                                 (
                                     <>
                                         <IconButton onClick={(event) => handleEdit()} >
@@ -177,11 +204,13 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                                             <CloseIcon />
                                         </IconButton>
                                     </>
+                                ) : (editModal ? (
+                                    <ItemModal columns={columns} onSubmit={onEdit} item={item} icon={<EditIcon />} />
                                 ) : (
                                     <IconButton onClick={(event) => setEditing(item)} >
                                         <EditIcon />
                                     </IconButton>
-                                )
+                                ))
                             }
                         </>
                     </Tooltip>
@@ -236,6 +265,7 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                 );
             })}
         </TableRow>
+    </>
     );
 }
 /**
@@ -261,10 +291,13 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
 * onClick: a function that receives an array of objects and performs the action on them
 * @returns table that can be edited and managed by the user
 */
-export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd, actions, globalActions, title, selectable = true }) {
+export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd, actions, globalActions, title, selectable = true, editModal = false }) {
     const language = useContext(LanguageContext);
     const editable = onEdit !== undefined;
     const [selected, setSelected] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             const newSelected = data;
@@ -291,6 +324,30 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
         setSelected(newSelected);
     };
     const isSelected = (item) => selected.indexOf(item) !== -1;
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+    const visibleRows = React.useMemo(
+        () =>
+            data.slice().sort(getComparator("asc", "firstName")).slice(
+                page * rowsPerPage,
+                page * rowsPerPage + rowsPerPage,
+            ),
+        [page, rowsPerPage, data],
+    );
+
+    useEffect(() => {
+        if (data.length / rowsPerPage < page) {
+            setPage(0)
+        }
+    }, [rowsPerPage, data, page])
+
     const handleEdit = (item) => {
         let id = item.id;
         let data = item
@@ -298,9 +355,12 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
         onEdit(id, item);
     };
     const handleDelete = () => {
-        for (let item of selected) {
-            onDelete(item.id);
-        }
+        let ids = selected.map((item) => item.id);
+        // for (let item of selected) {
+        //     onDelete(item.id);
+        // }
+
+        onDelete(ids);
         setSelected([]);
     }
     return (
@@ -337,7 +397,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
                 {onAdd && (
                     <Tooltip title={strings.add[language]}>
                         <>
-                            <AddModal columns={columns} onAdd={onAdd} />
+                            <ItemModal columns={columns} onSubmit={onAdd} />
                         </>
                     </Tooltip>
                 )}
@@ -353,12 +413,13 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
                         globalActions={globalActions}
                     />
                     <TableBody>
-                        {data.map((row, index) => (
+                        {visibleRows.map((row, index) => (
                             <ManagableTableRow
                                 key={row.id}
                                 columns={columns}
                                 row={row}
                                 onEdit={editable ? handleEdit : undefined}
+                                editModal={editModal}
                                 selected={isSelected(row)}
                                 actions={actions}
                                 setSelected={selectable ? (event) => handleSelect(event, row) : undefined}
@@ -366,6 +427,16 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
                         ))}
                     </TableBody>
                 </Table>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={data.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+
             </TableContainer>
         </Paper>
     );
