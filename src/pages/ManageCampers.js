@@ -7,11 +7,21 @@ import strings from '../static/Strings.json';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import * as XLSX from 'xlsx';
 
+function campersEscapeDate(campers){
+  return campers.map((camper) => {
+    if (camper.birthDate)
+      camper.birthDate = new Date(camper.birthDate.seconds * 1000);
+    return camper;
+  });
+}
+
+
 function CampersPreviewModal({campers, setCampers, show, setShow, handleSubmit }){
   const { language } = useContext(LanguageContext);
   const [error, setError] = useState(false);
 
   const campers_columns = [
+    {title: strings.id[language], field: 'id', type: 'text', invisible: true},
     {title: strings.camper_id[language], field: 'camper_id', type: 'text'},
     {title: strings.first_name[language], field: 'firstName', type: 'text'},
     {title: strings.last_name[language], field: 'lastName', type: 'text'},
@@ -36,8 +46,12 @@ function CampersPreviewModal({campers, setCampers, show, setShow, handleSubmit }
   ]
 
 
-  const handleUpdateCapmer = (camperId, campers_columns) => {
-    const newCampers = campers.map(camper => (camper.id === camperId) ? { ...camper, ...campers_columns} : camper);
+  const handleUpdateCapmer = (camperId,campers_columns) => {
+    // const camperId = campers_columns.id;
+    // delete campers_columns.id;
+    console.log("handleUpdateCapmer",camperId,campers_columns);
+    const newCampers = campers.map(camper => (camper.id === camperId) ? { ...camper, ...campers_columns} : camper)
+
     setCampers(newCampers);
   }
   
@@ -239,23 +253,20 @@ export default function ManageCampers() {
   ]
 
   useEffect(() => {
-    getCampers().then(campers => {
-      setCampers(campers);
-    });
+    getCampers().then(campersEscapeDate).then(campers =>setCampers(campers));
   }, []);
   const handleAddCamper = (camper) => {
-    addCamper(camper).then(getCampers).then(campers => setCampers(campers));
+    addCamper(camper).then(getCampers).then(campersEscapeDate).then(campers => setCampers(campers));
   }
 
   const handleUpdateCapmer = (camperId, campers_columns) => {
-    let id = campers_columns.id;
     delete campers_columns.id;
-    updateCamper(id, campers_columns).then(getCampers).then(campers => setCampers(campers));
+    updateCamper(camperId, campers_columns).then(getCampers).then(campersEscapeDate).then(campers => setCampers(campers));
   }
 
   const handleDeleteCampers = (camperId) => {
     
-    deleteCampers(camperId).then(getCampers).then(campers => setCampers(campers));
+    deleteCampers(camperId).then(getCampers).then(campersEscapeDate).then(campers => setCampers(campers));
   }
 
   const handleAddManyCampers = (campers) => {
@@ -269,7 +280,7 @@ export default function ManageCampers() {
         }
       });
     });
-    addManyCampers(newCampers).then(getCampers).then(campers => setCampers(campers));
+    addManyCampers(newCampers).then(getCampers).then(campersEscapeDate).then(campers => setCampers(campers));
     setShow(false);
   }
 

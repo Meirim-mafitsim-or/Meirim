@@ -10,6 +10,13 @@ export async function getCampers() {
     return campers;
 }
 
+export async function getCamper(camperId) {
+    const camperRef = doc(db, "campers", camperId);
+    const camperSnapshot = await getDoc(camperRef);
+    const camper = Object.assign({ id: camperSnapshot.id }, camperSnapshot.data());
+    return camper;
+}
+
 export async function addCamper(camper) {
     try {
         const camper_id = camper.id;

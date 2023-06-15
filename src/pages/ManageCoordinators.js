@@ -6,6 +6,7 @@ import { LanguageContext } from '../common/LanguageContext';
 import strings from '../static/Strings.json';
 import AddCoordinatorModal from './AddCoordinator';
 import AddIcon from '@mui/icons-material/Add';
+import citys from '../static/city.json';
 
 export default function ManageCoordinators() {
   const [coordinators, setCoordinators] = useState([]);
@@ -30,7 +31,8 @@ export default function ManageCoordinators() {
     {
       title: strings.place_name[language],
       field: 'place_name',
-      type: 'number'
+      type: 'select',
+      options: citys.values.reduce((acc, city) => ({ ...acc, [city.english_name]: language === 'he' ? city.name : city.english_name }), {})
     },
     {
       title: strings.email[language],

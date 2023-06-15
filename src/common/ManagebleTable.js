@@ -25,6 +25,18 @@ import { LanguageContext } from './LanguageContext';
 import { Select } from '@mui/material';
 import { Col, FloatingLabel, Form, Modal, Row, Button } from 'react-bootstrap';
 
+function dateToText(date) {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+function textToDate(text) {
+    if (!text) return '';
+    const [year,month,day] = text.split('-');
+    return new Date(year, month - 1, day);
+}
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
         return -1;
@@ -49,7 +61,6 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
     const [content, setContent] = useState(item ? item : fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
     const handleClose = () => {
         setShow(false);
-        setContent(fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
     }
     const handleShow = () => setShow(true);
     const handleInputChange = (event) => {
@@ -58,6 +69,13 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
     };
     const handleSubmit = (event) => {
         event.preventDefault();
+        // let newContent = columns.reduce((obj, column) => {
+        //     if (!content[column.field]) return obj;
+        //     if (column.type === 'date') {
+        //         return { ...obj, [column.field]: textToDate(content[column.field]) };
+        //     }
+        //     return { ...obj, [column.field]: content[column.field] };
+        // }, {});
         onSubmit(content);
         handleClose();
     };
@@ -72,14 +90,14 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
                 </Modal.Header>
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>
-                        {columns.reduce((rows, key, index) => (index % inputs_per_row === 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, [])
+                        {columns.filter(col=>!col.invisible).reduce((rows, key, index) => (index % inputs_per_row === 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, [])
                             .map((row, row_idx) => (
                                 <Row className='mb-3' key={`modal-row-${row_idx}`}>
                                     {row.map((column, col_idx) => (
                                         <Col key={col_idx}>
                                             <FloatingLabel label={column.title} controlId={column.field} style={{ color: 'grey' }}  >
                                                 {column.type === 'select' ? (
-                                                    <Form.Select id={column.id + "-" + column.field} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required>
+                                                    <Form.Select id={column.id + "-" + column.field} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required={column.required}>
                                                         <option value="" disabled>{strings.select[language]} {column.title}</option>
                                                         {Object.keys(column.options).map((option) => (
                                                             <option value={option} key={option}>{column.options[option]}</option>
@@ -87,11 +105,11 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
                                                     </Form.Select>
                                                 ) :
                                                     (column.type === 'textarea') ? (
-                                                        <Form.Control as="textarea" name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} rows="4" required />
+                                                        <Form.Control as="textarea" name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} rows="4" required={column.required} />
                                                     )
                                                         :
                                                         (
-                                                            <Form.Control type={column.type} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required />
+                                                            <Form.Control type={column.type} name={column.field} value={content[column.field]} onChange={handleInputChange} placeholder={column.title} required={column.required} />
                                                         )}
                                             </FloatingLabel>
                                         </Col>
@@ -146,28 +164,53 @@ function ManagableTableHead({ selected, onSelectAllClick, columns, data, editabl
                     </TableCell>
                 )}
                 {actions && actions.map((action) => (<TableCell key={`head-${action.title}`}>{action.title}</TableCell>))}
-                {columns.map((col) => (<TableCell key={`head-${col.field}`}>{col.title}</TableCell>))}
+                {columns.filter(col=>!col.invisible).map((col) => (<TableCell key={`head-${col.field}`}>{col.title}</TableCell>))}
             </TableRow>
         </TableHead>
     );
 }
+
 function ManagableTableRow({ columns, row, onEdit, selected, setSelected, actions, editModal }) {
+    // const myRow = columns.reduce((obj, column) => {
+    //     if (column.type === 'date') {
+    //         return { ...obj, [column.field]: dateToText(row[column.field]) };
+    //     }
+    //     return { ...obj, [column.field]: row[column.field] };
+    // }, {});
     const { language } = useContext(LanguageContext);
-    const [item, setItem] = useState(row);
+    const [item, setItem] = useState({});
     const [editing, setEditing] = useState(false);
+
+    useEffect(() => {
+        console.log('row changed', row);
+        let newContent = columns.reduce((obj, column) => {
+            if (column.type === 'date') {
+                return { ...obj, [column.field]: dateToText(row[column.field]) };
+            }
+            return { ...obj, [column.field]: row[column.field] };
+        }, {});
+        setItem(newContent);
+    }, [row, columns]);
     const editable = onEdit !== undefined;
     const selectable = setSelected !== undefined;
-    const labelId = `enhanced-table-checkbox-${row.id}`;
+    const labelId = `enhanced-table-checkbox-${item.id}`;
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setEditing({ ...editing, [name]: value });
-        console.log(editing);
     };
-    const handleEdit = () => {
-        setItem(editing)
-        onEdit(editing);
+    const handleEdit = (updatedItem) => {
+        let newContent = columns.reduce((obj, column) => {
+            if (!updatedItem[column.field]) return obj;
+            if (column.type === 'date') {
+                return { ...obj, [column.field]: textToDate(updatedItem[column.field])};
+            }
+            return { ...obj, [column.field]: updatedItem[column.field] };
+        }, {});
+        setItem(updatedItem)
+        onEdit(newContent);
         setEditing(false);
     };
+    // console.log(item);
     return (<>
         <TableRow
             hover
@@ -197,7 +240,7 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                             {editing && !editModal ?
                                 (
                                     <>
-                                        <IconButton onClick={(event) => handleEdit()} >
+                                        <IconButton onClick={(event) => handleEdit(editing)} >
                                             <DoneIcon />{/* TODO save changes */}
                                         </IconButton>
                                         <IconButton onClick={(event) => setEditing(false)} >
@@ -205,7 +248,7 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                                         </IconButton>
                                     </>
                                 ) : (editModal ? (
-                                    <ItemModal columns={columns} onSubmit={onEdit} item={item} icon={<EditIcon />} />
+                                    <ItemModal columns={columns} onSubmit={handleEdit} item={item} icon={<EditIcon />} />
                                 ) : (
                                     <IconButton onClick={(event) => setEditing(item)} >
                                         <EditIcon />
@@ -225,7 +268,7 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                     </Tooltip>
                 </tableCell>
             ))}
-            {columns.map(function (column) {
+            {columns.filter(col=>!col.invisible).map(function (column) {
                 return (
                     <TableCell key={`${item.id}-${column.field}`}>
                         {editing ?
@@ -257,10 +300,10 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
                                             type={column.type}
                                             onChange={handleInputChange} />
                             )
-                            : (column.type === 'select') ?
+                            :
+                            (column.type === 'select') ?
                                 column.options[item[column.field]]
-                                :
-                                item[column.field]}
+                                : item[column.field]}
                     </TableCell>
                 );
             })}
@@ -349,6 +392,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
     }, [rowsPerPage, data, page])
 
     const handleEdit = (item) => {
+        console.log("handleEdit",item);
         let id = item.id;
         let data = item
         delete data.id;
