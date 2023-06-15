@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { Container, Row, Col,  } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import EventCard from "../common/EventCard";
@@ -7,12 +7,14 @@ import strings from '../static/Strings.json';
 import { auth } from '../common/FirebaseApp';
 import { db } from '../common/FirebaseApp';
 import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 
 function FamiliesManagment(){
 
     const { language } = useContext(LanguageContext);
     const [Events, setEvents] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -21,7 +23,6 @@ function FamiliesManagment(){
             const eventsSnapshot = await getDocs(eventsCollection);
             const events = eventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
             const user = auth.currentUser;
-            console.log(user)
             if (user) {
                 const userDocRef = doc(collection(db, 'users'),user.uid);
                 const userDocSnapshot = await getDoc(userDocRef);
@@ -31,13 +32,15 @@ function FamiliesManagment(){
                 }
             }
             const filteredEvents = [];
-            console.log(user)
             eventsSnapshot.forEach((doc) => {
               const eventData = doc.data();
+              const eventId = doc.id;
+
               if (eventData.hasOwnProperty("coordinator") && eventData.coordinator !== null)
               {
                 if ( eventData.coordinator.id === user.uid) {
                     filteredEvents.push({
+                        id: eventId,
                       ...eventData,
                     });
                   }
@@ -53,12 +56,20 @@ function FamiliesManagment(){
             console.error('Error fetching events:', error);
           }
         };
-    
         fetchEvents();
-      }, []);
-      
-      console.log(Events)
+    }, []);
 
+
+    const navigateToEvent = useCallback(() => {
+        if (Events.length === 1) {
+          const event = Events[0];
+          navigate(`/Families/${event.id}`);
+        }
+      }, [Events, navigate]);
+      
+      useEffect(() => {
+        navigateToEvent();
+      }, [navigateToEvent]);
 
     return (
     
