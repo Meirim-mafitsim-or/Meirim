@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import strings from '../static/Strings.json';
@@ -188,11 +189,13 @@ export default function Assigning({
   };
 
   // Handle click event when the user clicks the "User Plus" icon to assign a camper to a family
-  const handleUserPlusClick = async (index) => {
+  const handleUserPlusClick = async (camperID) => {
     if (show) {
-      addFamilyToAssignings(campers[index].id);
+      addFamilyToAssignings(camperID);
     }
-
+    console.log("", camperID);
+    const curCamper = campers.find((camper) => camper.id === camperID);
+    console.log("", curCamper);
     const updatedCampers = [...campers];
     const familiesCol = collection(db, 'familiesRegistration');
     const cur_families = doc(familiesCol, regID);
@@ -202,24 +205,31 @@ export default function Assigning({
 
     const families = familiesData.families;
 
-    if (updatedCampers[index].assigning) {
+    if (curCamper.assigning) {
       const confirmed = window.confirm(strings.to_change_assigning[language]);
       if (!confirmed) {
         return; // Don't proceed further if not confirmed
       }
-      const lastFamily = families.find((check_family) => check_family.id === updatedCampers[index].family);
+      const lastFamily = families.find((check_family) => check_family.id === curCamper.family);
       if (lastFamily) {
         lastFamily.assigning = false;
         lastFamily.camper = null;
       }
     }
+    if (selectedFamily.assigning) {
+      const lastCamper = campers.find((camper) => camper.id === selectedFamily.camper);
+      if (lastCamper) {
+        lastCamper.assigning = false;
+        lastCamper.family = null;
+      }
+    }
 
-    updatedCampers[index].assigning = true;
-    updatedCampers[index].family = selectedFamily.id;
+    curCamper.assigning = true;
+    curCamper.family = selectedFamily.id;
 
     const desiredFamilyIndex = families.findIndex((check_family) => check_family.id === selectedFamily.id);
     if (desiredFamilyIndex !== -1) {
-      families[desiredFamilyIndex].camper = updatedCampers[index].id;
+      families[desiredFamilyIndex].camper = curCamper.id;
       families[desiredFamilyIndex].assigning = true;
     }
 
@@ -322,7 +332,7 @@ export default function Assigning({
                 <td>
                   <BiUserPlus
                     size={30}
-                    onClick={() => handleUserPlusClick(index)}
+                    onClick={() => handleUserPlusClick(item.id)}
                     style={{ cursor: 'pointer' }}
                     color="#313B72"
                   />

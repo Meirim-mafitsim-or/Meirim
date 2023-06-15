@@ -6,7 +6,7 @@ import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { BiPencil } from 'react-icons/bi';
-import { BsCheckCircleFill } from 'react-icons/bs';
+import { BsCheckCircleFill, BsTrash } from 'react-icons/bs';
 import { FaChild } from 'react-icons/fa';
 import Assigning from '../common/Assigning';
 import strings from '../static/Strings.json';
@@ -84,6 +84,7 @@ useEffect(() => {
   };
 
   const confirm = async (index, bool) => {
+
     const updatedFamilies = [...families];
     const familyToUpdate = { ...updatedFamilies[index] };
     const isAssigned = familyToUpdate.assigning;
@@ -137,6 +138,48 @@ useEffect(() => {
     setShowModal(true);
   };
 
+  const handleRemoveFamily = async (index) => {
+    const confirmRemoval = window.confirm(strings.sure_to_remove[language]);
+    if (!confirmRemoval) {
+      return;
+    }
+  
+    const updatedFamilies = [...families];
+    const familyToRemove = updatedFamilies[index];
+  
+    // Remove the family from the local state
+    updatedFamilies.splice(index, 1);
+    setFamilies(updatedFamilies);
+  
+    // Update specific fields in familiesDoc
+    await updateDoc(familiesDoc, {
+      families: updatedFamilies.map((family) => ({ ...family })),
+    });
+  
+    // Remove the family from the event document
+    const eventsSnapshot = await getDoc(event);
+    const eventData = eventsSnapshot.data();
+    const confirmedFamilies = eventData.families;
+    const campers = [...eventData.campers];
+    if (familyToRemove.assigning) {
+      const updatedCampers = campers.map((camper) => {
+        if (camper.id === familyToRemove.camper) {
+          return { ...camper, assigning: false, family: null };
+        }
+        return camper;
+      });
+      await updateDoc(event, {
+        families: confirmedFamilies.filter((family) => family !== familyToRemove.id),
+        campers: updatedCampers,
+      });
+    } else {
+      await updateDoc(event, {
+        families: confirmedFamilies.filter((family) => family !== familyToRemove.id),
+      });
+    }
+  };
+  
+
 
   return (
     <Container fluid>
@@ -155,9 +198,7 @@ useEffect(() => {
               <TableCell align="right">{strings.phone_number[language]}</TableCell>
               <TableCell align="right">{strings.email[language]}</TableCell>
               <TableCell align="right">{strings.special_comment[language]}</TableCell>
-              <TableCell align="right">{strings.confirmed[language]}</TableCell>
-              <TableCell align="right">{strings.editFamily[language]}</TableCell>
-              <TableCell align="right">{strings.assigning[language]}</TableCell>
+              <TableCell align="right">{strings.actions[language]}</TableCell>
               <TableCell align="right">{strings.curAssigning[language]}</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -175,14 +216,15 @@ useEffect(() => {
                 <TableCell align="right">{family.email}</TableCell>
                 <TableCell align="right">{family.special_comment}</TableCell>
                 <TableCell align="right">
+                <span title={strings.confirm_family[language]}>
                   <BsCheckCircleFill
                     style={{ cursor: 'pointer' }}
                     size={30}
                     color={family.confirmed ? 'green' : 'grey'}
                     onClick={() => confirm(index, !family.confirmed)}
                   />
-                </TableCell>
-                <TableCell align="right">
+                  </span>
+                  <span title={strings.editFamily[language]}>
                   <BiPencil
                     size={24}
                     style={{ cursor: 'pointer' }}
@@ -190,8 +232,15 @@ useEffect(() => {
                       editClick(family);
                     }}
                   />
-                </TableCell>
-                <TableCell align="right">
+                  </span>
+                  <span title={strings.remove_family[language]}>
+                  <BsTrash
+                    size={24}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleRemoveFamily(index)}
+                  />
+                  </span>
+                  <span title={strings.assigning[language]}>
                   {family.confirmed && (
                     <FaChild
                       size={24}
@@ -200,6 +249,8 @@ useEffect(() => {
                       onClick={() => handleAssigningModal(family)}
                     />
                   )}
+                  </span>
+
                   <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} setFamilies={setFamilies} settlement={settlement}/>
                 </TableCell>
                 <TableCell align="right">{family.camper}</TableCell>

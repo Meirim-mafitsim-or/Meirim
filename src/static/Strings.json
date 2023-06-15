@@ -586,5 +586,25 @@
     {
         "en":"edit family details",
         "he":"ערוך פרטי משפחה"
+    },
+    "actions":
+    {
+        "en":"actions",
+        "he":"פעולות"
+    },
+    "confirm_family":
+    {
+        "en":"confirm family",
+        "he":"אשר משפחה"
+    },
+    "remove_family":
+    {
+        "en":"remove family",
+        "he":"מחק משפחה"
+    },
+    "sure_to_remove":
+    {
+        "en":"Are you sure you want to remove this family?",
+        "he":"האם אתה בטוח שאתה רוצה למחוק את רישום המשפחה?"
     }
 }
