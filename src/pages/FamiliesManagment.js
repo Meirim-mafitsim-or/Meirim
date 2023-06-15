@@ -4,7 +4,9 @@ import { Container, Row, Col,  } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import EventCard from "../common/EventCard";
 import strings from '../static/Strings.json';
-import { getEvents } from '../common/Database';
+import { auth } from '../common/FirebaseApp';
+import { db } from '../common/FirebaseApp';
+import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 
 
 function FamiliesManagment(){
@@ -13,8 +15,50 @@ function FamiliesManagment(){
     const [Events, setEvents] = useState([]);
 
     useEffect(() => {
-        getEvents().then(Events => setEvents(Events))
-    }, []);
+        const fetchEvents = async () => {
+          try {
+            const eventsCollection = collection(db, 'events');
+            const eventsSnapshot = await getDocs(eventsCollection);
+            const events = eventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+            const user = auth.currentUser;
+            console.log(user)
+            if (user) {
+                const userDocRef = doc(collection(db, 'users'),user.uid);
+                const userDocSnapshot = await getDoc(userDocRef);
+                if (userDocSnapshot.exists() && userDocSnapshot.data().role === 'admin') {                    
+                    setEvents(events);
+                    return;
+                }
+            }
+            const filteredEvents = [];
+            console.log(user)
+            eventsSnapshot.forEach((doc) => {
+              const eventData = doc.data();
+              if (eventData.hasOwnProperty("coordinator") && eventData.coordinator !== null)
+              {
+                if ( eventData.coordinator.id === user.uid) {
+                    filteredEvents.push({
+                      ...eventData,
+                    });
+                  }
+              }
+              else{
+                setEvents([]);
+                return;
+              }   
+            });
+    
+            setEvents(filteredEvents);
+          } catch (error) {
+            console.error('Error fetching events:', error);
+          }
+        };
+    
+        fetchEvents();
+      }, []);
+      
+      console.log(Events)
+
 
     return (
     
