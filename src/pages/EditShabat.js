@@ -19,9 +19,9 @@ import Accordion from 'react-bootstrap/Accordion';
 import ManagableTable from '../common/ManagebleTable';
 import TableModal from '../common/TableModal';
 import AddIcon from '@mui/icons-material/Add';
-import { deleteDoc } from "firebase/firestore";
+import { deleteDoc,getDoc } from "firebase/firestore";
 import Spinner from 'react-bootstrap/Spinner';
-import { getEventById,getCoordinators,getCampers,getCampersById,getFamiliesRegistrationByIds } from '../common/Database';
+import { getEventById, getCoordinators, getCampers, getCampersById, getFamiliesRegistrationByIds } from '../common/Database';
 
 
 // export async function getEventById(eventId) {
@@ -51,6 +51,7 @@ function formatDate(seconds) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
+    // console.log(`${year}-${month}-${day}`);
     return `${year}-${month}-${day}`;
 }
 
@@ -92,23 +93,23 @@ export default function FormEvent() {
     const [campersData, setCampersData] = useState([]);
 
     const campers_columns = [
-        {title: strings.camper_id[language], field: 'camper_id', type: 'text'},
+        {title: strings.camper_id[language], field: 'camper_id', type: 'text', invisible: true},
         {title: strings.first_name[language], field: 'firstName', type: 'text'},
         {title: strings.last_name[language], field: 'lastName', type: 'text'},
-        {title: strings.birth_date[language], field: 'birthDate', type: 'date'},
+        {title: strings.birth_date[language], field: 'birthDate', type: 'date', invisible: true},
         {title: strings.gender[language], field: 'gender', type: 'select', options: 
           {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
         },
-        {title: strings.city[language],field: 'city',type: 'text'},
-        {title: strings.address[language],field: 'address',type: 'text'},
+        {title: strings.city[language],field: 'city',type: 'text', invisible: true},
+        {title: strings.address[language],field: 'address',type: 'text', invisible: true},
         {title: strings.frame[language], field: 'frame', type: 'text' },
         { title: strings.disability_definition[language], field: 'disabilityDefinition', type: 'text' },
         { title: strings.functioning_level[language], field: 'functioningLevel', type: 'select',
           options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
         },
         { title: strings.allergies[language], field: 'allergies', type: 'text' },
-        { title: strings.parent_name[language], field: 'parentName', type: 'text' },
-        { title: strings.parent_phone[language], field: 'parentPhone', type: 'text' },
+        { title: strings.parent_name[language], field: 'parentName', type: 'text', invisible: true },
+        { title: strings.parent_phone[language], field: 'parentPhone', type: 'text', invisible: true },
         { title: strings.branch[language], field: 'branch', type: 'text' },
         { title: strings.tutor[language], field: 'tutor', type: 'text' },
         { title: strings.tutor_phone[language], field: 'tutorPhone', type: 'text' },
@@ -180,7 +181,7 @@ export default function FormEvent() {
                 const event = await getEventById(id);
                 setShabatDitails({
                     coordinator: event[0].coordinator,
-                    date: event[0].date,
+                    date: formatDate(event[0].date.seconds),
                     image: event[0].image,
                     settlement: event[0].settlement,
                 });
@@ -197,7 +198,7 @@ export default function FormEvent() {
         };
         fetchEventData();
         getCoordinators().then(Coordinators => setCoordinators(Coordinators));
-    }, [ id]);//here add to do marging
+    }, [id]);//here add to do marging
 
 
     useEffect(() => {
@@ -205,12 +206,15 @@ export default function FormEvent() {
     }, [allCampers, campers]);
 
     const handleAddCamper = (camper) => {
-        setCampers([...campers, camper]);
+        setCampers([...campers, ...camper]);
     }
 
     const handleDeleteCampers = (camperIds) => {
-        let newCampers = campers.filter((camper) => !camperIds.includes(camper.id));
-        setCampers(newCampers);
+        const confirmed = window.confirm(strings.delete_confirm[language]);
+        if (confirmed) {
+            let newCampers = campers.filter((camper) => !camperIds.includes(camper.id));
+            setCampers(newCampers);
+        }
     }
 
     const handleSubmit = async (event) => {
@@ -221,7 +225,6 @@ export default function FormEvent() {
             event.preventDefault();
             event.stopPropagation();
         }
-
         setValidated(true);
         setSubmitted(true); // Set the submission status to true
         //if the user dont change the image the image will be the same and start with https://firebasestorage
@@ -243,15 +246,16 @@ export default function FormEvent() {
                 settlement: city_en,
             });
         }
+        setShabatDitails({ ...shabatDitails, date: new Date(shabatDitails.date) });
 
         const listCampers = campers.map((camper) => {
-            if(camper.id in campersData.map((c)=>c.id)){
-                return campersData.find((c)=>c.id === camper.id);
+            if (camper.id in campersData.map((c) => c.id)) {
+                return campersData.find((c) => c.id === camper.id);
             }
-            else{
-                return{
+            else {
+                return {
                     id: camper.id,
-                    familie :"",
+                    familie: "",
                     assigning: false,
                 }
             }
@@ -259,7 +263,7 @@ export default function FormEvent() {
 
         const shabatData = {
             coordinator: shabatDitails.coordinator,
-            date: shabatDitails.date,
+            date: new Date(shabatDitails.date),
             image: downloadURL,
             settlement: shabatDitails.settlement,
             campers: listCampers,
@@ -272,10 +276,26 @@ export default function FormEvent() {
 
     const handleDeleteEvent = async (event) => {
         event.preventDefault();
-        setSubmitted(true); // Set the submission status to true
-        const eventsRef = collection(db, "events");
-        await deleteDoc(doc(eventsRef, id));
-        navigate("/");
+        const confirmed = window.confirm(strings.delete_confirm[language]);
+        if (confirmed) {
+            // Perform the deletion logic
+            setSubmitted(true);
+            //first delet the families from the event i have field registrationId in the event that i can use to delete the families
+            // const eventsRef = collection(db, "events");
+            // await deleteDoc(doc(eventsRef, id));
+            const eventRef = doc(db, "events", id);
+            const familieId = await getDoc(eventRef).then((doc) => doc.data().registrationId);
+            const familiesRef = doc(db, "familiesRegistration", familieId);
+            await deleteDoc(familiesRef);
+            //then delete the event
+            await deleteDoc(eventRef);
+
+            navigate("/");
+        }
+        else {
+            setSubmitted(false);
+        }
+        
     };
 
 
@@ -298,13 +318,13 @@ export default function FormEvent() {
 
 
     return (
-        <div className="App home-paragraph home-color text-dark pt-5">
+        <div className="home-paragraph m-0 pt-5">
             <Card className="text-center w-75 m-auto">
                 <Card.Body>
                     {submitted ? ( // Render the thank you message if the form is submitted
                         <p>{strings.registration_submit_message[language]}</p>
                     ) : (
-                        <p>{strings.edit_shabat[language]}</p>
+                        <h3>{strings.edit_shabat[language]}</h3>
                     )}
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
                         <Row className="mb-3">
@@ -312,6 +332,7 @@ export default function FormEvent() {
                                 <Row className="mb-8 mt-2">
                                     <Form.Group as={Col} controlId="first_name">
                                         {/* <Form.Label>{strings.place_name[language]}</Form.Label> */}
+                                        {/* <FloatingLabel label={strings.place_name[language]} controlId='formPlaceName' className='m-0' style={{ color: 'gray' }}> */}
                                         <Select
                                             options={citysOptions}
                                             required
@@ -325,15 +346,38 @@ export default function FormEvent() {
                                                 })
                                             }
                                         />
+                                        {/* </FloatingLabel> */}
+                                        {/* <FloatingLabel label={strings.place_name[language]} controlId='formPlaceName' className='m-0' style={{ color: 'gray' }}>
+                                        <Form.Select
+                                            required
+                                            placeholder={shabatDitails.settlement}
+                                            value={shabatDitails.settlement}
+                                            onChange={(e) =>
+                                                setShabatDitails({
+                                                    ...shabatDitails,
+                                                    settlement: e.target.value,
+                                                })
+                                            }
+                                        >
+                                            {citysOptions.map((city, index) => (
+                                                <option key={index} value={city.value}>{city.label}</option>
+                                            ))}
+                                        </Form.Select>
+                                        </FloatingLabel> */}
                                     </Form.Group>
                                 </Row>
-                                <Row className="mb-7 mt-5">
-                                    <Form.Group as={Col} controlId="coordinator" className="mt-5">
-                                        {/* <Form.Label>{strings.coordinator[language]}</Form.Label> */}
+                                <Row className="mb-2 mt-4">
+                                    <Form.Group as={Col} controlId="coordinator" className="mt-4">
+                                        {/* <Form.Label>{strings.coordinator_name[language]}</Form.Label> */}
+                                        {/* <FloatingLabel label={strings.coordinator_name[language]} controlId='formCoordinator' style={{color:'gray'}}> */}
+                                        {/* {shabatDitails.coordinator===undefined?"select coordinator": } */}
                                         <Select
                                             options={optionsCoordinators}
+                                    
+                                            
                                             required
-                                            placeholder={shabatDitails.coordinator.first_name + " " + shabatDitails.coordinator.last_name + " - " + shabatDitails.coordinator.place_name}
+                                            placeholder={!shabatDitails.coordinator?strings.select_coordinator[language]:shabatDitails.coordinator.first_name + " " + shabatDitails.coordinator.last_name + " - " + shabatDitails.coordinator.place_name}
+                                            // placeholder={shabatDitails.coordinator.first_name + " " + shabatDitails.coordinator.last_name + " - " + shabatDitails.coordinator.place_name}
                                             value={optionsCoordinators.find(option => option.value === shabatDitails.coordinator)}
                                             onChange={(selectedOption) =>
                                                 setShabatDitails({
@@ -343,33 +387,33 @@ export default function FormEvent() {
                                             }
 
                                         />
+                                        {/* </FloatingLabel> */}
                                     </Form.Group>
                                 </Row>
-                                <Row className="mb-2 mt-5" >
+                                <Row className="mb-2 mt-4" >
                                     {/* //change the date*/}
-                                    <Form.Group as={Col} controlId="date" className="mt-5">
+                                    <Form.Group as={Col} controlId="date" className="mt-4">
                                         <Form.Control
 
                                             type="date"
                                             placeholder={shabatDitails.date.seconds}
-                                            value={shabatDitails.date ? formatDate(shabatDitails.date.seconds) : ''}
-                                            onChange={(e) =>
+                                            value={shabatDitails.date}
+                                            onChange={(e) =>{
                                                 setShabatDitails({
                                                     ...shabatDitails,
-                                                    date: {
-                                                        seconds: Math.floor(new Date(e.target.value).getTime() / 1000),
-                                                    },
+                                                    date: e.target.value,
                                                 })
+                                            }
                                             }
                                         />
                                     </Form.Group>
                                 </Row>
                             </Col>
-                            <Col md="6" mr="8">
+                            <Col md="6" >
 
                                 <Form.Group as={Col} controlId="image">
-                                    <img src={imageChanged ? previewImage : shabatDitails.image} className="mt-2 mb-4 rounded w-100 h-70" alt="shabat" height="250" />
-                                    <Form.Control className="w-65"
+                                    <img src={imageChanged ? previewImage : shabatDitails.image} className="mt-2 mb-4 rounded w-75 h-90" alt="shabat" height="190" />
+                                    <Form.Control className="w-75 m-auto"
                                         type="file"
                                         placeholder={shabatDitails.image}
                                         // onChange={(e) => setShabatDitails({ ...shabatDitails, image: e.target.files[0] })}
@@ -435,18 +479,18 @@ export default function FormEvent() {
                                     aria-hidden="true"
                                 />
                             }
-                            {strings.edit_shabat[language]}</Button>
-                        <Button variant='outline-secondary' onClick={handleDeleteEvent} disabled={submitted}>
-                            {submitted &&
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                />
-                            }
-                            {strings.delete_shabat[language]}</Button>
+                            {strings.edit[language]}</Button>
+                        {/* //ask if he realy want to delete */}
+                        <Button variant="outline-secondary" onClick={handleDeleteEvent} disabled={submitted}>
+                            {submitted ? (
+                                <>
+                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                                    {strings.delete_shabat[language]}
+                                </>
+                            ) : (
+                                strings.delete_shabat[language]
+                            )}
+                        </Button>
                     </Form>
                 </Card.Body>
             </Card>

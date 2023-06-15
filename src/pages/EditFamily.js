@@ -81,7 +81,7 @@ export default function EditFamily() {
   };
   
   return (
-    <div className="App home-paragraph home-color text-dark pt-5">
+    <div className="App home-paragraph">
     <Card className="text-center w-75 m-auto">
       <Card.Body>
       {submitted ? ( // Render the confirm nessage when the coordinator finished edit

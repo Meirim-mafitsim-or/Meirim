@@ -1,5 +1,8 @@
 .App {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;  
 }
 .nav-logo {
     width:          70px;
@@ -28,27 +31,74 @@ html, body {
     height: 100%;
     background-color: #0D2D46;
     /* background-color: linear-gradient(90deg,#0D2D46,yellow); */
-    /* background-image: linear-gradient(90deg, rgba(205, 234, 16, 0.4) 0%, #0D2D46 100%); */
+    background-image: url("../static/background.jpeg");
+    /* background-size: cover; */
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    /* background-size: 100% 100%; */
+    /* padding-bottom: 8px; */
+
+
 
     color: #fff;
     /* background-image: url('https://t4.ftcdn.net/jpg/02/63/16/79/360_F_263167929_5aR33gNcaJa3MfAKw5MTz3JF51qTjhbe.jpg'); */
 }
 
 .home-color{
-    background-color: #0D2D46; 
-    color:            #fff;
+    /* background-color: #8fc6ef;  */
+    /* color:            #fff; */
     margin:             0 0 0 0;
+    background-size: cover;
+    /* background-size: auto; */
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    /* background-size: 100% 100%; */
     /* background-image: url('https://t4.ftcdn.net/jpg/02/63/16/79/360_F_263167929_5aR33gNcaJa3MfAKw5MTz3JF51qTjhbe.jpg'); */
-    /* background-image: linear-gradient(90deg, rgba(205, 234, 16, 0.4) 0%, #0D2D46 100%); */
+    /* background-image: linear-gradient(90deg, rgba(140, 16, 234, 0.4) 0%, rgba(13, 45, 70, 0.4) 100%); */
 
 }
 .footer{
-    background-color: #abbdca;
+    background-color: #ffffff;
+    margin-top: auto;
     color: #0e0d0d;
+    /* background-image: url("../static/footer1.jpeg"); */
+    background-size: cover;
+    /* margin-top: auto; */
+    position: relative;
+     /* margin-top: -120px;  */
+     /* height: 70vh; */
+      clear: both;
+      /* margin-top: 50px; */
+      /* padding-top: 10px; */
+      /* padding-left: 70%; */
+      padding-bottom: 10px;
+      /* margin:110px 0 0 0;  */
+        font-size:1.2em; 
+        /* padding:5px 0px 5px 10px;         */
+        border-bottom-left-radius: 0.35em;
+        border-bottom-right-radius: 0.35em;
+        /* position: absolute; */
+  /* bottom: 0;
+  width: 100%;
+  height: 2.5rem;  */
+  /* padding: 20px; */
+  /* position: sticky; */
+  bottom: 0;
+        /* height: 50px; */
+        /* position: fixed; */
+        /* padding: 10px 10px 0px 10px; */
+        /* bottom: 1; */
+        /* width: 100%; */
+        /* Height of the footer*/
+        /* height: 40px;    */
     /* height: 100px; */
     /* padding: 10px; */
 
+    
+
 }
+
 .border-color{
     background-color: #1C5488;
 }
@@ -74,3 +124,14 @@ html, body {
     width: 1000px;
     max-width: 90%;
   }
+
+  .floating-label-container {
+    position: relative;
+  }
+  
+  .floating-label-container .floating-label {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  

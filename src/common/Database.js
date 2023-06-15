@@ -140,7 +140,7 @@ export async function getFamilies(id) {
 }
 
 export async function createCoordinator(coordinatorData, setError, onSuccessfulAdd, password) {
-    const coordinator = collection(db, 'coordinators');
+    // const coordinator = collection(db, 'coordinators');
     const secondaryApp = initializeApp(firebaseConfig, "Secondary");
     const tempAuth = getAuth(secondaryApp);
 
@@ -157,8 +157,8 @@ export async function createCoordinator(coordinatorData, setError, onSuccessfulA
 
         await setDoc(doc(userCollection, user.uid), userData);
 
-        coordinatorData.userId = user.uid;
-        await setDoc(doc(coordinator), coordinatorData);
+        // coordinatorData.userId = user.uid;
+        // await setDoc(doc(coordinator), coordinatorData);
         onSuccessfulAdd();
     })
         .catch((error) => {
@@ -181,7 +181,6 @@ export async function getCampersById(campersIds) {
     });
     const campers = await Promise.all(promises);
     let data = campers.map((camper) => Object.assign(camper.data(), { id: camper.id }));
-    console.log(data);
     return data;
 }
 
@@ -222,3 +221,46 @@ export async function getFamiliesRegistrationByIds(familiesIds, familiesRegistra
     const familiesData = families.filter(family => familiesIds.includes(family.id));
     return familiesData;
 }
+
+export async function createAdmin(userData, setError, onSuccessfulAdd, password) {
+    const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+    const tempAuth = getAuth(secondaryApp);
+
+    createUserWithEmailAndPassword(tempAuth, userData.email, password).then(async (userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        tempAuth.signOut();
+
+        const userCollection = collection(db, 'users');
+        const newUserData = {
+            ...userData,
+            role: "admin",
+        }
+        console.log(newUserData);
+
+        await setDoc(doc(userCollection, user.uid), newUserData);
+        onSuccessfulAdd();
+    })
+        .catch((error) => {
+            const errorCode = error.code;
+            setError(errorCode);
+        });
+}
+
+export async function getAbout() {
+    const aboutRef = doc(db, "values", "about");
+    const about = await getDoc(aboutRef);
+    const aboutData = about.data();
+    return aboutData;
+    
+}
+
+export async function updateAbout(about) {
+    try {
+        const docRef = doc(db, 'values', "about");
+        await setDoc(docRef, about, { merge: true });
+    } catch (error) {
+        console.error(error);
+    }
+}
+    

@@ -311,13 +311,6 @@
         "en":"Assigning Camper",
         "he":"שבץ חניך"
     },
-
-    "save":
-    {
-        "en":"save",
-        "he":"שמור"
-    },
-
     "cancel":
     {
         "en":"cancel",
@@ -626,5 +619,176 @@
     {
         "en":"Low",
         "he":"נמוכה"
+    },
+    "footer":
+    {
+        "en":"© 2023 Meirim team developments. All rights reserved.",
+        "he":"© 2023 מפתחי מאירים, כל הזכויות שמורות"
+    },
+    "save":
+    {
+        "en":"Save",
+        "he":"שמור"
+    },
+    "delete_confirm":
+    {
+        "en":"Are you sure you want to delete this event?",
+        "he":"האם אתה בטוח שברצונך למחוק את האירוע?"
+    },
+    "coordinator_name":
+    {
+        "en":"Coordinator",
+        "he":"רכז"
+    },
+    "delete_confirm_coordinator":
+    {
+        "en":"Are you sure you want to delete this coordinator if you are,not that also he deleted from the shabat event?",
+        "he":"האם אתה בטוח שברצונך למחוק את הרכז? אם כן, שים לב שהוא ימחק גם מהאירוע שבו הוא משויך"
+    },
+    "delete_confirm_family":
+    {
+        "en":"Are you sure you want to delete this family?",
+        "he":"האם אתה בטוח שברצונך למחוק את המשפחה?"
+    },
+    "delete_confirm_camper":
+    {
+        "en":"Are you sure you want to delete this camper?",
+        "he":"האם אתה בטוח שברצונך למחוק את החניך?"
+    },
+    "invalid_place_name":
+    {
+        "en":"Invalid place name",
+        "he":"שם מקום לא תקין"
+    },
+    "select_year":
+    {
+        "en":"Select year",
+        "he":"בחר שנה"
+    },
+    "show_all_settlements":
+    {
+        "en":"Show all settlements",
+        "he":"הצג את כל היישובים"
+    },
+    "feedback":
+    {
+        "en":"Feedback",
+        "he":"משוב"
+    },
+    "feedback_explanation":
+    {
+        "en":"We would love to hear your feedback next time if there is",
+        "he":"נשמח לשמוע משוב במידה ונהיה כאן פעם הבאה"
+
+    },
+    "feedback_camper_expierence":
+    {
+        "en": "How was with the camper?",
+        "he": "איך היה עם החניך?"
+    },
+    "feedback_same_camper":
+    {
+        "en": "Would you like to host the same camper again next time?",
+        "he": "האם ברצונך לארח את אותו החניך במידה ותהיה פעם הבאה?"
+    },
+    "rate_shabat":
+    {
+        "en": "Rate the shabat",
+        "he": "דרג את השבת"
+    },
+    "feedback_other_comments":
+    {
+        "en": "Other comments",
+        "he": "הערות נוספות"
+    },
+    "yes":
+    {
+        "en": "Yes",
+        "he": "כן"
+    },
+    "no":
+    {
+        "en": "No",
+        "he": "לא"
+    },
+    "very_good":
+    {
+        "en": "Very good",
+        "he": "מצויין"
+    },
+    "good":
+    {
+        "en": "Good",
+        "he": "טוב"
+    },
+    "not_good":
+    {
+        "en": "Not good",
+        "he": "לא טוב"
+    },
+    "bad":
+    {
+        "en": "Bad",
+        "he": "רע"
+    },
+    "poor":
+    {
+        "en": "Poor",
+        "he": "גרוע"
+    },
+    "poor_plus":
+    {
+        "en": "Poor+",
+        "he": "גרוע+"
+    },
+    "ok":
+    {
+        "en": "Ok",
+        "he": "בסדר"
+    },
+    "ok_plus":
+    {
+        "en": "Ok+",
+        "he": "בסדר+"
+    },
+    "good_plus":
+    {
+        "en": "Good+",
+        "he": "טוב+"
+    },
+    "excellent":
+    {
+        "en": "Excellent",
+        "he": "מצויין"
+    },
+    "excellent_plus":
+    {
+        "en": "Excellent+",
+        "he": "מצויין+"
+    },
+    "perfect":
+    {
+        "en": "Perfect",
+        "he": "מושלם"
+    },
+    "perfect_plus":
+    {
+        "en": "Perfect+",
+        "he": "מושלם+"
+    },
+    "thank_you":
+    {
+        "en": "Thank you for your feedback!",
+        "he": "תודה על המשוב!"
+    },
+    "feedback_same_camper_error":
+    {
+        "en": "Please answer the question about the camper",
+        "he": "אנא ענה על השאלה על החניך"
+    },
+    "feedback_rate_shabat_error":
+    {
+        "en": "Please rate the shabat",
+        "he": "אנא דרג את השבת"
     }
 }

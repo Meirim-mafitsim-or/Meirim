@@ -4,7 +4,7 @@ import { LanguageContext } from '../common/LanguageContext';
 import strings from '../static/Strings.json';
 import { useNavigate } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
-import { createCoordinator } from '../common/Database';
+import { createAdmin} from '../common/Database';
 
 export default function AddCamperModal({onSuccess}) {
     const { language } = useContext(LanguageContext);
@@ -46,12 +46,12 @@ export default function AddCamperModal({onSuccess}) {
             last_name: last_name,
             email: email,
         }
-        await createCoordinator(registration, handleError, onSuccessfulAdd,password);
+        await createAdmin(registration, handleError, onSuccessfulAdd,password);
         navigate("/");
       };
 
     return (
-        <div className="App home-paragraph home-color pt-5">
+        <div className="home-paragraph mt-5">
         <Card className="text-center w-50 m-auto text-dark">
           <Card.Body>
             <Form onSubmit={handleLogin}>

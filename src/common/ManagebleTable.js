@@ -182,7 +182,6 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
     const [editing, setEditing] = useState(false);
 
     useEffect(() => {
-        console.log('row changed', row);
         let newContent = columns.reduce((obj, column) => {
             if (column.type === 'date') {
                 return { ...obj, [column.field]: dateToText(row[column.field]) };
@@ -210,7 +209,6 @@ function ManagableTableRow({ columns, row, onEdit, selected, setSelected, action
         onEdit(newContent);
         setEditing(false);
     };
-    // console.log(item);
     return (<>
         <TableRow
             hover
@@ -392,7 +390,6 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
     }, [rowsPerPage, data, page])
 
     const handleEdit = (item) => {
-        console.log("handleEdit",item);
         let id = item.id;
         let data = item
         delete data.id;
@@ -408,7 +405,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
         setSelected([]);
     }
     return (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <Paper  className='mt-5' sx={{ width: '100%', overflow: 'hidden' }}>
             <Toolbar>
                 <Typography
                     sx={{ flex: '1 1 100%' }}

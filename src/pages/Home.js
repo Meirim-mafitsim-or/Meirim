@@ -18,8 +18,8 @@ export default function Home() {
                 {/*small backgroung color and a button that bring to all the events that in the bottom */}
                 <Row className='justify-content-md-center' style={
                     {
-                        opacity: '0.8',
-                        color: 'white',
+                        // opacity: '0.8',
+                        color: 'lightgray',
                         textAlign: 'center',
                         fontSize: '50px',
                         fontWeight: 'bold',
@@ -30,6 +30,7 @@ export default function Home() {
                         <div className="video-banner p-0 video-container" style={{
                             position: 'relative',
                             height: '70vh',
+                            backgroundColor: 'black',
                         }}>
                             <video className="video" autoPlay loop muted style={{
                                 width: '100%',
