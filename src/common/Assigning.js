@@ -74,7 +74,6 @@ export default function Assigning({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event, selectedFamily]); // Include selectedFamily as a dependency
 
-  console.log(campers)
   // Filter campers based on search query and gender filter
   const filteredCampers = campers.filter(
     (camper) =>
@@ -133,7 +132,6 @@ export default function Assigning({
   // Check if the camper ID exists in the assignings array for the selected family
   const checkCamperIDInAssigningsArray = async (last_name, phone_number) => {
     const result = await getFamilyFromAssignings(settlement);
-
     if (result !== null) {
       // eslint-disable-next-line no-unused-vars
       const { assigningExists: ignored, assigningsArray } = await getFamilyFromAssignings(settlement);
@@ -141,14 +139,13 @@ export default function Assigning({
       if (!assigningsArray || assigningsArray.length === 0) {
         return;
       }
-
       const foundAssigning = assigningsArray.find(
-        (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number
+        (assigning) => assigning.family_name === last_name && assigning.phone_number === phone_number
       );
 
       if (foundAssigning) {
-        await setHistoryAss(foundAssigning.campersId);
-        const idArray = foundAssigning.campersId.map(item => item.id);
+        const idArray = foundAssigning.campersID.map(item => item.id);
+        setHistoryAss(idArray);
         return idArray;
       }
     } else 

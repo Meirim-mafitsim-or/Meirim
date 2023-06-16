@@ -68,7 +68,6 @@ export default async function  updateAssigning()  {
             await updateDoc(settlementDoc, {
                 assignings: assigningsData,
               });
-            console.log(assigningsData);
 
         }
     };
