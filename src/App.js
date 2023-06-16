@@ -18,6 +18,7 @@ import EditShabat from './pages/EditShabat';
 import ManageCoordinators from './pages/ManageCoordinators';
 import DataReport from './pages/DataReport';
 import Messages from './pages/MessagesView';
+import CamperProfile from './pages/CamperProfile';
 
 
 
@@ -42,7 +43,8 @@ function App() {
           {user && <Route path="Messages" element={<Messages />} />}
           <Route path="AdminRegistration" element={<AdminRegistration />} />
           <Route path="EditShabat/:id" element={<EditShabat />} />
-          <Route path="*" element={<h1>Not Found</h1>} />
+          <Route path="Camper/:id" element={<CamperProfile />} />
+          {/* <Route path="*" element={<h1>Not Found</h1>} /> */}
           
         </Route>
       </Routes>
