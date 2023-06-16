@@ -127,37 +127,7 @@ export default function Assigning({
     return { assigningExists, assigningsArray };
   };
 
-  // Add a family to the assignings document
-  const addFamilyToAssignings = async (camperID) => {
-    if (!show) {
-      return;
-    }
 
-    const { assigning, assigningsArray } = await getFamilyFromAssignings(settlement);
-    const collectionRef = collection(db, 'assignings');
-    const docRef = doc(collectionRef, settlement);
-    if (!assigning) {
-      // Create a new object with the selected family details
-      const newAssigning = {
-        familyName: selectedFamily.last_name,
-        phoneNumber: selectedFamily.phone_number,
-        campersId: [camperID],
-      };
-
-      // Add the new object to the assigningsArray
-      assigningsArray.push(newAssigning);
-
-      // Update the Firestore document
-      await updateDoc(docRef, { assignings: assigningsArray });
-
-      console.log('New object added to assigningsArray:', newAssigning);
-    } else {
-      if (!assigning.campersId.includes(camperID)) {
-        assigning.campersId.push(camperID);
-        await updateDoc(docRef, { assignings: assigningsArray });
-      }
-    }
-  };
 
   // Check if the camper ID exists in the assignings array for the selected family
   const checkCamperIDInAssigningsArray = async (last_name, phone_number) => {

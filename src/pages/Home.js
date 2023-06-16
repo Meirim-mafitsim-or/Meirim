@@ -7,11 +7,13 @@ import Map from "../common/Map"
 import { Col, Row, Container } from 'react-bootstrap';
 import Vidio1 from "../static/vidio_1.mp4";
 import { Button } from 'react-bootstrap';
+import updateAssigning from '../common/updateAssigning';
 
 
 export default function Home() {
 
     const { language } = React.useContext(LanguageContext);
+    updateAssigning();
     return (
         <div className="home-color">
             <Container fluid >
