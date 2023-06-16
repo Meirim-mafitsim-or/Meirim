@@ -217,6 +217,21 @@ useEffect(() => {
     }
   };
 
+  // const getCamper = async (camperId) => {
+  //   if (camperId !== null) {
+  //     const campers_col = collection(db, 'campers');
+  //     const camper_doc = doc(campers_col, camperId);
+  //     const CamperSnapshot = await getDoc(camper_doc);
+  //     console.log(CamperSnapshot);
+  
+  //     const camperData = CamperSnapshot.data();
+  //     console.log(camperData);
+  //     return camperData;
+  //   }
+  //   return null;
+  // }
+  
+
   return (
     <Container fluid>
       <h1>{strings.registered_families[language]}</h1>
@@ -276,6 +291,18 @@ useEffect(() => {
                     onClick={() => handleRemoveFamily(index)}
                   />
                   </span>
+                  <span title={strings.sendSMS[language]}>
+ 
+                  <FaSms
+                    size={24}
+                    color="#313B72"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      setShowSMSModal(true);
+                      setSelectedFamily(family);
+                    }}
+                  />
+                  </span>
                   <span title={strings.assigning[language]}>
                   {family.confirmed && (
                     <FaChild
@@ -289,18 +316,7 @@ useEffect(() => {
 
                   </span>
 
-                  <span title={strings.sendSMS[language]}>
- 
-                  <FaSms
-                    size={24}
-                    color="#313B72"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      setShowSMSModal(true);
-                      setSelectedFamily(family);
-                    }}
-                  />
-                  </span>
+                  
                   <Modal show={showSMSModal} onHide={() => setShowModal(false)}>
                     <Modal.Header >
                       <Modal.Title>{strings.sendSMS[language]}</Modal.Title>

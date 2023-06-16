@@ -255,7 +255,7 @@ export default function FormEvent() {
             else {
                 return {
                     id: camper.id,
-                    familie: "",
+                    family: "",
                     assigning: false,
                 }
             }
