@@ -263,4 +263,21 @@ export async function updateAbout(about) {
         console.error(error);
     }
 }
+
+export async function getFeedbacks() {
+    const feedbacksRef = collection(db, "familiesFeedback");
+    const feedbacksSnapshot = await getDocs(feedbacksRef);
+    const feedbacks = feedbacksSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+    return feedbacks;
+}
     
+export async function getCamperByFamilyAndEvent(familyId, eventId){
+    const eventRef = doc(db, "events", eventId);
+    const event = await getDoc(eventRef);
+    const eventData = event.data();
+    const familiesRegistrationRef = doc(db, "familiesRegistration", eventData.registrationId);
+    const familiesRegistration = await getDoc(familiesRegistrationRef);
+    const familiesRegistrationData = familiesRegistration.data();
+    const family = familiesRegistrationData.families.filter(family => family.id === familyId);
+    return family[0].camper;
+}
