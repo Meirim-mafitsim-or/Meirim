@@ -1,5 +1,5 @@
 import { db, firebaseConfig } from "./FirebaseApp";
-import { collection, getDocs, setDoc, doc, deleteDoc, where, query, getDoc } from "firebase/firestore";
+import { collection , updateDoc, getDocs, setDoc, doc, deleteDoc, where, query, getDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -53,6 +53,8 @@ export async function deleteCamper(camperId) {
 }
 
 export async function deleteCampers(camperIds) {
+    await removeCampersFromEvents(camperIds); 
+    await updateFamiliesAssigning(camperIds);
     try {
         const docRef = collection(db, 'campers');
         camperIds.map(async camperId => {
@@ -64,6 +66,54 @@ export async function deleteCampers(camperIds) {
         console.error(error);
     }
 }
+
+export async function removeCampersFromEvents(IDs) {
+    try {
+        const events = await getDocs(collection(db, 'events'));
+        events.forEach(async (doc) => {
+        const eventData = doc.data();
+
+        const campers = eventData.campers;
+
+        const updatedCampers = campers.filter((camper) => !IDs.includes(camper.id));
+        console.log(updatedCampers);
+
+        await updateDoc(doc.ref, {
+            campers: updatedCampers
+        });
+      });
+  
+      console.log('Campers removed successfully.');
+    } catch (error) {
+      console.error('Error removing campers:', error);
+    }
+  };
+
+export async function updateFamiliesAssigning(IDs) {
+  
+    try {
+      const familiesReg = await getDocs(collection(db, 'familiesRegistration'));
+  
+      familiesReg.forEach(async (doc) => {
+        const families = doc.data().families;
+  
+        const updatedFamilies = families.map((family) => {
+          if (IDs.includes(family.camper)) {
+            return { ...family, assigning: false, camper: null };
+          }
+          return family;
+        });
+  
+        await updateDoc(doc.ref, {
+            families: updatedFamilies
+        });
+      });
+        console.log('Families updated successfully.');
+    } catch (error) {
+      console.error('Error updating families:', error);
+    }
+  }
+  
 
 export async function updateCamper(camperId, camper) {
     try {

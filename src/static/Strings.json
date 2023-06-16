@@ -790,5 +790,56 @@
     {
         "en": "Please rate the shabat",
         "he": "אנא דרג את השבת"
+    },
+    "actions":
+    {
+        "en":"actions",
+        "he":"פעולות"
+    },
+    "confirm_family":
+    {
+        "en":"confirm family",
+        "he":"אשר משפחה"
+    },
+    "remove_family":
+    {
+        "en":"remove family",
+        "he":"מחק משפחה"
+    },
+    "sure_to_remove":
+    {
+        "en":"Are you sure you want to remove this family?",
+        "he":"האם אתה בטוח שאתה רוצה למחוק את רישום המשפחה?"
+    },
+    "choose_format":
+    {
+        "en": "choose SMS format",
+        "he": "בחר את אופן השליחה"
+    },
+    "SendShabbatdetails":
+    {
+        "en":"Send Shabbat details",
+        "he":"שלח את פרטי השבת והשיבוץ"
+    },
+    "freeText":
+    {
+        "en": "free text",
+        "he": "טקסט חופשי"
+    },
+    "enter_message":
+    {
+        "en": "Enter your custom message:",
+        "he":"הכנס טקסט חופשי לשליחה"
+    },
+    "Shabbat_details_sent_successfully":
+    {
+        "en": "Shabbat details sent successfully!",
+        "he": "פרטי השבת נשלחו בהצלחה!"
+    
+    },
+    "success":
+    {
+        "en": "success",
+        "he": "נשלח בהצלחה"
     }
 }

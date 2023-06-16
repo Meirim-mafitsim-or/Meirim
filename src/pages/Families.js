@@ -6,7 +6,7 @@ import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { BiPencil } from 'react-icons/bi';
-import { BsCheckCircleFill } from 'react-icons/bs';
+import { BsCheckCircleFill, BsTrash } from 'react-icons/bs';
 import { FaChild } from 'react-icons/fa';
 import Assigning from '../common/Assigning';
 import strings from '../static/Strings.json';
@@ -92,6 +92,7 @@ useEffect(() => {
   };
 
   const confirm = async (index, bool) => {
+
     const updatedFamilies = [...families];
     const familyToUpdate = { ...updatedFamilies[index] };
     const isAssigned = familyToUpdate.assigning;
@@ -175,6 +176,46 @@ useEffect(() => {
     closeModal();
   };
 
+  const handleRemoveFamily = async (index) => {
+    const confirmRemoval = window.confirm(strings.sure_to_remove[language]);
+    if (!confirmRemoval) {
+      return;
+    }
+  
+    const updatedFamilies = [...families];
+    const familyToRemove = updatedFamilies[index];
+  
+    // Remove the family from the local state
+    updatedFamilies.splice(index, 1);
+    setFamilies(updatedFamilies);
+  
+    // Update specific fields in familiesDoc
+    await updateDoc(familiesDoc, {
+      families: updatedFamilies.map((family) => ({ ...family })),
+    });
+  
+    // Remove the family from the event document
+    const eventsSnapshot = await getDoc(event);
+    const eventData = eventsSnapshot.data();
+    const confirmedFamilies = eventData.families;
+    const campers = [...eventData.campers];
+    if (familyToRemove.assigning) {
+      const updatedCampers = campers.map((camper) => {
+        if (camper.id === familyToRemove.camper) {
+          return { ...camper, assigning: false, family: null };
+        }
+        return camper;
+      });
+      await updateDoc(event, {
+        families: confirmedFamilies.filter((family) => family !== familyToRemove.id),
+        campers: updatedCampers,
+      });
+    } else {
+      await updateDoc(event, {
+        families: confirmedFamilies.filter((family) => family !== familyToRemove.id),
+      });
+    }
+  };
 
   return (
     <Container fluid>
@@ -193,10 +234,7 @@ useEffect(() => {
               <TableCell align="right">{strings.phone_number[language]}</TableCell>
               <TableCell align="right">{strings.email[language]}</TableCell>
               <TableCell align="right">{strings.special_comment[language]}</TableCell>
-              <TableCell align="right">{strings.confirmed[language]}</TableCell>
-              <TableCell align="right">{strings.editFamily[language]}</TableCell>
-              <TableCell align="right">{strings.assigning[language]}</TableCell>
-              <TableCell align="right">{strings.sendSMS[language]}</TableCell>
+              <TableCell align="right">{strings.actions[language]}</TableCell>
               <TableCell align="right">{strings.curAssigning[language]}</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -214,14 +252,15 @@ useEffect(() => {
                 <TableCell align="right">{family.email}</TableCell>
                 <TableCell align="right">{family.special_comment}</TableCell>
                 <TableCell align="right">
+                <span title={strings.confirm_family[language]}>
                   <BsCheckCircleFill
                     style={{ cursor: 'pointer' }}
                     size={30}
                     color={family.confirmed ? 'green' : 'grey'}
                     onClick={() => confirm(index, !family.confirmed)}
                   />
-                </TableCell>
-                <TableCell align="right">
+                  </span>
+                  <span title={strings.editFamily[language]}>
                   <BiPencil
                     size={24}
                     style={{ cursor: 'pointer' }}
@@ -229,8 +268,15 @@ useEffect(() => {
                       editClick(family);
                     }}
                   />
-                </TableCell>
-                <TableCell align="right">
+                  </span>
+                  <span title={strings.remove_family[language]}>
+                  <BsTrash
+                    size={24}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleRemoveFamily(index)}
+                  />
+                  </span>
+                  <span title={strings.assigning[language]}>
                   {family.confirmed && (
                     <FaChild
                       size={24}
@@ -239,9 +285,11 @@ useEffect(() => {
                       onClick={() => handleAssigningModal(family)}
                     />
                   )}
-                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} setFamilies={setFamilies} settlement={settlement} />
-                </TableCell>
-                <TableCell align="right">
+                  <Assigning show={showModal} onHide={() => setShowModal(false)} language={language} event={event} selectedFamily={selectedFamily} setFamilies={setFamilies} settlement={settlement}/>
+
+                  </span>
+
+                  <span title={strings.sendSMS[language]}>
  
                   <FaSms
                     size={24}
@@ -252,25 +300,26 @@ useEffect(() => {
                       setSelectedFamily(family);
                     }}
                   />
+                  </span>
                   <Modal show={showSMSModal} onHide={() => setShowModal(false)}>
-                    <Modal.Header closeButton>
-                      <Modal.Title>Send SMS</Modal.Title>
+                    <Modal.Header >
+                      <Modal.Title>{strings.sendSMS[language]}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                       <Form.Group>
-                        <Form.Label>Choose an option:</Form.Label>
+                        <Form.Label>{strings.choose_format[language]}</Form.Label>
                         <Form.Select
                           value={selectedOption}
                           onChange={(e) => setSelectedOption(e.target.value)}
                         >
-                          <option value="">Select an option</option>
-                          <option value="shabbat">Send Shabbat details</option>
-                          <option value="custom">Free text</option>
+                          <option value="">{strings.choose[language]}</option>
+                          <option value="shabbat">{strings.SendShabbatdetails[language]}</option>
+                          <option value="custom">{strings.freeText[language]}</option>
                         </Form.Select>
                       </Form.Group>
                       {selectedOption === 'custom' && (
                         <Form.Group>
-                          <Form.Label>Enter your custom message:</Form.Label>
+                          <Form.Label>{strings.enter_message[language]}</Form.Label>
                           <Form.Control
                             as="textarea"
                             rows={3}
@@ -282,7 +331,7 @@ useEffect(() => {
                     </Modal.Body>
                     <Modal.Footer>
                       <Button variant="secondary" onClick={closeModal}>
-                        Cancel
+                      {strings.cancel[language]}
                       </Button>
                       <Button
                         variant="primary"
@@ -293,7 +342,7 @@ useEffect(() => {
                         }
                         disabled={!selectedOption}
                       >
-                        Send
+                        {strings.send[language]}
                       </Button>
                     </Modal.Footer>
                   </Modal>
@@ -309,9 +358,9 @@ useEffect(() => {
                     }}
                   >
                     <Toast.Header>
-                      <strong className="me-auto">Success</strong>
+                      <strong className="me-auto">{strings.success[language]}</strong>
                     </Toast.Header>
-                    <Toast.Body>Shabbat details sent successfully!</Toast.Body>
+                    <Toast.Body>{strings.Shabbat_details_sent_successfully[language]}</Toast.Body>
                   </Toast>
                 </TableCell>
  
