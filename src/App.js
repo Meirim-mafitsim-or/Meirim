@@ -18,6 +18,7 @@ import EditShabat from './pages/EditShabat';
 import ManageCoordinators from './pages/ManageCoordinators';
 import DataReport from './pages/DataReport';
 import Messages from './pages/MessagesView';
+import FamiliesFeedback from './pages/FamiliesFeedback';
 import CamperProfile from './pages/CamperProfile';
 
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="Contact" element={<Contact />} />
           <Route path="About" element={<About />} />
           <Route path="Event/:id" element={<Event />} />
+          <Route path="FamiliesFeedback/:eventId/:familyId" element={<FamiliesFeedback />} />
           {user && <Route path="Families" element={<FamiliesManagment />} />}
           {user && <Route path="Families/:id" element={<Families />} />}
           {user && <Route path="Families/:id/:family" element={<EditFamily/>} />}
