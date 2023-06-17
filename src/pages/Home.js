@@ -9,8 +9,6 @@ import Vidio1 from "../static/vidio_1.mp4";
 import { Button } from 'react-bootstrap';
 import updateAssigning from "../common/updateAssigning"
 import { auth } from '../common/FirebaseApp';
-import { collection, getDoc, doc } from 'firebase/firestore';
-import { db } from '../common/FirebaseApp';
 
 
 export default function Home() {
