@@ -58,6 +58,7 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
     const { language } = useContext(LanguageContext);
     const [show, setShow] = useState(false);
     const fields = columns.map((column) => column.field);
+    const isEdit = item ? true : false;
     const [content, setContent] = useState(item ? item : fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
     const handleClose = () => {
         setShow(false);
@@ -90,7 +91,7 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
                 </Modal.Header>
                 <Form onSubmit={handleSubmit}>
                     <Modal.Body>
-                        {columns.filter(col=>!col.invisible).reduce((rows, key, index) => (index % inputs_per_row === 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, [])
+                        {columns.filter(col=> !(col.readOnly && isEdit)).reduce((rows, key, index) => (index % inputs_per_row === 0 ? rows.push([key]) : rows[rows.length - 1].push(key)) && rows, [])
                             .map((row, row_idx) => (
                                 <Row className='mb-3' key={`modal-row-${row_idx}`}>
                                     {row.map((column, col_idx) => (
@@ -337,7 +338,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
     const editable = onEdit !== undefined;
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {

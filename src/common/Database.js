@@ -110,6 +110,13 @@ export async function updateCoordinator(coordinatorId, coordinator) {
         console.error(error);
     }
 }
+
+export async function getCoordinator(coordinatorId) {
+    const coordinatorRef = doc(db, "users", coordinatorId);
+    const coordinatorSnapshot = await getDoc(coordinatorRef);
+    const coordinator = Object.assign({ id: coordinatorSnapshot.id }, coordinatorSnapshot.data());
+    return coordinator;
+}
 export async function getEvents() {
     const EventsRef = collection(db, "events");
     const EventsSnapshot = await getDocs(EventsRef);
