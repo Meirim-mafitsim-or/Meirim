@@ -338,3 +338,21 @@ export async function getCamperByFamilyAndEvent(familyId, eventId){
     const family = familiesRegistrationData.families.filter(family => family.id === familyId);
     return family[0].camper;
 }
+
+export async function updateFamilyRegistration(family, familiesRegistration,familyId){
+    try {
+        const docRef = doc(db, 'familiesRegistration', familiesRegistration);
+        const familiesRegistrationData = await getDoc(docRef);
+        const familiesRegistrationDataData = familiesRegistrationData.data();
+        const families = familiesRegistrationDataData.families;
+        const newFamilies = families.map(familyData => {
+            if(familyData.id === familyId){
+                return family;
+            }
+            return familyData;
+        });
+        await setDoc(docRef, {families: newFamilies}, { merge: true });
+    } catch (error) {
+        console.error(error);
+    }
+}
