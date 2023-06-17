@@ -500,6 +500,11 @@
         "en":"Welcome to meirim website",
         "he":"ברוכים הבאים לאתר מאירים"
     },
+    "main_title":
+    {
+        "en":"Meirim - Hospitality Shabbat",
+        "he":"מאירים - שבתות אירוח"
+    },
     "all_events":
     {
         "en":"All Events",

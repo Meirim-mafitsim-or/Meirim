@@ -55,11 +55,11 @@ export default function Home() {
                                 textAlign: 'start',
                             }}>
                                 {/* <div className="video-content"> */}
-                                    <h1 style={{
-                                        fontSize: '5vw',
-                                        fontFamily: 'fantasy',
-                                    }}>{strings.welcome[language]}</h1>
-                                    <Button className="btn-primary" href="#events">{strings.all_events[language]}</Button>
+                                    <h1 className="display-1">{strings.main_title[language]}</h1>
+                                    <Button className="btn btn-outline-light" href="#events">
+                                        {strings.all_events[language]}
+                                    </Button>
+
                                 {/* </div> */}
                             </div>
                         </div>
