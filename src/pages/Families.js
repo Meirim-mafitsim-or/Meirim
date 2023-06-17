@@ -233,20 +233,6 @@ useEffect(() => {
       });
     }
   };
-
-  // const getCamper = async (camperId) => {
-  //   if (camperId !== null) {
-  //     const campers_col = collection(db, 'campers');
-  //     const camper_doc = doc(campers_col, camperId);
-  //     const CamperSnapshot = await getDoc(camper_doc);
-  //     console.log(CamperSnapshot);
-  
-  //     const camperData = CamperSnapshot.data();
-  //     console.log(camperData);
-  //     return camperData;
-  //   }
-  //   return null;
-  // }
   
 
   const handleSendSMS = async() => {
@@ -411,8 +397,9 @@ useEffect(() => {
                     autohide
                     style={{
                       position: 'fixed',
-                      bottom: '10px',
-                      right: '10px',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
                     }}
                   >
                     <Toast.Header>
