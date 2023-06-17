@@ -23,11 +23,30 @@ function FamiliesManagment(){
             const eventsSnapshot = await getDocs(eventsCollection);
             const events = eventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
             const user = auth.currentUser;
+
+            // Get the current date and time
+            const currentDate = new Date();
+
+            // Filter and sort the events array
+            const noPassedEvents = events.filter(event => {
+              // Convert the event date to a JavaScript Date object
+              const eventDate = new Date(event.date.seconds * 1000);
+
+              // Compare the event date with the current date
+              return eventDate > currentDate;
+            }).sort((a, b) => {
+              // Sort the events by date in ascending order
+              const dateA = new Date(a.date.seconds * 1000);
+              const dateB = new Date(b.date.seconds * 1000);
+              return dateA - dateB;
+            });
+
+
             if (user) {
                 const userDocRef = doc(collection(db, 'users'),user.uid);
                 const userDocSnapshot = await getDoc(userDocRef);
                 if (userDocSnapshot.exists() && userDocSnapshot.data().role === 'admin') {                    
-                    setEvents(events);
+                    setEvents(noPassedEvents);
                     return;
                 }
             }
@@ -50,8 +69,22 @@ function FamiliesManagment(){
                 return;
               }   
             });
+
+            // Filter and sort the events array
+            const noPassedFilteredEvents = filteredEvents.filter(event => {
+              // Convert the event date to a JavaScript Date object
+              const eventDate = new Date(event.date.seconds * 1000);
+
+              // Compare the event date with the current date
+              return eventDate > currentDate;
+            }).sort((a, b) => {
+              // Sort the events by date in ascending order
+              const dateA = new Date(a.date.seconds * 1000);
+              const dateB = new Date(b.date.seconds * 1000);
+              return dateA - dateB;
+            });
     
-            setEvents(filteredEvents);
+            setEvents(noPassedFilteredEvents);
           } catch (error) {
             console.error('Error fetching events:', error);
           }
