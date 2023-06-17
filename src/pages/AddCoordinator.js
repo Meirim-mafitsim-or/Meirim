@@ -120,7 +120,7 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
                 <Modal.Header closeButton>
                     <Modal.Title>{strings.add_coordinator[language]}</Modal.Title>
                 </Modal.Header>
-                <Form validated={validated} className='needs-validation' onSubmit={handleSubmit}>
+                <Form validated={validated} className='needs-validation'>
                     <Modal.Body>
                         <Row className='mb-3'>
                             <Col>
@@ -178,7 +178,7 @@ export default function AddCoordinatorModal({onSuccess ,show, setShow}) {
                         <Button variant="secondary" onClick={handleClose}>
                             {strings.close[language]}
                         </Button>
-                        <Button type="submit" className='mr-3' variant="primary">
+                        <Button type="submit" className='mr-3' variant="primary" onClick={handleSubmit}>
                             {strings.add[language]}
                         </Button>
                     </Modal.Footer>

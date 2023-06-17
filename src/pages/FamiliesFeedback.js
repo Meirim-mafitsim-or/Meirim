@@ -1,22 +1,14 @@
 //forms card feedback from families
 
-import React, { useState, useEffect, useContext } from 'react';
-import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
+import React, { useState, useContext } from 'react';
+import { Row, Col, Form, Button, Card } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import strings from '../static/Strings.json';
-import { getEvents, getFeedbacksk } from '../common/Database';
+// import { getEvents } from '../common/Database';
 // import { useParams } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from '../common/FirebaseApp';
-import { collection, getDocs } from "firebase/firestore";
-import { getAuth, signOut } from "firebase/auth";
-import { app } from '../common/FirebaseApp';
-import { useNavigate } from 'react-router-dom';
-import { getFamiliesRegistration,getFamiliesRegistrationByIds } from '../common/Database';
-import { getFirestore } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import Select from 'react-select';
-import FloatingLabel from 'react-bootstrap';
+import { collection } from "firebase/firestore";
 import Rating from '@mui/material/Rating';
 import Box from '@mui/material/Box';
 import StarIcon from '@mui/icons-material/Star';
@@ -24,49 +16,35 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-// import FormLabel from '@mui/material/FormLabel';
 import { useParams } from "react-router-dom";
 import { FormHelperText } from '@mui/material';
-import { httpsCallable } from '@firebase/functions';
-import { functions } from '../common/FirebaseApp';
+// import { httpsCallable } from '@firebase/functions';
+// import { functions } from '../common/FirebaseApp';
 import {getCamperByFamilyAndEvent} from '../common/Database';
  
-async function sendFeedbackSms(){
-    const doThings = httpsCallable(functions, 'sendfeedbackrequest');
-    const result = await doThings({});
-    return result
-}
+// async function sendFeedbackSms(){
+//     const doThings = httpsCallable(functions, 'sendFeedbackRequest');
+//     const result = await doThings({});
+//     return result
+// }
 
 export default function FamiliesFeedback() {
     const { language } = useContext(LanguageContext);
-    const [Events, setEvents] = useState([]);
-    const [Feedbacks, setFeedbacks] = useState([]);
-    const [feedback, setFeedback] = useState("");
+    // const [Events, setEvents] = useState([]);
+    // const [Feedbacks, setFeedbacks] = useState([]);
+    // const [feedback, setFeedback] = useState("");
     const [submitted, setSubmitted] = useState(false); // Track form submission status
-    const [invalid, setInvalid] = useState({
-        feedback: false,
-    });
-    const navigate = useNavigate();
-    const [familiesRegistration, setFamiliesRegistration] = useState([]);
-    const [file, setFile] = useState(null);
-    const [url, setURL] = useState("");
+    // const [invalid, setInvalid] = useState({
+    //     feedback: false,
+    // });
     const [value, setValue] = useState(0);
     const [hover, setHover] = useState(-1);
     const [feedback_same_camper, setFeedback_same_camper] = useState("");
-    const [feedback_rate_shabat, setFeedback_rate_shabat] = useState(""); // [1,2,3,4,5
     const [feedback_expierence, setFeedback_expierence] = useState("");
     const [feedback_other_comments, setFeedback_other_comments] = useState("");
     const { eventId, familyId } = useParams();
-    const [error, setError] = useState(false);
     const [radioErrorText, setRadioErrorText] = useState('');
     const [ratingErrorText, setRatingErrorText] = useState('');
-
-    const handleRadioChange = (event) => {
-        //   setValue(event.target.value);
-        // setErrorText(' ');
-        setError(false);
-    };
-
     
 
     const labels = {
@@ -87,8 +65,8 @@ export default function FamiliesFeedback() {
     }
 
 
-    const [validated, setValidated] = useState(false);
-    const [show, setShow] = useState(false);
+    // const [validated, setValidated] = useState(false);
+    // const [show, setShow] = useState(false);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -98,13 +76,11 @@ export default function FamiliesFeedback() {
             event.stopPropagation();
         }
         if (feedback_same_camper === "") {
-            setError(true);
             setRadioErrorText(strings.feedback_same_camper_error[language]);
             return;
         }
 
         if (value === 0) {
-            setError(true);
             setRatingErrorText(strings.feedback_rate_shabat_error[language]);
             return;
         }
@@ -122,28 +98,28 @@ export default function FamiliesFeedback() {
             feedback_other_comments: feedback_other_comments,
         };
         // const newFeedbacks = [...Feedbacks, newFeedback];
-        console.log("newFeedback", newFeedback);
-        setFeedbacks(newFeedback);
+        // console.log("newFeedback", newFeedback);
+        // setFeedbacks(newFeedback);
 
         await updateFeedback(newFeedback);
         setSubmitted(true);
-        setFeedback("");
+        // setFeedback("");
         // setValidated(true);
         // navigate("/FamiliesFeedback");
     };
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setFeedback(value);
-        setInvalid({ ...invalid, [name]: false });
-        console.log("feedback", feedback);
+    // const handleInputChange = (event) => {
+    //     const { name, value } = event.target;
+    //     setFeedback(value);
+    //     setInvalid({ ...invalid, [name]: false });
+    //     console.log("feedback", feedback);
 
 
-    };
+    // };
 
-    useEffect(() => {
-        getEvents().then(Events => setEvents(Events));
-    }, []);
+    // useEffect(() => {
+    //     getEvents().then(Events => setEvents(Events));
+    // }, []);
 
     async function updateFeedback(newFeedbacks) {
         //add a doc to the familiesFeedback
@@ -170,7 +146,7 @@ export default function FamiliesFeedback() {
                     ) : (
                         <>
                             <Card.Title className='mb-3'>{strings.feedback_explanation[language]}</Card.Title>
-                            <Form validated={validated} onSubmit={handleSubmit} className='needs-validation'>
+                            <Form onSubmit={handleSubmit} className='needs-validation'>
                                 <div className="form-group">
                                     {/* <label>{strings.feedback_camper_expierence[language]}</label> */}
                                     <textarea

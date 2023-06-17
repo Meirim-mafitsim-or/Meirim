@@ -1,20 +1,108 @@
 import React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { Container, Row, Col,  } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import EventCard from "../common/EventCard";
 import strings from '../static/Strings.json';
-import { getEvents } from '../common/Database';
+import { auth } from '../common/FirebaseApp';
+import { db } from '../common/FirebaseApp';
+import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 
 function FamiliesManagment(){
 
     const { language } = useContext(LanguageContext);
     const [Events, setEvents] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        getEvents().then(Events => setEvents(Events))
+        const fetchEvents = async () => {
+          try {
+            const eventsCollection = collection(db, 'events');
+            const eventsSnapshot = await getDocs(eventsCollection);
+            const events = eventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
+            const user = auth.currentUser;
+
+            // Get the current date and time
+            const currentDate = new Date();
+
+            // Filter and sort the events array
+            const noPassedEvents = events.filter(event => {
+              // Convert the event date to a JavaScript Date object
+              const eventDate = new Date(event.date.seconds * 1000);
+
+              // Compare the event date with the current date
+              return eventDate > currentDate;
+            }).sort((a, b) => {
+              // Sort the events by date in ascending order
+              const dateA = new Date(a.date.seconds * 1000);
+              const dateB = new Date(b.date.seconds * 1000);
+              return dateA - dateB;
+            });
+
+
+            if (user) {
+                const userDocRef = doc(collection(db, 'users'),user.uid);
+                const userDocSnapshot = await getDoc(userDocRef);
+                if (userDocSnapshot.exists() && userDocSnapshot.data().role === 'admin') {                    
+                    setEvents(noPassedEvents);
+                    return;
+                }
+            }
+            const filteredEvents = [];
+            eventsSnapshot.forEach((doc) => {
+              const eventData = doc.data();
+              const eventId = doc.id;
+
+              if (eventData.hasOwnProperty("coordinator") && eventData.coordinator !== null)
+              {
+                if ( eventData.coordinator.id === user.uid) {
+                    filteredEvents.push({
+                        id: eventId,
+                      ...eventData,
+                    });
+                  }
+              }
+              else{
+                setEvents([]);
+                return;
+              }   
+            });
+
+            // Filter and sort the events array
+            const noPassedFilteredEvents = filteredEvents.filter(event => {
+              // Convert the event date to a JavaScript Date object
+              const eventDate = new Date(event.date.seconds * 1000);
+
+              // Compare the event date with the current date
+              return eventDate > currentDate;
+            }).sort((a, b) => {
+              // Sort the events by date in ascending order
+              const dateA = new Date(a.date.seconds * 1000);
+              const dateB = new Date(b.date.seconds * 1000);
+              return dateA - dateB;
+            });
+    
+            setEvents(noPassedFilteredEvents);
+          } catch (error) {
+            console.error('Error fetching events:', error);
+          }
+        };
+        fetchEvents();
     }, []);
+
+
+    const navigateToEvent = useCallback(() => {
+        if (Events.length === 1) {
+          const event = Events[0];
+          navigate(`/Families/${event.id}`);
+        }
+      }, [Events, navigate]);
+      
+      useEffect(() => {
+        navigateToEvent();
+      }, [navigateToEvent]);
 
     return (
     

@@ -4,8 +4,8 @@ import 'chart.js/auto';
 import React, { useState, useContext, useEffect } from "react";
 import { LanguageContext } from '../common/LanguageContext';
 import citys from '../static/city.json';
-import { ToggleButton, ButtonGroup, Row, Card, Col, Container } from "react-bootstrap";
-import { getEvents ,getFeedbacks } from '../common/Database';
+import { ToggleButton, ButtonGroup, Row, Card, Col } from "react-bootstrap";
+import { getEvents } from '../common/Database';
 
 const options = {
     plugins: {
@@ -40,7 +40,7 @@ export default function DataReport() {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [selectedSettlementForCampers, setSelectedSettlementForCampers] = useState(null);
     const [selectedSettlementForFamilies, setSelectedSettlementForFamilies] = useState(null);
-    const [feedbacks, setFeedbacks] = useState([]);
+    // const [feedbacks, setFeedbacks] = useState([]);
 
     const handleSettlementSelectForCampers = (event) => {
         const selectedValue = event.target.value;
@@ -189,11 +189,11 @@ export default function DataReport() {
         };
         fetchEventData();
 
-        const fetchFeedbackData = async () => {
-            const feedbacks = await getFeedbacks();
-            setFeedbacks(feedbacks);
-        }
-        fetchFeedbackData();
+        // const fetchFeedbackData = async () => {
+        //     const feedbacks = await getFeedbacks();
+        //     setFeedbacks(feedbacks);
+        // }
+        // fetchFeedbackData();
     }, [language, selectedYear]);
 
     useEffect(() => {

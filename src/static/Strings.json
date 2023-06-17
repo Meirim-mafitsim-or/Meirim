@@ -165,7 +165,7 @@
     "confirmed":
     {
         "en":"confirm registration",
-        "he":"אישור ההרשמה"
+        "he":"אשר הרשמה"
     },
     "edit":
     {
@@ -500,6 +500,11 @@
         "en":"Welcome to meirim website",
         "he":"ברוכים הבאים לאתר מאירים"
     },
+    "main_title":
+    {
+        "en":"Meirim - Hospitality Shabbat",
+        "he":"מאירים - שבתות אירוח"
+    },
     "all_events":
     {
         "en":"All Events",
@@ -613,12 +618,12 @@
     "medium":
     {
         "en":"Medium",
-        "he":"בינונית"
+        "he":"בינוני"
     },
     "low":
     {
         "en":"Low",
-        "he":"נמוכה"
+        "he":"קל"
     },
     "footer":
     {
@@ -791,6 +796,57 @@
         "en": "Please rate the shabat",
         "he": "אנא דרג את השבת"
     },
+    "actions":
+    {
+        "en":"actions",
+        "he":"פעולות"
+    },
+    "confirm_family":
+    {
+        "en":"confirm family",
+        "he":"אשר משפחה"
+    },
+    "remove_family":
+    {
+        "en":"remove family",
+        "he":"מחק משפחה"
+    },
+    "sure_to_remove":
+    {
+        "en":"Are you sure you want to remove this family?",
+        "he":"האם אתה בטוח שאתה רוצה למחוק את רישום המשפחה?"
+    },
+    "choose_format":
+    {
+        "en": "choose SMS format",
+        "he": "בחר את אופן השליחה"
+    },
+    "SendShabbatdetails":
+    {
+        "en":"Send Shabbat details",
+        "he":"שלח את פרטי השבת והשיבוץ"
+    },
+    "freeText":
+    {
+        "en": "free text",
+        "he": "טקסט חופשי"
+    },
+    "enter_message":
+    {
+        "en": "Enter your custom message:",
+        "he":"הכנס טקסט חופשי לשליחה"
+    },
+    "Shabbat_details_sent_successfully":
+    {
+        "en": "Shabbat details sent successfully!",
+        "he": "פרטי השבת נשלחו בהצלחה!"
+    
+    },
+    "success":
+    {
+        "en": "success",
+        "he": "נשלח בהצלחה"
+    },
     "registrition_sms_template":
     {
         "en": "Hello [#familyName#] and thank you for registering for a hosting shabat with Ma'arim! We had assigned you with camper and you will be able to see his details in the attached link. The name of the camper is [#camperName#] and his tutor is [#tutorName#], you can contact the tutor at [#tutorPhone#] \n [#camperLink#]",
@@ -805,5 +861,20 @@
     {
         "en": "Send SMS",
         "he": "שלח הודעה"
+    },
+    "experience":
+    {
+        "en": "experience",
+        "he": "חווית האירוח"
+    },
+    "want_the_same":
+    {
+        "en": "Will be happy to host again",
+        "he": "ישמחו לארח שוב"
+    },
+    "remove":
+    {
+        "en":"remove family",
+        "he":"מחק משפחה"
     }
 }
