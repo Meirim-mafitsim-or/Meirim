@@ -24,11 +24,7 @@ async function createAssigningDoc(settlement) {
   const collectionRef = collection(db, 'assignings');
 
   const data = {
-    assignings: [{
-      familyName: "",
-      phoneNumber: "",
-      campersId: []
-    }]
+    assignings: []
   };
 
   const docRef = doc(collectionRef, settlement);
@@ -142,7 +138,7 @@ export default function FormCreatShabat() {
 
     const campersField = choosenCampers.map((camper, index) => ({
       id: camper.value.id,//here add id
-      familie: "",
+      family: "",
       assigning: false,
     }));  
 

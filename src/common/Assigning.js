@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import strings from '../static/Strings.json';
@@ -126,42 +127,11 @@ export default function Assigning({
     return { assigningExists, assigningsArray };
   };
 
-  // Add a family to the assignings document
-  const addFamilyToAssignings = async (camperID) => {
-    if (!show) {
-      return;
-    }
 
-    const { assigning, assigningsArray } = await getFamilyFromAssignings(settlement);
-    const collectionRef = collection(db, 'assignings');
-    const docRef = doc(collectionRef, settlement);
-    if (!assigning) {
-      // Create a new object with the selected family details
-      const newAssigning = {
-        familyName: selectedFamily.last_name,
-        phoneNumber: selectedFamily.phone_number,
-        campersId: [camperID],
-      };
-
-      // Add the new object to the assigningsArray
-      assigningsArray.push(newAssigning);
-
-      // Update the Firestore document
-      await updateDoc(docRef, { assignings: assigningsArray });
-
-      console.log('New object added to assigningsArray:', newAssigning);
-    } else {
-      if (!assigning.campersId.includes(camperID)) {
-        assigning.campersId.push(camperID);
-        await updateDoc(docRef, { assignings: assigningsArray });
-      }
-    }
-  };
 
   // Check if the camper ID exists in the assignings array for the selected family
   const checkCamperIDInAssigningsArray = async (last_name, phone_number) => {
     const result = await getFamilyFromAssignings(settlement);
-
     if (result !== null) {
       // eslint-disable-next-line no-unused-vars
       const { assigningExists: ignored, assigningsArray } = await getFamilyFromAssignings(settlement);
@@ -169,14 +139,14 @@ export default function Assigning({
       if (!assigningsArray || assigningsArray.length === 0) {
         return;
       }
-
       const foundAssigning = assigningsArray.find(
-        (assigning) => assigning.familyName === last_name && assigning.phoneNumber === phone_number
+        (assigning) => assigning.family_name === last_name && assigning.phone_number === phone_number
       );
 
       if (foundAssigning) {
-        await setHistoryAss(foundAssigning.campersId);
-        return foundAssigning.campersId;
+        const idArray = foundAssigning.campersID.map(item => item.id);
+        setHistoryAss(idArray);
+        return idArray;
       }
     } else 
     {
@@ -188,11 +158,8 @@ export default function Assigning({
   };
 
   // Handle click event when the user clicks the "User Plus" icon to assign a camper to a family
-  const handleUserPlusClick = async (index) => {
-    if (show) {
-      addFamilyToAssignings(campers[index].id);
-    }
-
+  const handleUserPlusClick = async (camperID) => {
+    const curCamper = campers.find((camper) => camper.id === camperID);
     const updatedCampers = [...campers];
     const familiesCol = collection(db, 'familiesRegistration');
     const cur_families = doc(familiesCol, regID);
@@ -202,24 +169,31 @@ export default function Assigning({
 
     const families = familiesData.families;
 
-    if (updatedCampers[index].assigning) {
+    if (curCamper.assigning) {
       const confirmed = window.confirm(strings.to_change_assigning[language]);
       if (!confirmed) {
         return; // Don't proceed further if not confirmed
       }
-      const lastFamily = families.find((check_family) => check_family.id === updatedCampers[index].family);
+      const lastFamily = families.find((check_family) => check_family.id === curCamper.family);
       if (lastFamily) {
         lastFamily.assigning = false;
         lastFamily.camper = null;
       }
     }
+    if (selectedFamily.assigning) {
+      const lastCamper = campers.find((camper) => camper.id === selectedFamily.camper);
+      if (lastCamper) {
+        lastCamper.assigning = false;
+        lastCamper.family = null;
+      }
+    }
 
-    updatedCampers[index].assigning = true;
-    updatedCampers[index].family = selectedFamily.id;
+    curCamper.assigning = true;
+    curCamper.family = selectedFamily.id;
 
     const desiredFamilyIndex = families.findIndex((check_family) => check_family.id === selectedFamily.id);
     if (desiredFamilyIndex !== -1) {
-      families[desiredFamilyIndex].camper = updatedCampers[index].id;
+      families[desiredFamilyIndex].camper = curCamper.id;
       families[desiredFamilyIndex].assigning = true;
     }
 
@@ -289,7 +263,7 @@ export default function Assigning({
             type="checkbox"
             id="filterCheckbox"
             checked={showFilteredCampers}
-            onChange={(e) => setShowFilteredCampers(e.target.checked)}
+            onChange={(e) => {setShowFilteredCampers(e.target.checked); }}
           />
           <label className="form-check-label" htmlFor="filterCheckbox">
             {strings.show_only_campers_in_history[language]}
@@ -303,7 +277,10 @@ export default function Assigning({
               <th>{strings.first_name[language]}</th>
               <th>{strings.last_name[language]}</th>
               <th>{strings.gender[language]}</th>
-              <th>{strings.birth_date[language]}</th>
+              <th>{strings.age[language]}</th>
+              <th>{strings.allergies[language]}</th>
+              <th>{strings.disability_definition[language]}</th>
+              <th>{strings.functioning_level[language]}</th>
               <th>{strings.special_comment[language]}</th>
               <th>{strings.assigned[language]}</th>
               <th>{strings.choose[language]}</th>
@@ -313,16 +290,19 @@ export default function Assigning({
             {sortedCampers.map((item, index) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{item.first_name}</td>
-                <td>{item.last_name}</td>
+                <td>{item.firstName}</td>
+                <td>{item.lastName}</td>
                 <td>{item.gender}</td>
-                <td>{item.birth_date}</td>
+                <td>{item.age}</td>
+                <td>{item.allergies}</td>
+                <td>{item.disability_definition}</td>
+                <td>{item.functioning_level}</td>
                 <td>{item.comments}</td>
                 <td>{item.assigning ? <BiCheck size={20} /> : null}</td>
                 <td>
                   <BiUserPlus
                     size={30}
-                    onClick={() => handleUserPlusClick(index)}
+                    onClick={() => handleUserPlusClick(item.id)}
                     style={{ cursor: 'pointer' }}
                     color="#313B72"
                   />
