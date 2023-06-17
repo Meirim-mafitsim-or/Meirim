@@ -279,6 +279,8 @@ export default function Assigning({
               <th>{strings.gender[language]}</th>
               <th>{strings.age[language]}</th>
               <th>{strings.allergies[language]}</th>
+              <th>{strings.disability_definition[language]}</th>
+              <th>{strings.functioning_level[language]}</th>
               <th>{strings.special_comment[language]}</th>
               <th>{strings.assigned[language]}</th>
               <th>{strings.choose[language]}</th>
@@ -292,8 +294,10 @@ export default function Assigning({
                 <td>{item.lastName}</td>
                 <td>{item.gender}</td>
                 <td>{item.age}</td>
-                <td>{item.comments}</td>
                 <td>{item.allergies}</td>
+                <td>{item.disability_definition}</td>
+                <td>{item.functioning_level}</td>
+                <td>{item.comments}</td>
                 <td>{item.assigning ? <BiCheck size={20} /> : null}</td>
                 <td>
                   <BiUserPlus
