@@ -14,15 +14,15 @@ import { Modal, Button, Form, Toast } from 'react-bootstrap';
 import { FaSms } from 'react-icons/fa';
 import { functions } from '../common/FirebaseApp';
 import { httpsCallable } from "firebase/functions";
-import { getCoordinator } from '../common/Database';
  
 // Function to retrieve families data from Firestore
-async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement) {
+async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement, setEventData) {
   const events = collection(db, 'events');
   const cur_event = doc(events, id);
+  setEvent(cur_event);  
   const EventsSnapshot = await getDoc(cur_event);
   const eventData = EventsSnapshot.data();
-  setEvent(eventData);
+  setEventData(eventData);
   const families_id = eventData.registrationId;
   setSettlement(eventData.settlement)
   setFamiliesEvent(families_id);
@@ -65,7 +65,8 @@ async function joinFamiliesCamers(families) {
 export default function Families() {
   const { language } = useContext(LanguageContext);
   const [families, setFamilies] = useState([]);
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState({});
+  const [eventData, setEventData] = useState(null);
   const location = useLocation();
   const [pathSuffix, setPathSuffix] = useState('');
   const [familiesEvent, setFamiliesEvent] = useState(null);
@@ -93,7 +94,7 @@ useEffect(() => {
   const fetchData = async () => {
     if (pathSuffix) { // Check if pathSuffix is not empty or null
       const familiesData = await getFamilies(
-        pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement);
+        pathSuffix, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement, setEventData);
       if (familiesData) {
         setFamilies(familiesData);
       }
@@ -257,12 +258,12 @@ useEffect(() => {
     const recipients = joinedFamilies.map((family) => ({
       Phone: family.phone_number,
       familyName: family.first_name + " " + family.last_name,
-      eventDate: event.date,
+      eventDate: eventData.date,
       camperName: family.camper.first_name + " " + family.camper.last_name,
       tutor: family.camper.tutor,
       tutorPhone: family.camper.tutor_phone,
-      coordinator: event.coordinator.first_name + " " + event.coordinator.last_name,
-      coordinatorPhone: event.coordinator.phone,
+      coordinator: eventData.coordinator.first_name + " " + eventData.coordinator.last_name,
+      coordinatorPhone: eventData.coordinator.phone,
       camperUrl: `${window.location.origin}/camper/${family.camper.id}`,
     } ));
 
@@ -427,7 +428,7 @@ useEffect(() => {
           </TableBody>
         </Table>
       </TableContainer>          
-      <Button className='mt-3' class="btn btn-info" onClick={handleSendSMS}>{strings.send_sms_for_all[language]}</Button>
+      <Button className='mt-3'  onClick={handleSendSMS}>{strings.send_sms_for_all[language]}</Button>
 
     </Container>
   );

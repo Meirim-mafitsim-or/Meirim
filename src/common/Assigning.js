@@ -288,10 +288,10 @@ export default function Assigning({
             {sortedCampers.map((item, index) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{item.first_name}</td>
-                <td>{item.last_name}</td>
+                <td>{item.firstName}</td>
+                <td>{item.lastName}</td>
                 <td>{item.gender}</td>
-                <td>{item.birth_date}</td>
+                <td>{item.age}</td>
                 <td>{item.comments}</td>
                 <td>{item.allergies}</td>
                 <td>{item.assigning ? <BiCheck size={20} /> : null}</td>
