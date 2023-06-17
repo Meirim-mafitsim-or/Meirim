@@ -21,37 +21,14 @@ import TableModal from '../common/TableModal';
 import AddIcon from '@mui/icons-material/Add';
 import { deleteDoc,getDoc } from "firebase/firestore";
 import Spinner from 'react-bootstrap/Spinner';
-import { getEventById, getCoordinators, getCampers, getCampersById, getFamiliesRegistrationByIds } from '../common/Database';
+import { getEventById, getCoordinators, getCampers, getCampersById, getFamiliesRegistrationByIds ,updateFamilyRegistration } from '../common/Database';
 
-
-// export async function getEventById(eventId) {
-//     const EventsRef = collection(db, "events");
-//     const EventsSnapshot = await getDocs(EventsRef);
-//     const Events = EventsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-//     const event = Events.filter(event => event.id === eventId);
-//     return event;
-// }
-
-// export async function getCoordinators() {
-//     const CoordinatorsRef = collection(db, "coordinators");
-//     const CoordinatorsSnapshot = await getDocs(CoordinatorsRef);
-//     const Coordinators = CoordinatorsSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-//     return Coordinators;
-// }
-
-// export async function getCampers() {
-//     const CampersRef = collection(db, "campers");
-//     const CampersSnapshot = await getDocs(CampersRef);
-//     const Campers = CampersSnapshot.docs.map(doc => Object.assign({ id: doc.id }, doc.data()));
-//     return Campers;
-// }
 
 function formatDate(seconds) {
     const date = new Date(seconds * 1000);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    // console.log(`${year}-${month}-${day}`);
     return `${year}-${month}-${day}`;
 }
 
@@ -91,6 +68,7 @@ export default function FormEvent() {
     const [restCampers, setRestCampers] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
     const [campersData, setCampersData] = useState([]);
+    const [familiesRegistration, setFamiliesRegistration] = useState([]);
 
     const campers_columns = [
         {title: strings.camper_id[language], field: 'camper_id', type: 'text', invisible: true},
@@ -189,6 +167,7 @@ export default function FormEvent() {
                 setCampers(camperss);
                 setCampersData(event[0].campers);
                 const familiesRegs = await getFamiliesRegistrationByIds(event[0].families, event[0].registrationId);
+                setFamiliesRegistration(event[0].registrationId);
                 setFamilies(familiesRegs);
                 getCampers().then(campersEscapeDate).then(Campers => setAllCampers(Campers));
         
@@ -209,11 +188,22 @@ export default function FormEvent() {
         setCampers([...campers, ...camper]);
     }
 
-    const handleDeleteCampers = (camperIds) => {
+    const handleDeleteCampers = (camperIds) =>{
         const confirmed = window.confirm(strings.delete_confirm[language]);
         if (confirmed) {
             let newCampers = campers.filter((camper) => !camperIds.includes(camper.id));
             setCampers(newCampers);
+            let deletedCampers = campersData.filter((camper) => camperIds.includes(camper.id));
+            //if one of the deleted campers is assigned to a family, remove it from the family
+            deletedCampers.forEach(async (deletedCamper) => {
+                if (deletedCamper.assigning) {
+                  const family = await getFamiliesRegistrationByIds([deletedCamper.family], familiesRegistration);
+                  family[0].camper = null;
+                  updateFamilyRegistration(family[0], familiesRegistration, deletedCamper.family);
+                  
+                }
+              });
+              
         }
     }
 
@@ -237,7 +227,6 @@ export default function FormEvent() {
         }
 
 
-
         let city_en;
         if (language === "he") {
             city_en = citys.values.filter(city => city.name === shabatDitails.settlement).map(city => city.english_name)[0];
@@ -247,10 +236,13 @@ export default function FormEvent() {
             });
         }
         setShabatDitails({ ...shabatDitails, date: new Date(shabatDitails.date) });
-
         const listCampers = campers.map((camper) => {
-            if (camper.id in campersData.map((c) => c.id)) {
-                return campersData.find((c) => c.id === camper.id);
+            if (campersData.map((c) => c.id).includes(camper.id)) {
+                return {
+                    id: camper.id,
+                    family: campersData.find((c) => c.id === camper.id).family,
+                    assigning: campersData.find((c) => c.id === camper.id).assigning,
+                }
             }
             else {
                 return {
@@ -278,16 +270,11 @@ export default function FormEvent() {
         event.preventDefault();
         const confirmed = window.confirm(strings.delete_confirm[language]);
         if (confirmed) {
-            // Perform the deletion logic
             setSubmitted(true);
-            //first delet the families from the event i have field registrationId in the event that i can use to delete the families
-            // const eventsRef = collection(db, "events");
-            // await deleteDoc(doc(eventsRef, id));
             const eventRef = doc(db, "events", id);
             const familieId = await getDoc(eventRef).then((doc) => doc.data().registrationId);
             const familiesRef = doc(db, "familiesRegistration", familieId);
             await deleteDoc(familiesRef);
-            //then delete the event
             await deleteDoc(eventRef);
 
             navigate("/");
@@ -331,8 +318,6 @@ export default function FormEvent() {
                             <Col md="6">
                                 <Row className="mb-8 mt-2">
                                     <Form.Group as={Col} controlId="first_name">
-                                        {/* <Form.Label>{strings.place_name[language]}</Form.Label> */}
-                                        {/* <FloatingLabel label={strings.place_name[language]} controlId='formPlaceName' className='m-0' style={{ color: 'gray' }}> */}
                                         <Select
                                             options={citysOptions}
                                             required
@@ -346,38 +331,16 @@ export default function FormEvent() {
                                                 })
                                             }
                                         />
-                                        {/* </FloatingLabel> */}
-                                        {/* <FloatingLabel label={strings.place_name[language]} controlId='formPlaceName' className='m-0' style={{ color: 'gray' }}>
-                                        <Form.Select
-                                            required
-                                            placeholder={shabatDitails.settlement}
-                                            value={shabatDitails.settlement}
-                                            onChange={(e) =>
-                                                setShabatDitails({
-                                                    ...shabatDitails,
-                                                    settlement: e.target.value,
-                                                })
-                                            }
-                                        >
-                                            {citysOptions.map((city, index) => (
-                                                <option key={index} value={city.value}>{city.label}</option>
-                                            ))}
-                                        </Form.Select>
-                                        </FloatingLabel> */}
                                     </Form.Group>
                                 </Row>
                                 <Row className="mb-2 mt-4">
                                     <Form.Group as={Col} controlId="coordinator" className="mt-4">
-                                        {/* <Form.Label>{strings.coordinator_name[language]}</Form.Label> */}
-                                        {/* <FloatingLabel label={strings.coordinator_name[language]} controlId='formCoordinator' style={{color:'gray'}}> */}
-                                        {/* {shabatDitails.coordinator===undefined?"select coordinator": } */}
                                         <Select
                                             options={optionsCoordinators}
                                     
                                             
                                             required
                                             placeholder={!shabatDitails.coordinator?strings.select_coordinator[language]:shabatDitails.coordinator.first_name + " " + shabatDitails.coordinator.last_name + " - " + shabatDitails.coordinator.place_name}
-                                            // placeholder={shabatDitails.coordinator.first_name + " " + shabatDitails.coordinator.last_name + " - " + shabatDitails.coordinator.place_name}
                                             value={optionsCoordinators.find(option => option.value === shabatDitails.coordinator)}
                                             onChange={(selectedOption) =>
                                                 setShabatDitails({
@@ -387,11 +350,9 @@ export default function FormEvent() {
                                             }
 
                                         />
-                                        {/* </FloatingLabel> */}
                                     </Form.Group>
                                 </Row>
                                 <Row className="mb-2 mt-4" >
-                                    {/* //change the date*/}
                                     <Form.Group as={Col} controlId="date" className="mt-4">
                                         <Form.Control
 
@@ -416,7 +377,6 @@ export default function FormEvent() {
                                     <Form.Control className="w-75 m-auto"
                                         type="file"
                                         placeholder={shabatDitails.image}
-                                        // onChange={(e) => setShabatDitails({ ...shabatDitails, image: e.target.files[0] })}
                                         onChange={(e) => {
                                             setImageChanged(true);
                                             setShabatDitails({
