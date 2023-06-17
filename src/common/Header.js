@@ -1,18 +1,19 @@
-import { useState, useContext } from 'react';
 import './common.css';
 import logo from '../static/logo.png';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { useContext, useState } from 'react';
+import strings from '../static/Strings.json';
 import { LanguageContext } from './LanguageContext';
 import { UserContext } from './UserContext';
 import { Link, useNavigate } from 'react-router-dom';
-import strings from '../static/Strings.json';
-
 
 export default function Header() {
   const { language, changeLanguage } = useContext(LanguageContext);
   const { user, logout } = useContext(UserContext);
+  const [timeoutId, setTimeoutId] = useState(null);
+
   const navigate = useNavigate();
   const menuItems = [
     { link: "/", text: strings.home[language] },
@@ -29,7 +30,19 @@ export default function Header() {
   };
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownOpenLan, setDropdownOpenLan] = useState(false);
+  const handleMouseEnter = () => {
+    setDropdownOpen(true);
+    clearTimeout(timeoutId); // Clear any existing timeout
+  };
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 500); // Set the delay to 500 milliseconds (adjust as needed)
+
+    setTimeoutId(id); // Store the timeout ID
+  };
+  
 
   return (
     <>
@@ -62,26 +75,27 @@ export default function Header() {
             )}
             {user && (
               <NavDropdown
-                title={strings.management_users[language]}
-                id="basic-nav-dropdown"
-                show={dropdownOpen}
-                onMouseEnter={() => setDropdownOpen(true)}
-                onMouseLeave={() => setDropdownOpen(false)}
-              >
-                {user.role === 'admin' && (
-                  <Nav.Link as={Link} to="/manageCampers">
-                    {strings.manage_campers[language]}
-                  </Nav.Link>
-                )}
-                <Nav.Link as={Link} to="/Families">
-                  {strings.manage_families[language]}
+              title={strings.management_users[language]}
+              id="basic-nav-dropdown"
+              show={dropdownOpen}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              {user.role === 'admin' && (
+                <Nav.Link as={Link} to="/manageCampers" onClick={() => setDropdownOpen(false)}>
+                  {strings.manage_campers[language]}
                 </Nav.Link>
-                {user.role === 'admin' && (
-                  <Nav.Link as={Link} to="/ManageCoordinators">
-                    {strings.manage_coordinators[language]}
-                  </Nav.Link>
-                )}
-              </NavDropdown>
+              )}
+              <Nav.Link as={Link} to="/Families" onClick={() => setDropdownOpen(false)}>
+                {strings.manage_families[language]}
+              </Nav.Link>
+              {user.role === 'admin' && (
+                <Nav.Link as={Link} to="/ManageCoordinators" onClick={() => setDropdownOpen(false)}>
+                  {strings.manage_coordinators[language]}
+                </Nav.Link>
+              )}
+            </NavDropdown>
+            
             )}
             <Navbar.Collapse className="justify-content-end"></Navbar.Collapse>
           </Nav>
@@ -89,15 +103,11 @@ export default function Header() {
             <NavDropdown
               title={strings.language[language]}
               id="basic-nav-dropdown"
-              show={dropdownOpenLan}
-              onMouseEnter={() => setDropdownOpenLan(true)}
-              onMouseLeave={() => setDropdownOpenLan(false)}
             >
               {langItems.map((item, index) => (
                 <NavDropdown.Item
                   key={index}
                   onClick={() => {
-                    setDropdownOpenLan(false);
                     changeLanguage(item.code);
                   }}
                 >
