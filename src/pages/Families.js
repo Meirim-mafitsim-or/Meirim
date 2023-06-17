@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container } from 'react-bootstrap';
 import { LanguageContext } from '../common/LanguageContext';
 import { db } from '../common/FirebaseApp';
@@ -14,14 +14,15 @@ import { Modal, Button, Form, Toast } from 'react-bootstrap';
 import { FaSms } from 'react-icons/fa';
 import { functions } from '../common/FirebaseApp';
 import { httpsCallable } from "firebase/functions";
+import { getCoordinator } from '../common/Database';
  
 // Function to retrieve families data from Firestore
 async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent, setSettlement) {
   const events = collection(db, 'events');
   const cur_event = doc(events, id);
-  setEvent(cur_event);
   const EventsSnapshot = await getDoc(cur_event);
   const eventData = EventsSnapshot.data();
+  setEvent(eventData);
   const families_id = eventData.registrationId;
   setSettlement(eventData.settlement)
   setFamiliesEvent(families_id);
@@ -44,8 +45,25 @@ async function getFamilies(id, setFamiliesEvent, setFamiliesDoc, setEvent, setSe
   }
 }
 
+async function joinFamiliesCamers(families) {
+  const campers_ids = families.map(family => family.camper);
+  const campersCol = collection(db, 'campers');
+  const campers = await Promise.all(campers_ids.map(async camper_id => {
+    if (camper_id){
+      const camper = doc(campersCol, camper_id);
+      const camperSnapshot = await getDoc(camper);
+      return camperSnapshot;
+
+    }
+    else return null;
+  }));
+  return families.map((family, index) => {
+    return Object.assign(family, { camper: campers[index] ? {...campers[index].data(), id:campers[index].id}: null });
+  });
+}
+
 export default function Families() {
-  const { language } = React.useContext(LanguageContext);
+  const { language } = useContext(LanguageContext);
   const [families, setFamilies] = useState([]);
   const [event, setEvent] = useState(null);
   const location = useLocation();
@@ -149,9 +167,7 @@ useEffect(() => {
     setShowModal(true);
   };
  
-  const handleSendShabbatMessage = () => {
-    console.log('Sending Shabbat details to selected campers');
- 
+  const handleSendShabbatMessage = () => { 
     // Logic to send "hi you are invited to a Shabbat at 15/5/2025"
     // Show success toast
     const sendSMS = httpsCallable(functions, 'sendMessagesWithTemplate');
@@ -232,10 +248,35 @@ useEffect(() => {
   // }
   
 
+  const handleSendSMS = async() => {
+    const template = strings.registrition_sms_template["he"];
+    const sendSMS = httpsCallable(functions, 'sendMessagesWithTemplate');
+    const familiesWithCamper = families.filter((family) => family.camper);
+    const joinedFamilies = await joinFamiliesCamers(familiesWithCamper);
+
+    const recipients = joinedFamilies.map((family) => ({
+      Phone: family.phone_number,
+      familyName: family.first_name + " " + family.last_name,
+      eventDate: event.date,
+      camperName: family.camper.first_name + " " + family.camper.last_name,
+      tutor: family.camper.tutor,
+      tutorPhone: family.camper.tutor_phone,
+      coordinator: event.coordinator.first_name + " " + event.coordinator.last_name,
+      coordinatorPhone: event.coordinator.phone,
+      camperUrl: `${window.location.origin}/camper/${family.camper.id}`,
+    } ));
+
+    sendSMS({
+      template: template,
+      recipients: recipients
+    }).then((result) => {
+      console.log(result);
+    }
+    )    
+  }
   return (
     <Container fluid>
       <h1>{strings.registered_families[language]}</h1>
-
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
@@ -385,7 +426,9 @@ useEffect(() => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer>          
+      <Button className='mt-3' class="btn btn-info" onClick={handleSendSMS}>{strings.send_sms_for_all[language]}</Button>
+
     </Container>
   );
 }

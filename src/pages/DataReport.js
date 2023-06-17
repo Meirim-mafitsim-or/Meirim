@@ -1,20 +1,16 @@
+import strings from '../static/Strings.json';
 import { Doughnut, Bar, Line } from "react-chartjs-2";
 import 'chart.js/auto';
-import React from "react";
-import { useState } from 'react';
-import { useContext } from 'react';
-import strings from '../static/Strings.json';
+import React, { useState, useContext, useEffect } from "react";
 import { LanguageContext } from '../common/LanguageContext';
 import citys from '../static/city.json';
-import { useEffect } from 'react';
-import { ToggleButton, ButtonGroup, Row } from "react-bootstrap";
-import { getEvents } from '../common/Database';
+import { ToggleButton, ButtonGroup, Row, Card, Col, Container } from "react-bootstrap";
+import { getEvents ,getFeedbacks } from '../common/Database';
 
 const options = {
     plugins: {
         legend: {
             labels: {
-                // This more specific font property overrides the global property
                 font: {
                     size: 20
                 }
@@ -28,20 +24,36 @@ const options = {
     }
 };
 
-
 export default function DataReport() {
     const { language } = useContext(LanguageContext);
     const [campersNum, setCampersNum] = useState([]);
     const [settlement, setSettlement] = useState([]);
-    const [settlementByDate , setSettlementByDate] = useState([]); //[strings.january[language], strings.february[language], strings.march[language], strings.april[language], strings.may[language], strings.june[language], strings.july[language], strings.august[language], strings.september[language], strings.october[language], strings.november[language], strings.december[language
+    const [settlementByDate, setSettlementByDate] = useState([]);
     const [familiesNum, setFamiliesNum] = useState([]);
     const [numOfEventsInHalfYear, setNumOfEventsInHalfYear] = useState([]);
-    const [labels, setLabels] = useState([]); //[strings.january[language], strings.february[language], strings.march[language], strings.april[language], strings.may[language], strings.june[language], strings.july[language], strings.august[language], strings.september[language], strings.october[language], strings.november[language], strings.december[language]
+    const [labels, setLabels] = useState([]);
     const [settlementCount, setSettlementCount] = useState([]);
-    const [colors, setColors] = useState([]); //["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)"
+    const [colors, setColors] = useState([]);
     const [chartTypeCampers, setChartTypeCampers] = useState("bar");
     const [chartTypeFamilies, setChartTypeFamilies] = useState("bar");
+    const [chartTypeYear, setChartTypeYear] = useState("bar");
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedSettlementForCampers, setSelectedSettlementForCampers] = useState(null);
+    const [selectedSettlementForFamilies, setSelectedSettlementForFamilies] = useState(null);
+    const [feedbacks, setFeedbacks] = useState([]);
 
+    const handleSettlementSelectForCampers = (event) => {
+        const selectedValue = event.target.value;
+        setSelectedSettlementForCampers(selectedValue);
+    };
+    const handleSettlementSelectForFamilies = (event) => {
+        const selectedValue = event.target.value;
+        setSelectedSettlementForFamilies(selectedValue);
+    };
+
+    //from 2022 to this year
+    const availableYears = Array.from({ length: new Date().getFullYear() - 2021 }, (_, i) => 2022 + i);
+    
 
     const campersData = {
         labels: settlementByDate,
@@ -78,7 +90,30 @@ export default function DataReport() {
             },
         ]
     };
-    // const uniqueSettlement = [...new Set(settlement)];
+
+    // const settlementData = {
+    //     labels: Object.keys(settlementCount),
+    //     datasets: [
+    //       {
+    //         label: strings.settlements[language],
+    //         data: Object.keys(settlementCount).map(settlement => settlementCount[settlement]),
+    //         fill: true,
+    //         backgroundColor: colors,
+    //         borderColor: colors,
+    //         borderWidth: 1,
+    //         options: {
+    //           aspectRatio: 3.4,
+    //           plugins: {
+    //             legend: {
+    //               display: true, // Display the legend
+    //               position: 'right', // Position the legend on the right side
+    //               align: 'start', // Align the legend items to the start
+    //             },
+    //           },
+    //         },
+    //       },
+    //     ],
+    //   };
     const settlementData = {
         labels: Object.keys(settlementCount),
         datasets: [
@@ -100,6 +135,7 @@ export default function DataReport() {
             },
         ]
     };
+
     const eventsInYearData = {
         labels: labels,
         datasets: [
@@ -131,16 +167,17 @@ export default function DataReport() {
                 setSettlement(Events.map(event => event.settlement));
                 setSettlementByDate(Events.map(event => (event.settlement) + " - " + event.date.toDate().toLocaleDateString()));
             }
-            
-          
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth();
-            const lastYear = new Date(currentYear - 1, (currentMonth+1)%12, 1);
 
-            const eventsInYear = Events.filter(event => event.date.toDate() >= lastYear && event.date.toDate() <= now);
-            let labels = [0,1,2,3,4,5,6,7,8,9,10,11].map(month => (currentMonth+month + 1)%12);
-            //and this year
+            // const now = new Date();
+            // const currentYear = now.getFullYear();
+            // const currentMonth = now.getMonth();
+            // const lastYear = new Date(currentYear - 1, (currentMonth + 1) % 12, 1);
+
+            const eventsInYear = Events.filter(event => {
+                const eventYear = event.date.toDate().getFullYear();
+                return eventYear === selectedYear;
+            });
+            let labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
             const eventsGroupByMonth = labels.map(month => eventsInYear.filter(event => event.date.toDate().getMonth() === month).length);
             setNumOfEventsInHalfYear(eventsGroupByMonth);
             if (language === "he") {
@@ -149,10 +186,15 @@ export default function DataReport() {
             else
                 labels = labels.map(month => strings.months[language][month]);
             setLabels(labels);
-
         };
         fetchEventData();
-    }, [language]);
+
+        const fetchFeedbackData = async () => {
+            const feedbacks = await getFeedbacks();
+            setFeedbacks(feedbacks);
+        }
+        fetchFeedbackData();
+    }, [language, selectedYear]);
 
     useEffect(() => {
         let settlementCount = {};
@@ -175,57 +217,219 @@ export default function DataReport() {
         setColors(collors);
     }, [settlement]);
 
+    const handleYearChange = (event) => {
+        setSelectedYear(parseInt(event.target.value));
+    };
+
     return (
         <>
-            <Row>
-                <div className="w-50">
-                    <h1 className="title">{strings.campers_per_event[language]}</h1>
-                    {chartTypeCampers === "bar" ? (
-                        <Bar data={campersData} options={options} />
-                    ) : (
-                        <Line data={campersData} options={options} />
-                    )}
-                    <ButtonGroup aria-label="Basic example">
-                        <ToggleButton variant="outline-secondary" onClick={() => setChartTypeCampers("bar")} checked={chartTypeCampers === "bar"} size="sm">
-                            <i className="bi bi-bar-chart-line"></i>
-                        </ToggleButton>
-                        <ToggleButton variant="outline-secondary" onClick={() => setChartTypeCampers("line")} checked={chartTypeCampers === "line"} size="sm">
-                            <i className="bi bi-graph-up"></i>
-                        </ToggleButton>
-                    </ButtonGroup>
-                </div>
+            <Card className="m-auto mt-5 w-75 p-4">
+                <Row>
+                    <div className="w-100">
+                        <h1 className="title">{strings.campers_per_event[language]}</h1>
+                        {chartTypeCampers === "bar" ? (
+                            selectedSettlementForCampers ? (
+                                campersData.datasets[0].data = campersNum.filter((_, index) => settlement[index] === selectedSettlementForCampers),
+                                campersData.labels = settlementByDate.filter((_, index) => settlement[index] === selectedSettlementForCampers),
+                                <Bar data={campersData} options={options} />
+                            ) : (
 
-                <div className="w-50">
-                    <h1 className="title">{strings.families_per_event[language]}</h1>
-                    {chartTypeFamilies === "bar" ? (
-                        <Bar data={familiesData} options={options} />
-                    ) : (
-                        <Line data={familiesData} options={options} />
-                    )}
-                    <ButtonGroup aria-label="Basic example">
-                        <ToggleButton variant="outline-secondary" onClick={() => setChartTypeFamilies("bar")} checked={chartTypeFamilies === "bar"} size="sm">
-                            <i className="bi bi-bar-chart-line"></i>
-                        </ToggleButton>
-                        <ToggleButton variant="outline-secondary" onClick={() => setChartTypeFamilies("line")} checked={chartTypeFamilies === "line"} size="sm">
-                            <i className="bi bi-graph-up"></i>
-                        </ToggleButton>
-                    </ButtonGroup>
-                </div>
-            </Row>
-            <Row className="mb-3">
-                <div className="w-50">
-                {/* //do Doughnut for the settlements */}
-                <div className="w-5 col-md-12 doughnut-chart-container" >
-                    <h1 className="title mb-5">{strings.settlements[language]}</h1>
-                    <Doughnut data={settlementData} options={settlementData.datasets[0].options} />
-                </div>
-                </div>
-                <div className="w-50" >
-                    <h1 className="title">{strings.events_in_year[language]}</h1>
-                    <Bar data={eventsInYearData} options={options} />
-                </div>
-            </Row>
+                                <Bar data={campersData} options={options} />
+                            )
+                        ) : (
+                            selectedSettlementForCampers ? (
+                                campersData.datasets[0].data = campersNum.filter((_, index) => settlement[index] === selectedSettlementForCampers),
+                                campersData.labels = settlementByDate.filter((_, index) => settlement[index] === selectedSettlementForCampers),
+                                <Line data={campersData} options={options} />
+                            )
+                                : (
 
+                                    <Line data={campersData} options={options} />
+                                )
+                        )}
+                        <Row className='mt-4 mb-4'>
+                            <Col xs={6} className="d-flex justify-content-start align-items-center">
+                                <ButtonGroup className="me-2" aria-label="Basic example">
+                                    <ToggleButton variant="outline-secondary" onClick={() => setChartTypeCampers("bar")} checked={chartTypeCampers === "bar"}>
+                                        <i className="bi bi-bar-chart-line"></i>
+                                    </ToggleButton>
+                                    <ToggleButton variant="outline-secondary" onClick={() => setChartTypeCampers("line")} checked={chartTypeCampers === "line"}>
+                                        <i className="bi bi-graph-up"></i>
+                                    </ToggleButton>
+                                </ButtonGroup>
+                                <select className="form-select" value={selectedSettlementForCampers} onChange={handleSettlementSelectForCampers} style={{ width: 200 }}>
+                                    <option value="">{strings.show_all_settlements[language]}</option>
+                                    {[...new Set(settlement)].map((settlementOption) => (
+                                        <option key={settlementOption} value={settlementOption}>
+                                            {settlementOption}
+                                        </option>
+                                    ))}
+                                </select>
+                            </Col>
+                        </Row>
+
+                    </div>
+                </Row>
+                <Row className="mb-3">
+                    <div >
+                        <h1 className="title">{strings.families_per_event[language]}</h1>
+                        {chartTypeFamilies === "bar" ? (
+                            selectedSettlementForFamilies ? (
+                                familiesData.datasets[0].data = familiesNum.filter((_, index) => settlement[index] === selectedSettlementForFamilies),
+                                familiesData.labels = settlementByDate.filter((_, index) => settlement[index] === selectedSettlementForFamilies),
+                                <Bar data={familiesData} options={options} />
+                            ) : (
+
+                                <Bar data={familiesData} options={options} />
+                            )
+                        ) : (
+                            selectedSettlementForFamilies ? (
+                                familiesData.datasets[0].data = familiesNum.filter((_, index) => settlement[index] === selectedSettlementForFamilies),
+                                familiesData.labels = settlementByDate.filter((_, index) => settlement[index] === selectedSettlementForFamilies),
+                                <Line data={familiesData} options={options} />
+                            )
+
+                                : (
+
+                                    <Line data={familiesData} options={options} />
+
+                                )
+                        )}
+                        <Row className='mt-4 mb-4'>
+                            <Col xs={6} className="d-flex justify-content-start align-items-center">
+                                <ButtonGroup className="me-2" aria-label="Basic example">
+                                    <ToggleButton variant="outline-secondary" onClick={() => setChartTypeFamilies("bar")} checked={chartTypeFamilies === "bar"}>
+                                        <i className="bi bi-bar-chart-line"></i>
+                                    </ToggleButton>
+                                    <ToggleButton variant="outline-secondary" onClick={() => setChartTypeFamilies("line")} checked={chartTypeFamilies === "line"}>
+
+                                        <i className="bi bi-graph-up"></i>
+                                    </ToggleButton>
+                                </ButtonGroup>
+                                <select className="form-select" value={selectedSettlementForFamilies} onChange={handleSettlementSelectForFamilies} style={{ width: 200 }}>
+                                    <option value="">{strings.show_all_settlements[language]}</option>
+                                    {[...new Set(settlement)].map((settlementOption) => (
+                                        <option key={settlementOption} value={settlementOption}>
+                                            {settlementOption}
+                                        </option>
+                                    ))}
+                                </select>
+                            </Col>
+                        </Row>
+                    </div>
+                </Row>
+                {/* <Row className="mb-3">
+                    <div className="w-5 col-md-12 doughnut-chart-container" >
+                        <h1 className="title mb-5">{strings.settlements[language]}</h1>
+                        <Doughnut data={settlementData} options={settlementData.datasets[0].options} />
+                    </div>
+                </Row> */}
+                <Row className="mb-3">
+                    <div className="col-md-12 doughnut-chart-container">
+                        <h1 className="title mb-5">{strings.settlements[language]}</h1>
+                        <div className="d-flex justify-content-center align-items-center flex-wrap">
+                            <Doughnut data={settlementData} options={settlementData.datasets[0].options} />
+                            <div className="d-flex flex-wrap mt-4">
+                                {Object.keys(settlementCount).map((settlement, index) => (
+                                    <div key={settlement} className="d-flex align-items-center mb-2 me-4">
+                                        <div
+                                            className="legend-color"
+                                            style={{
+                                                width: '16px',
+                                                height: '16px',
+                                                backgroundColor: colors[index],
+                                                marginRight: '8px',
+                                            }}
+                                        ></div>
+                                        <div>{settlement}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </Row>
+                <Row className="mb-3">
+                    <div >
+                        <h1 className="title">{strings.events_in_year[language]}</h1>
+                        {chartTypeYear === "bar" ? (
+                            <Bar data={eventsInYearData} options={options} />
+                        ) : (
+                            <Line data={eventsInYearData} options={options} />
+                        )}
+                        <Row className='mt-4 mb-4'>
+                            <Col xs={6} className="d-flex justify-content-start align-items-center">
+                                <ButtonGroup className="me-2" aria-label="Basic example">
+                                    <ToggleButton variant="outline-secondary" onClick={() => setChartTypeYear("bar")} checked={chartTypeYear === "bar"}>
+                                        <i className="bi bi-bar-chart-line"></i>
+                                    </ToggleButton>
+                                    <ToggleButton variant="outline-secondary" onClick={() => setChartTypeYear("line")} checked={chartTypeYear === "line"}>
+                                        <i className="bi bi-graph-up"></i>
+                                    </ToggleButton>
+                                </ButtonGroup>
+                                <select id="year-select" className="form-select" onChange={handleYearChange} defaultValue={new Date().getFullYear()} style={{ width: 95 }}>
+                                    {availableYears.map(year => (
+                                        <option key={year} value={year}>{year}</option>
+                                    ))}
+                                </select>
+                            </Col>
+                        </Row>
+                    </div>
+                    {/* <Row className="mb-3"> */}
+                    {/* <div className='p-10'>
+
+                <Row style={{
+                    height: '55vh',
+                }}>
+                {feedbacks.map((feedback, index) => (
+                    <Col>
+                    <Card key={index} className="text-center text-dark h-75 mb-3" >
+                        <Card.Header>{feedback.event}</Card.Header>
+                        <Card.Body style={{
+                        overflowY: 'auto',
+                        }}>
+                            <Card.Title>{feedback.camper}</Card.Title>
+                            <Container>
+                            <Card.Text>
+                                {feedback.feedback_expierence}
+                            </Card.Text>
+                            <Card.Text>
+                                {feedback.feedback_other_comments}
+                            </Card.Text>
+                            <Card.Text>
+                                {feedback.feedback_rate_shabat}
+                            </Card.Text>
+                            <Card.Text>
+                                {feedback.feedback_same_camper}
+                            </Card.Text>
+                            </Container>
+                        </Card.Body>
+                    </Card>
+                    </Col>
+                    ))}
+                </Row>
+        </div> */}
+        {/* reduce((rows, key, index) => (index % 4 === 0 ? rows.push([key])
+                    : rows[rows.length - 1].push(key)) && rows, [])
+                    .map((row, index) => (
+                        <Row key={index} xs={1} md={4} >
+                            {row.map((event, index) => (
+                                <Col key={index} className="p-3" style={{backgroundColor: 'lightgrey'}}>
+                                    <ui>
+                                        <li>{event.feedback_expierence}</li>
+                                        <li>{event.feedback_other_comments}</li>
+                                        <li>{event.feedback_rate_shabat}</li>
+                                        <li>{event.feedback_same_camper}</li>
+                                    </ui>
+                                    
+                                </Col>
+                                ))}
+                        </Row>
+                    ))
+            } */}
+                    {/* </Row> */}
+                </Row>
+            </Card>
         </>
     );
 }
+

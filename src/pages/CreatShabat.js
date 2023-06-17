@@ -246,7 +246,9 @@ export default function FormCreatShabat() {
                     <Form.Label>{strings.coordinator[language]}</Form.Label>
                     {/* <ButtonToolbar aria-label="Toolbar with Button groups"> */}
                     <InputGroup>
-                    <Button variant="outline-secondary" className='w-25' onClick={() => setShowCoordinatorModal(true)}>
+                    <Button variant="outline-secondary" className='w-25' onClick={() => setShowCoordinatorModal(true)} style={{
+                      zIndex: 0,
+                    }}>
                       {strings.add_coordinator[language]}
                     </Button>
                     <AddCoordinator onSuccess={() => {

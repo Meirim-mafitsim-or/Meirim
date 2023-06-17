@@ -841,5 +841,20 @@
     {
         "en": "success",
         "he": "נשלח בהצלחה"
+    },
+    "registrition_sms_template":
+    {
+        "en": "Hello [#familyName#] and thank you for registering for a hosting shabat with Ma'arim! We had assigned you with camper and you will be able to see his details in the attached link. The name of the camper is [#camperName#] and his tutor is [#tutorName#], you can contact the tutor at [#tutorPhone#] \n [#camperLink#]",
+        "he": " שלום [#familyName#] ותודה שנרשמתם לשבת אירוח עם עמותת מאירים! שיבצנו לכם חניך ותוכלו לראות את פרטיו בקישור המצורף. שם החניך הוא [#camperName#] והחונך שלו הוא [#tutorName#], ניתן ליצור קשר עם החונך במספר [#tutorPhone#] \n [#camperLink#]"
+    },
+    "send_sms_for_all":
+    {
+        "en": "Send SMS for all",
+        "he": "שלח הודעה לכל המשפחות על השיבוץ"
+    },
+    "send_sms":
+    {
+        "en": "Send SMS",
+        "he": "שלח הודעה"
     }
 }

@@ -57,8 +57,8 @@ function formatDate(seconds) {
 
 function campersEscapeDate(campers){
     return campers.map((camper) => {
-      if (camper.birthDate)
-        camper.birthDate = new Date(camper.birthDate.seconds * 1000);
+      if (camper.birth_date)
+        camper.birth_date = new Date(camper.birth_date.seconds * 1000);
       return camper;
     });
   }
@@ -94,25 +94,25 @@ export default function FormEvent() {
 
     const campers_columns = [
         {title: strings.camper_id[language], field: 'camper_id', type: 'text', invisible: true},
-        {title: strings.first_name[language], field: 'firstName', type: 'text'},
-        {title: strings.last_name[language], field: 'lastName', type: 'text'},
-        {title: strings.birth_date[language], field: 'birthDate', type: 'date', invisible: true},
+        {title: strings.first_name[language], field: 'first_name', type: 'text'},
+        {title: strings.last_name[language], field: 'last_name', type: 'text'},
+        {title: strings.birth_date[language], field: 'birth_date', type: 'date', invisible: true},
         {title: strings.gender[language], field: 'gender', type: 'select', options: 
           {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
         },
         {title: strings.city[language],field: 'city',type: 'text', invisible: true},
         {title: strings.address[language],field: 'address',type: 'text', invisible: true},
         {title: strings.frame[language], field: 'frame', type: 'text' },
-        { title: strings.disability_definition[language], field: 'disabilityDefinition', type: 'text' },
-        { title: strings.functioning_level[language], field: 'functioningLevel', type: 'select',
+        { title: strings.disability_definition[language], field: 'disability_definition', type: 'text' },
+        { title: strings.functioning_level[language], field: 'functioning_level', type: 'select',
           options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
         },
         { title: strings.allergies[language], field: 'allergies', type: 'text' },
-        { title: strings.parent_name[language], field: 'parentName', type: 'text', invisible: true },
-        { title: strings.parent_phone[language], field: 'parentPhone', type: 'text', invisible: true },
+        { title: strings.parent_name[language], field: 'parent_name', type: 'text', invisible: true },
+        { title: strings.parent_phone[language], field: 'parent_phone', type: 'text', invisible: true },
         { title: strings.branch[language], field: 'branch', type: 'text' },
         { title: strings.tutor[language], field: 'tutor', type: 'text' },
-        { title: strings.tutor_phone[language], field: 'tutorPhone', type: 'text' },
+        { title: strings.tutor_phone[language], field: 'tutor_phone', type: 'text' },
         { title: strings.special_comment[language], field: 'comments', type: 'textarea' }
       ]
         const families_columns = [
