@@ -861,5 +861,15 @@
     {
         "en": "Send SMS",
         "he": "שלח הודעה"
+    },
+    "experience":
+    {
+        "en": "experience",
+        "he": "חווית האירוח"
+    },
+    "want_the_same":
+    {
+        "en": "Will be happy to host again",
+        "he": "ישמחו לארח שוב"
     }
 }

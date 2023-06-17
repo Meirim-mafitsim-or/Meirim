@@ -8,10 +8,16 @@ import { Col, Row, Container } from 'react-bootstrap';
 import Vidio1 from "../static/vidio_1.mp4";
 import { Button } from 'react-bootstrap';
 import updateAssigning from "../common/updateAssigning"
+import { auth } from '../common/FirebaseApp';
+import { collection, getDoc, doc } from 'firebase/firestore';
+import { db } from '../common/FirebaseApp';
 
 
 export default function Home() {
-    updateAssigning();
+    const user = auth.currentUser;
+    if (user) {                  
+        updateAssigning();
+    }
     const { language } = React.useContext(LanguageContext);
     return (
         <div className="home-color">
