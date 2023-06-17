@@ -17,6 +17,7 @@ import AddCoordinator from './AddCoordinator';
 import Spinner from 'react-bootstrap/Spinner';
 import { getCampers, getCoordinators } from '../common/Database';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { DataGrid } from '@mui/x-data-grid';
 
 
 async function createAssigningDoc(settlement) {
@@ -24,11 +25,7 @@ async function createAssigningDoc(settlement) {
   const collectionRef = collection(db, 'assignings');
 
   const data = {
-    assignings: [{
-      familyName: "",
-      phoneNumber: "",
-      campersId: []
-    }]
+    assignings: []
   };
 
   const docRef = doc(collectionRef, settlement);
@@ -38,6 +35,14 @@ async function createAssigningDoc(settlement) {
     return;
   }
   await setDoc(doc(collectionRef, settlement), data);
+}
+
+function campersEscapeDate(campers){
+  return campers.map((camper) => {
+    if (camper.birth_date)
+      camper.birth_date = new Date(camper.birth_date.seconds * 1000);
+    return camper;
+  });
 }
 
 
@@ -62,9 +67,31 @@ export default function FormCreatShabat() {
   });
 
 
-
+  const campers_columns = [
+    {headerName: strings.camper_id[language], field: 'camper_id', type: 'text'},
+    {headerName: strings.first_name[language], field: 'first_name', type: 'text'},
+    {headerName: strings.last_name[language], field: 'last_name', type: 'text'},
+    {headerName: strings.birth_date[language], field: 'birth_date', type: 'date'},
+    {headerName: strings.gender[language], field: 'gender', type: 'select', options: 
+      {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
+    },
+    {headerName: strings.city[language],field: 'city',type: 'text'},
+    {headerName: strings.address[language],field: 'address',type: 'text'},
+    {headerName: strings.frame[language], field: 'frame', type: 'text' },
+    { headerName: strings.disability_definition[language], field: 'disability_definition', type: 'text' },
+    { headerName: strings.functioning_level[language], field: 'functioning_level', type: 'select',
+      options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
+    },
+    { headerName: strings.allergies[language], field: 'allergies', type: 'text' },
+    { headerName: strings.parent_name[language], field: 'parent_name', type: 'text' },
+    { headerName: strings.parent_phone[language], field: 'parent_phone', type: 'text' },
+    { headerName: strings.branch[language], field: 'branch', type: 'text' },
+    { headerName: strings.tutor[language], field: 'tutor', type: 'text' },
+    { headerName: strings.tutor_phone[language], field: 'tutor_phone', type: 'text' },
+    { headerName: strings.special_comment[language], field: 'comments', type: 'textarea' }
+  ]
   useEffect(() => {
-    getCampers().then(Campers => setCampers(Campers))
+    getCampers().then(campersEscapeDate).then(Campers => setCampers(Campers))
     getCoordinators().then(Coordinators => setCoordinators(Coordinators))
   }, []);
 
@@ -79,16 +106,15 @@ export default function FormCreatShabat() {
 
   });
 
-  const options = Campers.map((camper, index) => ({
-    "value": camper, "label": camper.firstName
-  }));
+  // const options = Campers.map((camper, index) => ({
+  //   "value": camper, "label": camper.first_name
+  // }));
 
   const optionsCoordinators = Coordinators.map((coordinator, index) => ({
     "value": coordinator, "label": coordinator.first_name + " " + coordinator.last_name + " - " + coordinator.place_name
   }));
 
   
-
   /* ----------------------------------------after submit--------------------------------------------- */
 
 
@@ -141,8 +167,8 @@ export default function FormCreatShabat() {
     const id = await createRegistration();
 
     const campersField = choosenCampers.map((camper, index) => ({
-      id: camper.value.id,//here add id
-      familie: "",
+      id: camper,//here add id
+      family: "",
       assigning: false,
     }));  
 
@@ -217,14 +243,48 @@ export default function FormCreatShabat() {
                   <div className="m-auto w-100">
                     {/* <Form.Label>{strings.campers[language]}</Form.Label> */}
                     {/* select first all the campers and than can delete the one you dont want */}
-                    <Select
+                    {/* add title */}
+                    <h5 className='mb-3'>{strings.select_campers[language]}</h5>
+                    <DataGrid 
+                            rows={Campers}
+                            columns={campers_columns}
+                            initialState={{
+                              pagination: {
+                                paginationModel: { page: 0, pageSize: 5 },
+                              },
+                              columns: {
+                                columnVisibilityModel: {
+                                  // Hide columns status and traderName, the other columns will remain visible
+                                  camper_id: false,
+                                  city: false,
+                                  address: false,
+                                  disabilityDefinition: false,
+                                  allergies: false,
+                                  parentName: false,
+                                  parentPhone: false,
+                                  branch: false,
+                                  tutor: false,
+                                  tutorPhone: false,
+                                  comments: false,
+
+                                },
+                              },                          
+                            }}
+                            pageSizeOptions={[5, 10]}
+                            checkboxSelection
+                            onRowSelectionModelChange={(newRowSelectionModel) => {
+                                setChoosenCampers(newRowSelectionModel);
+                              }}
+                              rowSelectionModel={choosenCampers}
+                          />
+                    {/* <Select
                       isMulti
                       onChange={(e) => setChoosenCampers(e)}
                       options={options}
                       placeholder={strings.select_campers[language]}
                       // isInvalid={invalid.choosenCampers}
                       // required
-                    />
+                    /> */}
                   </div>
                 </div>
               </Form.Group>

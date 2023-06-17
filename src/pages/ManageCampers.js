@@ -6,6 +6,32 @@ import { LanguageContext } from '../common/LanguageContext';
 import strings from '../static/Strings.json';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import * as XLSX from 'xlsx';
+import moment from 'moment';
+
+function parseDate(dateString) {
+  const formats = [
+    'YYYY-MM-DD',
+    'MM/DD/YYYY',
+    'MM/DD/YY',
+    'DD/MM/YYYY',
+    'DD/MM/YY',
+    'YYYY/MM/DD',
+    'DD.MM.YYYY',
+    'D.MM.YYYY',
+    'DD.M.YYYY',
+    'D.M.YYYY',
+  ];
+
+  for (let i = 0; i < formats.length; i++) {
+    const format = formats[i];
+    const date = moment(dateString, format, true);
+    if (date.isValid()) {
+      return date.toDate();
+    }
+  }
+
+  return null;
+}
 
 function campersEscapeDate(campers){
   return campers.map((camper) => {
@@ -79,10 +105,11 @@ function CampersPreviewModal({campers, setCampers, show, setShow, handleSubmit }
   return (
     <Modal className="modal-xl" show={show} onHide={() => setShow(false)}>
       <Modal.Header closeButton>
-        <Modal.Title>Modal heading</Modal.Title>
+        <Modal.Title>{strings.add_camper[language]}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <ManagebleTable
+          title={strings.campers[language]}
           data={campers}
           columns={campers_columns}
           onEdit={handleUpdateCapmer}
@@ -92,10 +119,10 @@ function CampersPreviewModal({campers, setCampers, show, setShow, handleSubmit }
       <Modal.Footer>
         {campers.filter(camper=>!camper.camper_id).length>0 && <p style={{color: 'red'}}>{error}</p>}
         <Button variant="secondary" onClick={() => setShow(false)}>
-          Close
+          {strings.close[language]}
         </Button>
         <Button variant="primary" onClick={() => handleSubmitCampers(campers)}>
-          Save Changes
+          {strings.add[language]}
         </Button>
         {/* if any of the campers is not valid, show error message */}
       </Modal.Footer>
@@ -112,9 +139,9 @@ export default function ManageCampers() {
   
   const campers_columns = [
     {title: strings.camper_id[language], field: 'id', type: 'text', invisible: true, readOnly: true},
-    {title: strings.first_name[language], field: 'first_name', type: 'text'},
+    {title: strings.first_name[language], field: 'first_name', type: 'text',},
     {title: strings.last_name[language], field: 'last_name', type: 'text'},
-    {title: strings.birth_date[language], field: 'birth_date', type: 'date', invisible: true},
+    {title: strings.birth_date[language], field: 'birth_date', type: 'date', invisible: true, validate: rowData => rowData instanceof Date && !isNaN(rowData)},
     {title: strings.gender[language], field: 'gender', type: 'select', options: 
       {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
     },
@@ -127,10 +154,10 @@ export default function ManageCampers() {
     },
     { title: strings.allergies[language], field: 'allergies', type: 'text' },
     { title: strings.parent_name[language], field: 'parent_name', type: 'text', invisible: true },
-    { title: strings.parent_phone[language], field: 'parent_phone', type: 'text', invisible: true },
+    { title: strings.parent_phone[language], field: 'parent_phone', type: 'text', invisible: true, validate: rowData => rowData.match(/^[0-9]{10}$/)},
     { title: strings.branch[language], field: 'branch', type: 'text' },
     { title: strings.tutor[language], field: 'tutor', type: 'text' },
-    { title: strings.tutor_phone[language], field: 'tutor_phone', type: 'text' },
+    { title: strings.tutor_phone[language], field: 'tutor_phone', type: 'text', validate: rowData => rowData.match(/^[0-9]{10}$/)},
     { title: strings.special_comment[language], field: 'comments', type: 'textarea' }
   ]
 
@@ -163,6 +190,18 @@ export default function ManageCampers() {
               titles.forEach((header, index) => {
                 item[header] = row[index];
               });
+              // birth_date to date object
+              let genderOptions = campers_columns.filter((item => item.field === 'gender'))[0].options;
+              // find gender key or value in the options and retrun the key or null
+              if (Object.values(genderOptions).includes(item['gender'])) {
+                item['gender'] = Object.keys(genderOptions).find(key => genderOptions[key] === item['gender']);
+              }
+              let functioning_levelOptions = campers_columns.filter((item => item.field === 'functioning_level'))[0].options;
+              if (Object.values(functioning_levelOptions).includes(item['functioning_level'])) {
+                item['functioning_level'] = Object.keys(functioning_levelOptions).find(key => functioning_levelOptions[key] === item['functioning_level']);
+              }
+
+              item['birth_date'] = parseDate(item['birth_date']);
               item['camper_id'] = item['id'];
               item['id'] = i;
               return item;
@@ -206,6 +245,7 @@ export default function ManageCampers() {
           delete camper[key];
         }
         camper.birth_date = new Date(camper.birth_date);
+        if (camper[key]===undefined) delete camper[key];
       });
     });
     addManyCampers(newCampers).then(getCampers).then(campersEscapeDate).then(campers => setCampers(campers));
@@ -213,7 +253,7 @@ export default function ManageCampers() {
   }
 
   return (
-    <Container>
+    <Container className='pt-5'>
       <CampersPreviewModal
         campers={newCampers}
         setCampers={setNewCampers}

@@ -29,7 +29,7 @@
 html, body {
     margin: 0;
     height: 100%;
-    background-color: #0D2D46;
+    /* background-color: #0D2D46; */
     /* background-color: linear-gradient(90deg,#0D2D46,yellow); */
     background-image: url("../static/background.jpeg");
     /* background-size: cover; */

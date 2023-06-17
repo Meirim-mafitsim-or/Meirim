@@ -64,9 +64,10 @@ export default function ManageCoordinators() {
     updateCoordinator(coordinatorId, coordinators_columns).then(getCoordinators).then(coordinators => setCoordinators(coordinators));
   }
 
-  const handleDeleteCoordinator = (coordinatorId) => {
+  const handleDeleteCoordinator = (coordinatorIds) => {
     const confirmed = window.confirm(strings.delete_confirm_coordinator[language]);
     if (confirmed){
+        coordinatorIds.forEach(coordinatorId => {
         getEvents().then(events => {
           events.forEach(event => {
             //delete fromv the shabats that the date is bigger then now
@@ -80,6 +81,8 @@ export default function ManageCoordinators() {
           })
         })
         deleteCoordinator(coordinatorId).then(getCoordinators).then(coordinators => setCoordinators(coordinators));
+    
+      });
     }
   }
 

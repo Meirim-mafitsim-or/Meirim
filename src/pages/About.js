@@ -30,7 +30,9 @@ export default function About() {
                     </IconButton>
                     ) : null}
                 </Card.Title>
-                <Card.Text>
+                <Card.Text style={{
+                    whiteSpace: 'pre-line'
+                }}>
                     {editing && user && user.role==='admin' ? (
                         <textarea
                             className="form-control"

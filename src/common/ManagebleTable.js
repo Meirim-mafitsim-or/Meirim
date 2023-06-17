@@ -62,6 +62,7 @@ function ItemModal({ columns, onSubmit, item, inputs_per_row = 2, icon = <AddIco
     const [content, setContent] = useState(item ? item : fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
     const handleClose = () => {
         setShow(false);
+        setContent(item ? item : fields.reduce((obj, key) => ({ ...obj, [key]: '' }), {}));
     }
     const handleShow = () => setShow(true);
     const handleInputChange = (event) => {
@@ -398,13 +399,23 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
     };
     const handleDelete = () => {
         let ids = selected.map((item) => item.id);
-        // for (let item of selected) {
-        //     onDelete(item.id);
-        // }
-
         onDelete(ids);
         setSelected([]);
     }
+
+    const handleAdd = (item) => {
+        // escape date type
+        let newContent = columns.reduce((obj, column) => {
+            if (!item[column.field]) return obj;
+            if (column.type === 'date') {
+                return { ...obj, [column.field]: textToDate(item[column.field])};
+            }
+            return { ...obj, [column.field]: item[column.field] };
+        }, {});
+            
+        onAdd(newContent);
+    };
+
     return (
         <Paper  className='mt-5' sx={{ width: '100%', overflow: 'hidden' }}>
             <Toolbar>
@@ -439,7 +450,7 @@ export default function ManagableTable({ columns, data, onDelete, onEdit, onAdd,
                 {onAdd && (
                     <Tooltip title={strings.add[language]}>
                         <>
-                            <ItemModal columns={columns} onSubmit={onAdd} />
+                            <ItemModal columns={columns} onSubmit={handleAdd} />
                         </>
                     </Tooltip>
                 )}
