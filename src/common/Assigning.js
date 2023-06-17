@@ -76,8 +76,8 @@ export default function Assigning({
   // Filter campers based on search query and gender filter
   const filteredCampers = campers.filter(
     (camper) =>
-      (camper.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        camper.lastName.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (camper.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        camper.last_name.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (!filterByGender || camper.gender === filterByGender) &&
       (!showFilteredCampers || historyAss.includes(camper.id))
   );
@@ -303,7 +303,7 @@ export default function Assigning({
               <th>{strings.first_name[language]}</th>
               <th>{strings.last_name[language]}</th>
               <th>{strings.gender[language]}</th>
-              <th>{strings.age[language]}</th>
+              <th>{strings.birth_date[language]}</th>
               <th>{strings.special_comment[language]}</th>
               <th>{strings.assigned[language]}</th>
               <th>{strings.choose[language]}</th>
@@ -313,10 +313,10 @@ export default function Assigning({
             {sortedCampers.map((item, index) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{item.firstName}</td>
-                <td>{item.lastName}</td>
+                <td>{item.first_name}</td>
+                <td>{item.last_name}</td>
                 <td>{item.gender}</td>
-                <td>{item.age}</td>
+                <td>{item.birth_date}</td>
                 <td>{item.comments}</td>
                 <td>{item.assigning ? <BiCheck size={20} /> : null}</td>
                 <td>

@@ -8,25 +8,25 @@ export default function AddModal({ onAdd, campers, show, setShow}) {
     const { language } = useContext(LanguageContext);
     const columns = [
       {headerName: strings.camper_id[language], field: 'camper_id', type: 'text'},
-      {headerName: strings.first_name[language], field: 'firstName', type: 'text'},
-      {headerName: strings.last_name[language], field: 'lastName', type: 'text'},
-      {headerName: strings.birth_date[language], field: 'birthDate', type: 'date'},
+      {headerName: strings.first_name[language], field: 'first_name', type: 'text'},
+      {headerName: strings.last_name[language], field: 'last_name', type: 'text'},
+      {headerName: strings.birth_date[language], field: 'birth_date', type: 'date'},
       {headerName: strings.gender[language], field: 'gender', type: 'select', options: 
         {'male': strings.male[language], 'female': strings.female[language], 'other': strings.other[language] }
       },
       {headerName: strings.city[language],field: 'city',type: 'text'},
       {headerName: strings.address[language],field: 'address',type: 'text'},
       {headerName: strings.frame[language], field: 'frame', type: 'text' },
-      { headerName: strings.disability_definition[language], field: 'disabilityDefinition', type: 'text' },
-      { headerName: strings.functioning_level[language], field: 'functioningLevel', type: 'select',
+      { headerName: strings.disability_definition[language], field: 'disability_definition', type: 'text' },
+      { headerName: strings.functioning_level[language], field: 'functioning_level', type: 'select',
         options: { 'high': strings.high[language], 'medium': strings.medium[language], 'low': strings.low[language] }
       },
       { headerName: strings.allergies[language], field: 'allergies', type: 'text' },
-      { headerName: strings.parent_name[language], field: 'parentName', type: 'text' },
-      { headerName: strings.parent_phone[language], field: 'parentPhone', type: 'text' },
+      { headerName: strings.parent_name[language], field: 'parent_name', type: 'text' },
+      { headerName: strings.parent_phone[language], field: 'parent_phone', type: 'text' },
       { headerName: strings.branch[language], field: 'branch', type: 'text' },
       { headerName: strings.tutor[language], field: 'tutor', type: 'text' },
-      { headerName: strings.tutor_phone[language], field: 'tutorPhone', type: 'text' },
+      { headerName: strings.tutor_phone[language], field: 'tutor_phone', type: 'text' },
       { headerName: strings.special_comment[language], field: 'comments', type: 'textarea' }
     ]
   
