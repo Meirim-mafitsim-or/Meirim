@@ -200,7 +200,6 @@ export default function FormEvent() {
                   const family = await getFamiliesRegistrationByIds([deletedCamper.family], familiesRegistration);
                   family[0].camper = null;
                   updateFamilyRegistration(family[0], familiesRegistration, deletedCamper.family);
-                  
                 }
               });
               
